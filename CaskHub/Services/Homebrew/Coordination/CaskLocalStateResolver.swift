@@ -53,9 +53,7 @@ struct CaskLocalStateResolver {
         }
         if macAppStoreApplication(for: cask) != nil { return true }
 
-        let matchingNames = Set(
-            cask.appArtifactNames + cask.packageAppNameCandidates
-        )
+        let matchingNames = Set(cask.storeAppNames)
         .intersection(snapshot.macAppStoreAppNames)
         guard !matchingNames.isEmpty else { return false }
 
@@ -184,13 +182,12 @@ struct CaskLocalStateResolver {
     }
 
     func launchURL(for cask: Cask) -> URL? {
-        existingBundleURL(named: launchableBundleNames(for: cask))
+        guard isInstalled(token: cask.token) else { return externalLaunchURL(for: cask) }
+        return existingBundleURL(named: launchableBundleNames(for: cask))
     }
 
     func externalLaunchURL(for cask: Cask) -> URL? {
-        macAppStoreApplication(for: cask)?.url
-            ?? snapshot.externalApplicationOwners[cask.token]?.url
-            ?? existingBundleURL(named: externalBundleNameCandidates(for: cask))
+        externalApplication(for: cask)?.url
     }
 
     func externalAppVersion(for cask: Cask) -> String? {
@@ -250,7 +247,7 @@ struct CaskLocalStateResolver {
         if snapshot.installationIndex.catalogTokens.contains(cask.token) {
             return snapshot.installationIndex.macAppStoreApplications[cask.token]
         }
-        return (cask.appArtifactNames + cask.packageAppNameCandidates).lazy
+        return cask.storeAppNames.lazy
             .flatMap { snapshot.detectedApplicationsByBundleName[$0] ?? [] }
             .first { application in
                 guard application.isMacAppStore else { return false }
@@ -265,13 +262,13 @@ struct CaskLocalStateResolver {
         _ identifier: String,
         matches cask: Cask
     ) -> Bool {
-        if !cask.applicationBundleIdentifiers.isEmpty {
+        if !cask.storeBundleIdentifiers.isEmpty {
             return ApplicationIdentityMatcher.applicationBundleIdentifier(
                 identifier,
-                matchesAny: cask.applicationBundleIdentifiers
+                matchesAny: cask.storeBundleIdentifiers
             )
         }
-        return cask.hasPackageArtifact && ApplicationIdentityMatcher.bundleIdentifier(
+        return cask.hasPackageArtifact && cask.catalogPackageProducts == nil && ApplicationIdentityMatcher.bundleIdentifier(
             identifier,
             matchesPackageIdentifiers: cask.packageIdentifiers
         )
