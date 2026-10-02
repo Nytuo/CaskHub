@@ -217,6 +217,16 @@ nonisolated struct Cask: Decodable, Identifiable, Hashable, Sendable {
     var catalogPackageAppIdentifiers: [String: [String]]?
     /// Conditional payloads, used only by the installed-package receipt scanner.
     var catalogPackageCandidates: [PackageApplicationIdentity]?
+    /// Reviewed product association: nil is unreviewed; empty requires Homebrew registration.
+    var catalogPackageProducts: [PackageApplicationIdentity]?
+
+    var storeAppNames: [String] {
+        catalogPackageProducts?.map(\.bundleName) ?? (appArtifactNames + packageAppNameCandidates)
+    }
+
+    var storeBundleIdentifiers: [String] {
+        catalogPackageProducts?.map(\.bundleIdentifier) ?? applicationBundleIdentifiers
+    }
 
     var catalogPackageAppNames: [String] {
         catalogPackageAppIdentifiers?.keys.sorted() ?? []

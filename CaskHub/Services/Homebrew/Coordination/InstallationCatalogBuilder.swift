@@ -52,15 +52,14 @@ nonisolated struct InstallationCatalogBuilder: Sendable {
         _ casks: [Cask]
     ) -> [MacAppStoreCaskSignature] {
         casks.compactMap { cask -> MacAppStoreCaskSignature? in
-            let bundleNames = Set(
-                cask.appArtifactNames + cask.packageAppNameCandidates
-            )
+            let bundleNames = Set(cask.storeAppNames)
             guard !bundleNames.isEmpty else { return nil }
             return MacAppStoreCaskSignature(
                 token: cask.token,
                 bundleNames: bundleNames,
-                hasPackageArtifact: cask.hasPackageArtifact,
-                applicationBundleIdentifiers: cask.applicationBundleIdentifiers,
+                hasPackageArtifact: cask.hasPackageArtifact && cask.catalogPackageProducts == nil,
+                isReviewedProduct: cask.catalogPackageProducts != nil,
+                applicationBundleIdentifiers: cask.storeBundleIdentifiers,
                 packageIdentifiers: cask.packageIdentifiers
             )
         }
@@ -93,7 +92,8 @@ nonisolated struct InstallationCatalogBuilder: Sendable {
                 receiptPatterns: cask.packageIdentifiers,
                 appNameCandidates: cask.packageAppNameCandidates,
                 verifiedBundleIdentifiersByName: cask.catalogPackageAppIdentifiers ?? [:],
-                receiptCandidates: cask.catalogPackageCandidates ?? []
+                receiptCandidates: cask.catalogPackageCandidates ?? [],
+                productIdentities: cask.catalogPackageProducts
             )
         }
     }

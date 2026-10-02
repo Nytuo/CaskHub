@@ -72,18 +72,23 @@ nonisolated struct InstallationIndexBuilder: Sendable {
         installedCasks: [String: LocalCaskInstallation]
     ) -> [String: DetectedApplication] {
         let installedTokens = Set(installedCasks.keys)
+        let reviewedNames = Set(signatures.filter(\.isReviewedProduct).flatMap(\.bundleNames))
         var signaturesByBundleName: [String: [MacAppStoreCaskSignature]] = [:]
         for signature in signatures where !installedTokens.contains(signature.token) {
-            for bundleName in signature.bundleNames {
+            for bundleName in signature.bundleNames where signature.isReviewedProduct
+                || !signature.applicationBundleIdentifiers.isEmpty || !reviewedNames.contains(bundleName) {
                 signaturesByBundleName[bundleName, default: []].append(signature)
             }
         }
 
         var result: [String: DetectedApplication] = [:]
         for application in applications where application.isMacAppStore {
-            for signature in signaturesByBundleName[application.bundleName] ?? []
-                where result[signature.token] == nil
-                    && macAppStoreApplication(application, matches: signature) {
+            let matches = (signaturesByBundleName[application.bundleName] ?? []).filter {
+                macAppStoreApplication(application, matches: $0)
+            }
+            // Conflicting reviewed products remain unresolved, just like receipt matching.
+            guard !matches.contains(where: \.isReviewedProduct) || matches.count == 1 else { continue }
+            for signature in matches where result[signature.token] == nil {
                 result[signature.token] = application
             }
         }

@@ -49,7 +49,7 @@ nonisolated struct PackageReceiptResolver: Sendable {
             }
         }
         var receipts: [String: Receipt] = [:]
-        let conditionalReceipts = Set(signatures.flatMap(\.receiptCandidates).map(\.packageIdentifier))
+        let conditionalReceipts = Set(signatures.flatMap(\.receiptIdentities).map(\.packageIdentifier))
         for receipt in relevantReceipts {
             let location = conditionalReceipts.contains(receipt)
                 ? query(["--pkg-info-plist", receipt]).flatMap {
@@ -82,6 +82,10 @@ nonisolated struct PackageReceiptResolver: Sendable {
             signatures: signatures, receipts: receipts,
             applicationsByName: applicationsByName, homebrewInstalledTokens: homebrewInstalledTokens
         )
+        // A conditional identity must pass its receipt/path checks. A different
+        // cask's cleanup-name fallback cannot claim it when those checks fail,
+        // or outrank the verified match when they succeed.
+        let conditionalNames = Set(signatures.flatMap(\.receiptIdentities).map(\.bundleName))
         var candidates = signatures.compactMap { signature -> PackageInstallationCandidate? in
             let rejectedNames = signature.verifiedBundleIdentifiersByName.keys.filter { name in
                 let matches = applicationsByName[name] ?? []
@@ -90,15 +94,21 @@ nonisolated struct PackageReceiptResolver: Sendable {
                     identifier, matchesAny: signature.verifiedBundleIdentifiersByName[name] ?? []
                 )
             }
-            let conditionalNames = Set(signature.receiptCandidates.map(\.bundleName))
+            // Homebrew registration establishes the managed token independently
+            // of which standalone products share the package's components.
+            let managed = homebrewInstalledTokens.contains(signature.token)
+            let availableNames = managed ? availableAppNames : availableAppNames.subtracting(conditionalNames)
+            let fallbackNames = managed || signature.productIdentities == nil ? availableNames : []
             return candidate(
                 for: signature,
                 receipts: receipts,
-                availableAppNames: availableAppNames.subtracting(rejectedNames).subtracting(conditionalNames),
+                availableAppNames: fallbackNames.subtracting(rejectedNames)
+                    .subtracting(signature.receiptIdentities.map(\.bundleName)),
                 receiptVerifiedApps: verifiedCandidates[signature.token] ?? [],
                 isHomebrewInstalled: homebrewInstalledTokens.contains(signature.token)
             )
         }
+        // ponytail: unreviewed packages retain legacy ranking until their mappings are reviewed.
         candidates.sort {
             if $0.isHomebrewInstalled != $1.isHomebrewInstalled {
                 return $0.isHomebrewInstalled
@@ -254,12 +264,13 @@ extension PackageReceiptResolver {
     ) -> [String: Set<String>] {
         var claims: [String: Set<String>] = [:]
         for signature in signatures {
-            for identity in signature.receiptCandidates where
+            for identity in signature.receiptIdentities where
                 signature.receiptPatterns.contains(where: { Self.identifier(identity.packageIdentifier, matches: $0) })
                     && receipts[identity.packageIdentifier] != nil {
                 // A component can contain auxiliary apps (for example, Google Drive's Docs shortcut).
                 // Receipt ownership alone must not identify those as the parent product.
-                guard Self.payloadAppName(identity.bundleName, matches: signature.appNameCandidates),
+                guard signature.productIdentities != nil
+                    || Self.payloadAppName(identity.bundleName, matches: signature.appNameCandidates),
                       let applications = applicationsByName[identity.bundleName], applications.count == 1,
                       let application = applications.first,
                       let location = receipts[identity.packageIdentifier]?.location,
