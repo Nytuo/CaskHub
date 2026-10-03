@@ -365,7 +365,7 @@ struct PillButton: View {
             Text(title)
                 .font(CHType.button)
                 .foregroundStyle(foreground)
-                .padding(.vertical, 4)
+                .frame(height: CHSize.pillHeight)
                 .padding(.horizontal, 13)
                 .background(Capsule().fill(background))
                 .overlay(Capsule().strokeBorder(border, lineWidth: 1))
