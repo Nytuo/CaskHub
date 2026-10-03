@@ -270,11 +270,10 @@ struct UtilityTopBar: View {
             if let summary {
                 Text(summary)
                     .font(CHType.countMeta)
-                    .foregroundStyle(Color.chTextMuted)
+                    .foregroundStyle(CHType.isNative ? Color.chTextBody : Color.chTextMuted)
             }
         }
-        .padding(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
-        .glassPanel(radius: 999, surface: .chSurfaceToolbar)
+        .toolbarChrome(classicInsets: EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20), radius: 999)
     }
 }
 

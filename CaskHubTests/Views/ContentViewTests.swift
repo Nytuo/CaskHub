@@ -489,7 +489,7 @@ final class TopBarViewTests: XCTestCase {
         AppStyle.current = .native
         XCTAssertEqual(Color.chHairlineStrong.resolve(in: environment).opacity, 0)
         XCTAssertEqual(Color.chActionInstallBorder.resolve(in: environment).opacity, 0)
-        XCTAssertEqual(Color.chSurfaceStatusbar.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(Color.chBadgeBorder.resolve(in: environment).opacity, 0)
         XCTAssertEqual(CHRadius.card, 14)
         XCTAssertEqual(CHType.trackingLabel, 0.9)
     }

@@ -66,9 +66,13 @@ struct StatusBarView: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 7)
         .background {
-            Rectangle()
-                .fill(Color.chSurfaceStatusbar)
-                .background(.ultraThinMaterial)
+            if CHType.isNative {
+                Rectangle().fill(Color.chSurfaceStatusbar)
+            } else {
+                Rectangle()
+                    .fill(Color.chSurfaceStatusbar)
+                    .background(.ultraThinMaterial)
+            }
         }
         .overlay(alignment: .top) {
             Rectangle().fill(Color.chHairline).frame(height: 1)
@@ -79,7 +83,7 @@ struct StatusBarView: View {
     private func operationView(_ operation: CaskOperationStatus) -> some View {
         HStack(spacing: 8) {
             Rectangle()
-                .fill(Color.chDivider)
+                .fill(Color.chEdge)
                 .frame(width: 1, height: 13)
 
             ProgressView()

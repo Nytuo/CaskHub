@@ -71,6 +71,13 @@ struct SidebarView: View {
             .contentMargins(.bottom, 44, for: .scrollContent)
         }
         .ignoresSafeArea(.container, edges: .top)
+        .background {
+            if CHType.isNative {
+                Color.chNativeSidebar
+                    .overlay(alignment: .trailing) { Color.chHairline.frame(width: 1) }
+                    .ignoresSafeArea()
+            }
+        }
         .onChange(of: showAdoptApps) { _, shown in
             if !shown, selection == .library(.adopt) {
                 selection = .library(.installed)

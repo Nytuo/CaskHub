@@ -28,7 +28,7 @@ struct MaintenanceDiskCard: View {
         .overlay {
             if !model.hasDiskSnapshot {
                 RoundedRectangle(cornerRadius: CHRadius.card)
-                    .fill(Color.chInk.opacity(0.50))
+                    .fill(Color.chScrim)
                     .overlay {
                         ProgressView(String(localized: .maintenanceDiskMeasuring))
                             .font(CHType.body)

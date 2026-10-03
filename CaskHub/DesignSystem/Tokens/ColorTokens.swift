@@ -52,7 +52,7 @@ extension Color {
     static var chSurfaceToolbar: Color { styled(Classic.surfaceToolbar, Native.glass) }
     static var chSurfaceCard: Color { styled(Classic.surfaceCard, Native.card) }
     static var chSurfaceHero: Color { styled(Classic.surfaceHero, Native.card) }
-    static var chSurfaceStatusbar: Color { styled(Classic.surfaceStatusbar, .clear) }
+    static var chSurfaceStatusbar: Color { styled(Classic.surfaceStatusbar, Native.window) }
     static var chSurfaceField: Color { styled(Classic.surfaceField, Native.field) }
     static var chSurfaceWell: Color { styled(Classic.surfaceField, Native.well) }
     static var chSurfaceTerminal: Color { styled(chInk, Native.terminal) }
@@ -61,7 +61,8 @@ extension Color {
     // ── Hairlines & separators ─────────────────────────
     static var chHairline: Color { styled(Classic.hairline, Native.separator) }
     static var chHairlineStrong: Color { styled(Classic.hairlineStrong, .clear) }
-    static var chDivider: Color { styled(Classic.hairlineStrong, Native.separator) }
+    static var chEdge: Color { styled(Classic.hairlineStrong, Native.separator) }
+    static var chScrim: Color { styled(chInk.opacity(0.50), Native.scrim) }
 
     // ── Text ───────────────────────────────────────────
     static var chTextTitle: Color { styled(Classic.textTitle, Native.textPrimary) }
@@ -173,6 +174,7 @@ private enum Native {
     static let terminal = adaptive(0x33304A, 0x38383C)
     static let separator = adaptive(0x000000, 0xFFFFFF, alpha: (0.08, 0.08))
     static let segmentSelected = adaptive(0x000000, 0xFFFFFF, alpha: (0.07, 0.13))
+    static let scrim = adaptive(0xFDFDFE, 0x1C1C1E, alpha: (0.7, 0.6))
 
     static let textPrimary = adaptive(0x1D1D1F, 0xF5F5F7)
     static let textSecondary = adaptive(0x6E6E73, 0xA1A1A6)

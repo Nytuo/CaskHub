@@ -54,8 +54,8 @@ struct TopBarView: View {
                 }
             }
         }
-        .padding(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 10))
-        .glassPanel(radius: 24, surface: .chSurfaceToolbar)
+        .toolbarGlassGroup(spacing: 10)
+        .toolbarChrome(classicInsets: EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 10), radius: 24)
     }
 
     @ViewBuilder
@@ -66,7 +66,7 @@ struct TopBarView: View {
             .lineLimit(1)
         Text("\(caskCount) casks")
             .font(CHType.countMeta)
-            .foregroundStyle(Color.chTextMuted)
+            .foregroundStyle(CHType.isNative ? Color.chTextBody : Color.chTextMuted)
             .lineLimit(1)
     }
 
@@ -108,10 +108,11 @@ struct TopBarView: View {
             .foregroundStyle(isOn ? Color.chActionUpdateFg : Color.chTextTitle)
             .padding(.vertical, 5)
             .padding(.horizontal, 14)
-            .background(Capsule().fill(isOn ? Color.chActionUpdateBg : Color.chSurfaceField))
-            .overlay(Capsule().strokeBorder(
-                isOn ? Color.chActionUpdateBorder : Color.chHairlineStrong, lineWidth: 1
-            ))
+            .toolbarCapsule(
+                fill: isOn ? .chActionUpdateBg : .chSurfaceField,
+                border: isOn ? .chActionUpdateBorder : .chHairlineStrong,
+                isNeutral: !isOn
+            )
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -133,8 +134,7 @@ struct TopBarView: View {
             .foregroundStyle(Color.chTextTitle)
             .padding(.vertical, 5)
             .padding(.horizontal, 14)
-            .background(Capsule().fill(Color.chSurfaceField))
-            .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
+            .toolbarCapsule()
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -173,8 +173,7 @@ struct TopBarView: View {
             .foregroundStyle(Color.chTextTitle)
             .padding(.vertical, 5)
             .padding(.horizontal, 14)
-            .background(Capsule().fill(Color.chSurfaceField))
-            .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
+            .toolbarCapsule()
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -224,9 +223,8 @@ struct TopBarView: View {
             segment(.grid, icon: "square.grid.2x2")
             segment(.list, icon: "list.bullet")
         }
-        .padding(2)
-        .background(Capsule().fill(Color.chSurfaceField))
-        .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
+        .padding(CHType.isNative ? 3 : 2)
+        .toolbarCapsule()
     }
 
     private func segment(_ mode: ViewMode, icon: String) -> some View {
@@ -260,7 +258,9 @@ struct TopBarView: View {
                 .foregroundStyle(Color.chTextTitle)
                 .focused(searchFocus)
                 .onSubmit { onSubmitSearch?() }
-            if !searchText.isEmpty {
+            if searchText.isEmpty, CHType.isNative {
+                searchShortcutHint
+            } else if !searchText.isEmpty {
                 Button {
                     searchText = ""
                 } label: {
@@ -276,12 +276,17 @@ struct TopBarView: View {
         .padding(.vertical, 5)
         .padding(.horizontal, 12)
         .frame(minWidth: 140, idealWidth: 200, maxWidth: 240)
-        .background(Capsule().fill(Color.chSurfaceField))
-        .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
+        .toolbarCapsule()
     }
 }
 
 private extension TopBarView {
+    var searchShortcutHint: some View {
+        Text(verbatim: "⌘F")
+            .font(.custom(CHType.monoFamily, size: 10))
+            .foregroundStyle(Color.chTextMuted)
+    }
+
     var updateAllChip: some View {
         Button {
             showUpdateAllConfirmation = true
@@ -299,8 +304,7 @@ private extension TopBarView {
             .foregroundStyle(Color.chActionUpdateFg)
             .padding(.vertical, 5)
             .padding(.horizontal, 14)
-            .background(Capsule().fill(Color.chActionUpdateBg))
-            .overlay(Capsule().strokeBorder(Color.chActionUpdateBorder, lineWidth: 1))
+            .toolbarCapsule(fill: .chActionUpdateBg, border: .chActionUpdateBorder, isNeutral: false)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
