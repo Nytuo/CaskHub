@@ -62,12 +62,7 @@ struct CatalogToolbar: ToolbarContent {
         }
         if let greedyUpdates {
             ToolbarItem(placement: .automatic) {
-                Toggle(isOn: Binding(get: { greedyUpdates }, set: { onToggleGreedy?($0) })) {
-                    Label("Greedy", systemImage: greedyUpdates ? "checkmark.circle.fill" : "circle")
-                        .labelStyle(.titleAndIcon)
-                }
-                .toggleStyle(.button)
-                .help("Also list apps that update themselves (brew upgrade --greedy)")
+                GreedyButton(isOn: greedyUpdates) { onToggleGreedy?($0) }
             }
         }
         if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
@@ -91,6 +86,9 @@ struct CatalogToolbar: ToolbarContent {
                 }
             }
         }
+        if showsSort, analyticsPeriod != nil || recentWindow != nil, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
+        }
         if let analyticsPeriod {
             ToolbarItem(placement: .automatic) {
                 OptionMenu(current: analyticsPeriod, options: AnalyticsPeriod.allCases, label: \.label, systemImage: "clock") {
@@ -104,6 +102,9 @@ struct CatalogToolbar: ToolbarContent {
                     onSelectWindow?($0)
                 }
             }
+        }
+        if #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
         }
         ToolbarItem(placement: .automatic) {
             Picker("View Mode", selection: $viewMode) {
@@ -129,12 +130,44 @@ private struct OptionMenu<Option: Identifiable & Equatable>: View {
                 Toggle(option[keyPath: label], isOn: Binding(get: { option == current }, set: { _ in onSelect(option) }))
             }
         } label: {
-            Label(current[keyPath: label], systemImage: systemImage)
-                .labelStyle(.titleAndIcon)
+            HStack(spacing: 6) {
+                Label(current[keyPath: label], systemImage: systemImage)
+                    .labelStyle(.titleAndIcon)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8, weight: .bold))
+            }
+            .padding(.horizontal, CHSpace.toolbarLabelInset)
         }
+        .menuIndicator(.hidden)
         // Toolbar items keep their first measured width; a new identity re-measures.
         .fixedSize()
         .id(current.id)
+    }
+}
+
+private struct GreedyButton: View {
+    let isOn: Bool
+    let onToggle: (Bool) -> Void
+
+    var body: some View {
+        let button = Button {
+            onToggle(!isOn)
+        } label: {
+            Label("Greedy", systemImage: isOn ? "checkmark.circle.fill" : "circle")
+                .labelStyle(.titleAndIcon)
+                .padding(.horizontal, CHSpace.toolbarLabelInset)
+        }
+        .help("Also list apps that update themselves (brew upgrade --greedy)")
+        .accessibilityAddTraits(isOn ? .isSelected : [])
+
+        if isOn {
+            button
+                .buttonStyle(.borderedProminent)
+                .tint(Color.chAccent.opacity(0.2))
+                .foregroundStyle(Color.chAccent)
+        } else {
+            button
+        }
     }
 }
 
@@ -146,19 +179,26 @@ private struct UpdateAllButton: View {
 
     @State private var showsConfirmation = false
 
+    private var isTinted: Bool {
+        count > 0 && !isUpdatingAll && !isUpdatingHomebrew
+    }
+
     var body: some View {
-        Button {
+        let button = Button {
             showsConfirmation = true
         } label: {
-            if isUpdatingAll {
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small)
-                    Text("Updating…")
+            Group {
+                if isUpdatingAll {
+                    HStack(spacing: 6) {
+                        ProgressView().controlSize(.small)
+                        Text("Updating…")
+                    }
+                } else {
+                    Label("Update All", systemImage: CaskActionStyle.update.icon)
+                        .labelStyle(.titleAndIcon)
                 }
-            } else {
-                Label("Update All", systemImage: CaskActionStyle.update.icon)
-                    .labelStyle(.titleAndIcon)
             }
+            .padding(.horizontal, CHSpace.toolbarLabelInset)
         }
         .disabled(isUpdatingAll || isUpdatingHomebrew)
         .help(
@@ -171,6 +211,15 @@ private struct UpdateAllButton: View {
             Button("Update All", action: onUpdateAll)
         } message: {
             Text(.alertUpdateAllConfirmation(count))
+        }
+
+        if isTinted {
+            button
+                .buttonStyle(.borderedProminent)
+                .tint(CaskActionStyle.update.background)
+                .foregroundStyle(CaskActionStyle.update.foreground)
+        } else {
+            button
         }
     }
 }
