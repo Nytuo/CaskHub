@@ -20,11 +20,11 @@ enum CHType {
     // Display — wordmark, screen titles, section heads
     static var heroTitle: Font { Catalog(scale: 1).hero }
     static var section: Font {
-        isNative ? .system(size: 17, weight: .bold) : Font.custom(displayFamily, size: 16).weight(.heavy)
+        isNative ? .system(size: 15, weight: .bold) : Font.custom(displayFamily, size: 16).weight(.heavy)
     }
 
     static var topBarTitle: Font {
-        isNative ? .system(size: 15, weight: .bold) : Font.custom(displayFamily, size: 18).weight(.heavy)
+        isNative ? .system(size: 17, weight: .bold) : Font.custom(displayFamily, size: 18).weight(.heavy)
     }
 
     // UI — everything else
@@ -105,11 +105,11 @@ extension CHType {
         }
 
         var tag: Font {
-            isNative ? .system(size: 11.5 * scale, weight: .medium) : .custom(uiFamily, size: 10 * scale).weight(.bold)
+            isNative ? .system(size: 11 * scale, weight: .medium) : .custom(uiFamily, size: 10 * scale).weight(.bold)
         }
 
         var description: Font {
-            isNative ? .system(size: 12 * scale) : .custom(uiFamily, size: 11 * scale).weight(.semibold)
+            isNative ? .system(size: 11.5 * scale) : .custom(uiFamily, size: 11 * scale).weight(.semibold)
         }
 
         var body: Font {
