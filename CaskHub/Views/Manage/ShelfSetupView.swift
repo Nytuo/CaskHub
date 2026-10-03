@@ -255,28 +255,6 @@ struct ShelfSetupView: View {
     }
 }
 
-// MARK: - Page Chrome
-
-struct UtilityTopBar: View {
-    let title: String
-    var summary: String?
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(CHType.topBarTitle)
-                .foregroundStyle(Color.chTextTitle)
-            Spacer(minLength: 10)
-            if let summary {
-                Text(summary)
-                    .font(CHType.countMeta)
-                    .foregroundStyle(CHType.isNative ? Color.chTextBody : Color.chTextMuted)
-            }
-        }
-        .toolbarChrome(classicInsets: EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20), radius: 999)
-    }
-}
-
 // MARK: - Picker Sheet
 
 struct AdoptIgnorePickerSheet: View {

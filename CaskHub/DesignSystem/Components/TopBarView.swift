@@ -7,14 +7,43 @@
 
 import SwiftUI
 
-struct TopBarView: View {
+/// Page title and count, inline on the window toolbar's leading edge.
+struct TopBarTitle: ToolbarContent {
     let title: String
-    let caskCount: Int
+    var summary: String?
+
+    var body: some ToolbarContent {
+        if #available(macOS 26, *) {
+            item.sharedBackgroundVisibility(.hidden)
+        } else {
+            item
+        }
+    }
+
+    private var item: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(title)
+                    .font(CHType.topBarTitle)
+                    .foregroundStyle(Color.chTextTitle)
+                if let summary {
+                    Text(summary)
+                        .font(CHType.countMeta)
+                        .foregroundStyle(CHType.isNative ? Color.chTextBody : Color.chTextMuted)
+                }
+            }
+            .lineLimit(1)
+            .fixedSize()
+            .padding(.leading, 4)
+        }
+    }
+}
+
+/// Catalog filters and view mode as system toolbar items; search is attached with `.searchable`.
+struct CatalogToolbar: ToolbarContent {
     @Binding var sortOption: SortOption
     var sortOptions: [SortOption] = SortOption.standard
     @Binding var viewMode: ViewMode
-    @Binding var searchText: String
-    var searchFocus: FocusState<Bool>.Binding
     var analyticsPeriod: AnalyticsPeriod?
     var onSelectPeriod: ((AnalyticsPeriod) -> Void)?
     var recentWindow: RecentlyAddedWindow?
@@ -26,301 +55,117 @@ struct TopBarView: View {
     var greedyUpdates: Bool?
     var onToggleGreedy: ((Bool) -> Void)?
     var showsSort = true
-    var onSubmitSearch: (() -> Void)?
 
-    @State private var showSortMenu = false
-    @State private var showPeriodMenu = false
-    @State private var showUpdateAllConfirmation = false
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 10) {
-                heading
-                Spacer(minLength: 10)
-                filters
-                viewModeToggle
-                searchField
-            }
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 10) {
-                    heading
-                    Spacer(minLength: 10)
-                    viewModeToggle
-                    searchField
-                }
-                HStack(spacing: 10) {
-                    filters
-                    Spacer(minLength: 0)
-                }
-            }
+    var body: some ToolbarContent {
+        if #available(macOS 26, *) {
+            ToolbarSpacer(.flexible)
         }
-        .toolbarGlassGroup(spacing: 10)
-        .toolbarChrome(classicInsets: EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 10), radius: 24)
-    }
-
-    @ViewBuilder
-    private var heading: some View {
-        Text(title)
-            .font(CHType.topBarTitle)
-            .foregroundStyle(Color.chTextTitle)
-            .lineLimit(1)
-        Text("\(caskCount) casks")
-            .font(CHType.countMeta)
-            .foregroundStyle(CHType.isNative ? Color.chTextBody : Color.chTextMuted)
-            .lineLimit(1)
-    }
-
-    @ViewBuilder
-    private var filters: some View {
         if let greedyUpdates {
-            greedyChip(isOn: greedyUpdates)
+            ToolbarItem(placement: .automatic) {
+                Toggle(isOn: Binding(get: { greedyUpdates }, set: { onToggleGreedy?($0) })) {
+                    Label("Greedy", systemImage: greedyUpdates ? "checkmark.circle.fill" : "circle")
+                        .labelStyle(.titleAndIcon)
+                }
+                .toggleStyle(.button)
+                .help("Also list apps that update themselves (brew upgrade --greedy)")
+            }
         }
-        if onUpdateAll != nil {
-            updateAllChip
+        if let onUpdateAll {
+            ToolbarItem(placement: .automatic) {
+                UpdateAllButton(
+                    count: updateAllCount,
+                    isUpdatingAll: isUpdatingAll,
+                    isUpdatingHomebrew: isUpdatingHomebrew,
+                    onUpdateAll: onUpdateAll
+                )
+            }
         }
         if showsSort {
-            sortChip
+            ToolbarItem(placement: .automatic) {
+                OptionMenu(current: sortOption, options: sortOptions, label: \.title, systemImage: "arrow.up.arrow.down") {
+                    if $0 != sortOption { Analytics.sortChanged($0) }
+                    sortOption = $0
+                }
+            }
         }
         if let analyticsPeriod {
-            periodChip(current: analyticsPeriod, options: AnalyticsPeriod.allCases, label: \.label) {
-                onSelectPeriod?($0)
+            ToolbarItem(placement: .automatic) {
+                OptionMenu(current: analyticsPeriod, options: AnalyticsPeriod.allCases, label: \.label, systemImage: "clock") {
+                    onSelectPeriod?($0)
+                }
             }
         }
         if let recentWindow {
-            periodChip(current: recentWindow, options: RecentlyAddedWindow.allCases, label: \.label) {
-                onSelectWindow?($0)
-            }
-        }
-    }
-
-    // MARK: - Greedy updates chip
-
-    private func greedyChip(isOn: Bool) -> some View {
-        Button {
-            onToggleGreedy?(!isOn)
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 10, weight: .bold))
-                Text("Greedy")
-                    .font(CHType.button)
-            }
-            .foregroundStyle(isOn ? Color.chActionUpdateFg : Color.chTextTitle)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 14)
-            .toolbarCapsule(
-                fill: isOn ? .chActionUpdateBg : .chSurfaceField,
-                border: isOn ? .chActionUpdateBorder : .chHairlineStrong,
-                isNeutral: !isOn
-            )
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .help("Also list apps that update themselves (brew upgrade --greedy)")
-    }
-
-    // MARK: - Sort chip
-
-    private var sortChip: some View {
-        Button {
-            showSortMenu.toggle()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "arrow.up.arrow.down")
-                    .font(.system(size: 10, weight: .bold))
-                Text(sortOption.title)
-                    .font(CHType.button)
-            }
-            .foregroundStyle(Color.chTextTitle)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 14)
-            .toolbarCapsule()
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .popover(isPresented: $showSortMenu, arrowEdge: .bottom) {
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(sortOptions) { option in
-                    menuRow(label: option.title, isSelected: sortOption == option) {
-                        if option != sortOption { Analytics.sortChanged(option) }
-                        sortOption = option
-                        showSortMenu = false
-                    }
+            ToolbarItem(placement: .automatic) {
+                OptionMenu(current: recentWindow, options: RecentlyAddedWindow.allCases, label: \.label, systemImage: "clock") {
+                    onSelectWindow?($0)
                 }
             }
-            .padding(8)
-            .frame(width: 190)
         }
-    }
-
-    // MARK: - Time window chip (Top Charts period / Recently Added window)
-
-    private func periodChip<Option: Identifiable & Equatable>(
-        current: Option,
-        options: [Option],
-        label: KeyPath<Option, String>,
-        onSelect: @escaping (Option) -> Void
-    ) -> some View {
-        Button {
-            showPeriodMenu.toggle()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "clock")
-                    .font(.system(size: 10, weight: .bold))
-                Text(current[keyPath: label])
-                    .font(CHType.button)
+        ToolbarItem(placement: .automatic) {
+            Picker("View", selection: $viewMode) {
+                Label("Grid", systemImage: "square.grid.2x2").tag(ViewMode.grid)
+                Label("List", systemImage: "list.bullet").tag(ViewMode.list)
             }
-            .foregroundStyle(Color.chTextTitle)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 14)
-            .toolbarCapsule()
-            .contentShape(Capsule())
+            .pickerStyle(.segmented)
+            .labelStyle(.iconOnly)
         }
-        .buttonStyle(.plain)
-        .popover(isPresented: $showPeriodMenu, arrowEdge: .bottom) {
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(options) { option in
-                    menuRow(label: option[keyPath: label], isSelected: option == current) {
-                        onSelect(option)
-                        showPeriodMenu = false
-                    }
-                }
-            }
-            .padding(8)
-            .frame(width: 150)
-        }
-    }
-
-    private func menuRow(label: String, isSelected: Bool, onSelect: @escaping () -> Void) -> some View {
-        Button(action: onSelect) {
-            HStack {
-                Text(label)
-                    .font(isSelected ? CHType.navActive : CHType.navItem)
-                    .foregroundStyle(isSelected ? Color.chSelectionFg : Color.chTextNav)
-                Spacer(minLength: 8)
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.chSelectionFg)
-                }
-            }
-            .padding(.vertical, 5)
-            .padding(.horizontal, 10)
-            .background {
-                if isSelected {
-                    Capsule().fill(Color.chSelectionBg)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Grid / list toggle
-
-    private var viewModeToggle: some View {
-        HStack(spacing: 0) {
-            segment(.grid, icon: "square.grid.2x2")
-            segment(.list, icon: "list.bullet")
-        }
-        .padding(CHType.isNative ? 3 : 2)
-        .toolbarCapsule()
-    }
-
-    private func segment(_ mode: ViewMode, icon: String) -> some View {
-        Button {
-            viewMode = mode
-        } label: {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(viewMode == mode ? Color.chSegmentIcon : Color.chTextNav)
-                .frame(width: 34, height: 22)
-                .background {
-                    if viewMode == mode {
-                        Capsule().fill(Color.chSegmentSelected)
-                    }
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Search field
-
-    private var searchField: some View {
-        HStack(spacing: 7) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.chTextMuted)
-            TextField("Search apps…", text: $searchText)
-                .textFieldStyle(.plain)
-                .font(CHType.field)
-                .foregroundStyle(Color.chTextTitle)
-                .focused(searchFocus)
-                .onSubmit { onSubmitSearch?() }
-            if searchText.isEmpty, CHType.isNative {
-                searchShortcutHint
-            } else if !searchText.isEmpty {
-                Button {
-                    searchText = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.chTextMuted)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .help("Clear search")
-            }
-        }
-        .padding(.vertical, 5)
-        .padding(.horizontal, 12)
-        .frame(minWidth: 140, idealWidth: 200, maxWidth: 240)
-        .toolbarCapsule()
     }
 }
 
-private extension TopBarView {
-    var searchShortcutHint: some View {
-        Text(verbatim: "⌘F")
-            .font(.custom(CHType.monoFamily, size: 10))
-            .foregroundStyle(Color.chTextMuted)
-    }
+/// Toolbar menu that shows the current choice and checks it in the list.
+private struct OptionMenu<Option: Identifiable & Equatable>: View {
+    let current: Option
+    let options: [Option]
+    let label: KeyPath<Option, String>
+    let systemImage: String
+    let onSelect: (Option) -> Void
 
-    var updateAllChip: some View {
-        Button {
-            showUpdateAllConfirmation = true
-        } label: {
-            HStack(spacing: 6) {
-                if isUpdatingAll {
-                    ProgressView().controlSize(.mini)
-                } else {
-                    Image(systemName: CaskActionStyle.update.icon)
-                        .font(.system(size: 10, weight: .bold))
-                }
-                Text(isUpdatingAll ? "Updating…" : "Update All")
-                    .font(CHType.button)
+    var body: some View {
+        Menu {
+            ForEach(options) { option in
+                Toggle(option[keyPath: label], isOn: Binding(get: { option == current }, set: { _ in onSelect(option) }))
             }
-            .foregroundStyle(Color.chActionUpdateFg)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 14)
-            .toolbarCapsule(fill: .chActionUpdateBg, border: .chActionUpdateBorder, isNeutral: false)
-            .contentShape(Capsule())
+        } label: {
+            Label(current[keyPath: label], systemImage: systemImage)
+                .labelStyle(.titleAndIcon)
         }
-        .buttonStyle(.plain)
+    }
+}
+
+private struct UpdateAllButton: View {
+    let count: Int
+    let isUpdatingAll: Bool
+    let isUpdatingHomebrew: Bool
+    let onUpdateAll: () -> Void
+
+    @State private var showsConfirmation = false
+
+    var body: some View {
+        Button {
+            showsConfirmation = true
+        } label: {
+            if isUpdatingAll {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text("Updating…")
+                }
+            } else {
+                Label("Update All", systemImage: CaskActionStyle.update.icon)
+                    .labelStyle(.titleAndIcon)
+            }
+        }
         .disabled(isUpdatingAll || isUpdatingHomebrew)
         .help(
             isUpdatingHomebrew
                 ? String(localized: "Wait for the current action to finish.")
                 : String(localized: "Update All")
         )
-        .alert("Update All Apps?", isPresented: $showUpdateAllConfirmation) {
+        .alert("Update All Apps?", isPresented: $showsConfirmation) {
             Button("Cancel", role: .cancel) {}
-            Button("Update All") {
-                onUpdateAll?()
-            }
+            Button("Update All", action: onUpdateAll)
         } message: {
-            Text(.alertUpdateAllConfirmation(updateAllCount))
+            Text(.alertUpdateAllConfirmation(count))
         }
     }
 }

@@ -51,18 +51,6 @@ struct ContentView: View {
             .navigationSplitViewColumnWidth(min: 245, ideal: 245, max: 300)
         } detail: {
             VStack(spacing: 0) {
-                Group {
-                    if isUtilityPage {
-                        utilityTopBar
-                    } else {
-                        catalogTopBar
-                    }
-                }
-                .frame(maxWidth: isUtilityPage ? CHSize.contentWidth : catalogWidth)
-                .padding(.horizontal, isUtilityPage ? CHSpace.s5 : CHSize.catalogInset)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, CHSpace.s4)
-
                 if showsResultsHeader {
                     Text("Results for “\(viewModel.searchText)”")
                         .font(CHType.section)
@@ -70,7 +58,7 @@ struct ContentView: View {
                         .frame(maxWidth: catalogWidth, alignment: .leading)
                         .padding(.horizontal, CHSize.catalogInset)
                         .frame(maxWidth: .infinity)
-                        .padding(.bottom, CHSpace.s4)
+                        .padding(.vertical, CHSpace.s4)
                 }
 
                 detailContent
@@ -79,7 +67,21 @@ struct ContentView: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { detailWidth = $0 }
-            .ignoresSafeArea(.container, edges: .top)
+            .toolbar {
+                TopBarTitle(title: sectionName, summary: topBarSummary)
+                if !isUtilityPage {
+                    catalogToolbar
+                }
+            }
+            .modifier(CatalogSearch(
+                isEnabled: !isUtilityPage,
+                text: $viewModel.searchText,
+                isFocused: $searchFocused,
+                onSubmit: {
+                    searchFocused = false
+                    showsResultsHeader = !viewModel.searchText.isEmpty
+                }
+            ))
         }
         .overlay {
             Button("") { searchFocused = true }
@@ -141,8 +143,10 @@ struct ContentView: View {
                 showsResultsHeader = false
             }
         }
-        .onAppear {
-            DispatchQueue.main.async { searchFocused = false }
+        .task {
+            // The toolbar search field is the window's first key view; don't open with it focused.
+            try? await Task.sleep(for: .milliseconds(300))
+            searchFocused = false
         }
         .modifier(ResignFocusOnOutsideClick(
             isFocused: { searchFocused },
@@ -152,15 +156,11 @@ struct ContentView: View {
 
     // MARK: - Top Bar
 
-    private var catalogTopBar: some View {
-        TopBarView(
-            title: sectionName,
-            caskCount: viewModel.filteredCasks.count,
+    private var catalogToolbar: CatalogToolbar {
+        CatalogToolbar(
             sortOption: $viewModel.sortOption,
             sortOptions: sortOptions,
             viewMode: $viewMode,
-            searchText: $viewModel.searchText,
-            searchFocus: $searchFocused,
             analyticsPeriod: selectedSidebar == .discover(.topCharts) ? viewModel.analyticsPeriod : nil,
             onSelectPeriod: { period in
                 Analytics.topChartsPeriodChanged(period)
@@ -186,19 +186,12 @@ struct ContentView: View {
                 Analytics.greedyUpdatesChanged(enabled)
                 localHomebrew.setGreedyUpdates(enabled)
             },
-            showsSort: selectedSidebar != .discover(.featured) && !showsBrowseSections,
-            onSubmitSearch: {
-                searchFocused = false
-                showsResultsHeader = !viewModel.searchText.isEmpty
-            }
+            showsSort: selectedSidebar != .discover(.featured) && !showsBrowseSections
         )
     }
 
-    private var utilityTopBar: some View {
-        UtilityTopBar(
-            title: sectionName,
-            summary: utilitySummary
-        )
+    private var topBarSummary: String? {
+        isUtilityPage ? utilitySummary : String(localized: "\(viewModel.filteredCasks.count) casks")
     }
 
     private var utilitySummary: String? {
@@ -277,6 +270,27 @@ struct ContentView: View {
 
     func categoryInfo(for cask: Cask) -> CaskCategoryPresentation? {
         viewModel.categoryPresentation(for: cask)
+    }
+}
+
+// MARK: - Search
+
+/// Catalog pages search from the toolbar; utility pages have nothing to search.
+private struct CatalogSearch: ViewModifier {
+    let isEnabled: Bool
+    @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding
+    let onSubmit: () -> Void
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content
+                .searchable(text: $text, placement: .toolbar, prompt: Text("Search apps…"))
+                .searchFocused(isFocused)
+                .onSubmit(of: .search, onSubmit)
+        } else {
+            content
+        }
     }
 }
 

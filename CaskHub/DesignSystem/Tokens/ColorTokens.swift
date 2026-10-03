@@ -88,12 +88,6 @@ extension Color {
     static var chSelectionBg: Color { styled(Classic.actionInstallBg, Native.selectionBg) }
     static var chSelectionFg: Color { styled(Classic.actionInstallFg, Native.selectionFg) }
 
-    /// ── Segmented view-mode toggle ─────────────────────
-    /// Classic: ink capsule + cream glyph in light; cream capsule + ink glyph in dark.
-    /// Native: faint neutral capsule + accent glyph.
-    static var chSegmentIcon: Color { styled(Classic.segmentIcon, Native.accent) }
-    static var chSegmentSelected: Color { styled(Classic.textTitle, Native.segmentSelected) }
-
     // ── Badge ──────────────────────────────────────────
     static var chBadgeBg: Color { styled(Classic.badgeBg, Native.badgeBg) }
     static var chBadgeBorder: Color { styled(Classic.badgeBorder, .clear) }
@@ -148,8 +142,6 @@ private enum Classic {
     static let actionDoneBorder = adaptive(light: NSColor(hex: 0x6FA287, alpha: 0.60), dark: NSColor(hex: 0x6FA287, alpha: 0.50))
     static let actionDoneFg = adaptive(light: NSColor(hex: 0x3E6E55), dark: NSColor(hex: 0x8FC4A8))
 
-    static let segmentIcon = adaptive(light: NSColor(hex: 0xFDF6E4), dark: NSColor(hex: 0x2B2838))
-
     static let badgeBg = adaptive(light: NSColor(hex: 0xD99A4E, alpha: 0.35), dark: NSColor(hex: 0xE2AB60, alpha: 0.28))
     static let badgeBorder = adaptive(light: NSColor(hex: 0xFFFFFF, alpha: 0.80), dark: NSColor(hex: 0xFFFFFF, alpha: 0.30))
     static let badgeFg = adaptive(light: NSColor(hex: 0x8A5A1A), dark: NSColor(hex: 0xECC084))
@@ -173,7 +165,6 @@ private enum Native {
     static let keycap = adaptive(0x000000, 0xFFFFFF, alpha: (0.06, 0.08))
     static let terminal = adaptive(0x33304A, 0x38383C)
     static let separator = adaptive(0x000000, 0xFFFFFF, alpha: (0.08, 0.08))
-    static let segmentSelected = adaptive(0x000000, 0xFFFFFF, alpha: (0.07, 0.13))
     static let scrim = adaptive(0xFDFDFE, 0x1C1C1E, alpha: (0.7, 0.6))
 
     static let textPrimary = adaptive(0x1D1D1F, 0xF5F5F7)

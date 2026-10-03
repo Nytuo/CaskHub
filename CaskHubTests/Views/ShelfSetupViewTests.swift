@@ -232,8 +232,6 @@ final class ShelfSetupViewTests: XCTestCase {
 
     @MainActor
     func test_page_chrome_renders() {
-        render(UtilityTopBar(title: "Shelf Setup", summary: "3 ignored"), width: 1100, height: 600)
-        render(UtilityTopBar(title: "Health"), width: 1100, height: 600)
         render(CountBadge(count: 2), width: 1100, height: 600)
     }
 

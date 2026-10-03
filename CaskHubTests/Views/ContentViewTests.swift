@@ -276,23 +276,24 @@ final class TopBarViewTests: XCTestCase {
         let isUpdatingHomebrew: Bool
         var greedyUpdates: Bool?
         let onAppear: () -> Void
-        @FocusState private var searchFocused: Bool
 
         var body: some View {
-            TopBarView(
-                title: "Updates",
-                caskCount: 2,
-                sortOption: .constant(.mostPopular),
-                viewMode: .constant(.grid),
-                searchText: .constant(""),
-                searchFocus: $searchFocused,
-                onUpdateAll: {},
-                isUpdatingAll: isUpdatingAll,
-                isUpdatingHomebrew: isUpdatingHomebrew,
-                greedyUpdates: greedyUpdates,
-                onToggleGreedy: { _ in }
-            )
-            .onAppear(perform: onAppear)
+            NavigationStack {
+                Color.clear
+                    .toolbar {
+                        TopBarTitle(title: "Updates", summary: "2 casks")
+                        CatalogToolbar(
+                            sortOption: .constant(.mostPopular),
+                            viewMode: .constant(.grid),
+                            onUpdateAll: {},
+                            isUpdatingAll: isUpdatingAll,
+                            isUpdatingHomebrew: isUpdatingHomebrew,
+                            greedyUpdates: greedyUpdates,
+                            onToggleGreedy: { _ in }
+                        )
+                    }
+                    .onAppear(perform: onAppear)
+            }
         }
     }
 
@@ -309,13 +310,13 @@ final class TopBarViewTests: XCTestCase {
     ) {
         let probe = RenderProbe()
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 900, height: 80),
-            styleMask: .borderless,
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 200),
+            styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false
         )
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(
+        window.contentViewController = NSHostingController(
             rootView: TopBarHarness(
                 isUpdatingAll: isUpdatingAll,
                 isUpdatingHomebrew: isUpdatingHomebrew,
@@ -325,12 +326,13 @@ final class TopBarViewTests: XCTestCase {
         window.orderFrontRegardless()
 
         let deadline = Date().addingTimeInterval(2)
-        while !probe.appeared, Date() < deadline {
+        while !probe.appeared || (window.toolbar?.items.isEmpty ?? true), Date() < deadline {
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
         XCTAssertTrue(probe.appeared, "top bar never rendered")
+        XCTAssertFalse(window.toolbar?.items.isEmpty ?? true, "toolbar items never installed")
 
-        window.contentView = NSView()
+        window.contentViewController = nil
         window.close()
     }
 

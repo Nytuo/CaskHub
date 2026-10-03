@@ -65,58 +65,7 @@ private struct NativeCardSurface: View {
     }
 }
 
-/// Toolbar controls: Classic tinted capsule with hairline; Native Liquid Glass (solid before macOS 26).
-private struct ToolbarCapsuleModifier: ViewModifier {
-    var fill: Color
-    var border: Color
-    var isNeutral: Bool
-
-    func body(content: Content) -> some View {
-        if CHType.isNative, isNeutral {
-            if #available(macOS 26, *) {
-                content.glassEffect(.regular.interactive(), in: Capsule())
-            } else {
-                content
-                    .background(Capsule().fill(Color.chSurfaceToolbar))
-                    .overlay(Capsule().stroke(Color.chNativeCardEdge, lineWidth: 0.5))
-            }
-        } else {
-            content
-                .background(Capsule().fill(fill))
-                .overlay(Capsule().strokeBorder(border, lineWidth: 1))
-        }
-    }
-}
-
 extension View {
-    func toolbarCapsule(
-        fill: Color = .chSurfaceField,
-        border: Color = .chHairlineStrong,
-        isNeutral: Bool = true
-    ) -> some View {
-        modifier(ToolbarCapsuleModifier(fill: fill, border: border, isNeutral: isNeutral))
-    }
-
-    /// Lets neighbouring Native glass capsules sample and blend with each other.
-    @ViewBuilder
-    func toolbarGlassGroup(spacing: CGFloat) -> some View {
-        if #available(macOS 26, *), CHType.isNative {
-            GlassEffectContainer(spacing: spacing) { self }
-        } else {
-            self
-        }
-    }
-
-    /// Classic floats a top bar in a frosted panel; Native leaves it on the window like a toolbar.
-    @ViewBuilder
-    func toolbarChrome(classicInsets: EdgeInsets, radius: CGFloat) -> some View {
-        if CHType.isNative {
-            frame(minHeight: 30).padding(.vertical, 4)
-        } else {
-            padding(classicInsets).glassPanel(radius: radius, surface: .chSurfaceToolbar)
-        }
-    }
-
     func glassPanel(
         radius: CGFloat = CHRadius.card,
         surface: Color = .chSurfaceCard,
