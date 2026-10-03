@@ -41,4 +41,5 @@ enum CHSpace {
     static let s5: CGFloat = 24
     static let gridGap: CGFloat = 14 // cask card grid gap
     static let belowToolbar: CGFloat = 10 // plus the toolbar inset
+    static let toolbarLabelInset: CGFloat = 5 // matches the segmented picker's inset
 }
