@@ -304,9 +304,14 @@ final class SettingsViewTests: XCTestCase {
     }
 
     @MainActor
-    func test_theme_preview_assets_are_bundled() {
-        for theme in AppTheme.allCases {
-            XCTAssertNotNil(theme.previewImage, "missing theme preview for \(theme.rawValue)")
+    func test_appearance_split_cards_fit_the_settings_window_in_both_styles() {
+        defer { AppStyle.current = .classic }
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let host = NSHostingView(rootView: AppearanceSettingsView())
+            host.frame = NSRect(x: 0, y: 0, width: 650, height: 560)
+            host.layoutSubtreeIfNeeded()
+            XCTAssertLessThanOrEqual(host.fittingSize.width, 650, "\(style)")
         }
     }
 

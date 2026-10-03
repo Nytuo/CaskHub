@@ -73,17 +73,13 @@ enum AppTheme: String, CaseIterable, Identifiable {
     }
 
     /// Localized label for display. `rawValue` stays language-independent because
-    /// it is persisted in `@AppStorage("appTheme")` and used to build asset names.
+    /// it is persisted in `@AppStorage("appTheme")`.
     var title: String {
         switch self {
         case .system: return String(localized: "System")
         case .light: return String(localized: "Light")
         case .dark: return String(localized: "Dark")
         }
-    }
-
-    var previewImage: NSImage? {
-        NSImage(named: "ThemePreview-\(rawValue.lowercased())")
     }
 
     static func apply(_ raw: String) {
