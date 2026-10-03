@@ -40,5 +40,5 @@ enum CHSpace {
     static let s4: CGFloat = 16
     static let s5: CGFloat = 24
     static let gridGap: CGFloat = 14 // cask card grid gap
-    static let belowToolbar: CGFloat = 10 // on top of the toolbar's own inset, for a 20pt gap
+    static let belowToolbar: CGFloat = 10 // plus the toolbar inset
 }

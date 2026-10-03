@@ -31,7 +31,6 @@ enum AppStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Upgraders keep Classic; only installs with no earlier CaskHub state start Native.
     static func resolveStored(in defaults: UserDefaults, hasPriorInstall: () -> Bool) -> AppStyle {
         if let raw = defaults.string(forKey: storageKey), let style = AppStyle(rawValue: raw) {
             return style
@@ -41,8 +40,7 @@ enum AppStyle: String, CaseIterable, Identifiable {
         return style
     }
 
-    // ponytail: heuristic; every earlier launch leaves prefs or app-owned caches behind, so a
-    // user who wiped all of them reads as a new install
+    // ponytail: heuristic; a user who wiped prefs and caches reads as a new install
     static func hasPriorInstall(
         defaults: UserDefaults = .standard,
         fileManager: FileManager = .default

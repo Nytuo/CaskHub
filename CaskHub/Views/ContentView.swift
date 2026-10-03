@@ -71,7 +71,7 @@ struct ContentView: View {
             .onPreferenceChange(ScrolledUnderToolbarKey.self) { scrolled in
                 isScrolledUnderToolbar = scrolled
             }
-            // Transparent at rest; the backing and edge effect appear once content scrolls under it.
+            // Hiding the backing outright also drops the scroll edge effect, so toggle it.
             .toolbarBackgroundVisibility(isScrolledUnderToolbar ? .visible : .hidden, for: .windowToolbar)
             .toolbar {
                 TopBarTitle(title: sectionName, summary: topBarSummary)
@@ -150,7 +150,7 @@ struct ContentView: View {
             }
         }
         .task {
-            // The toolbar search field is the window's first key view; don't open with it focused.
+            // The toolbar search field is the window's first key view.
             try? await Task.sleep(for: .milliseconds(300))
             searchFocused = false
         }
@@ -281,7 +281,6 @@ struct ContentView: View {
 
 // MARK: - Search
 
-/// Catalog pages search from the toolbar; utility pages have nothing to search.
 private struct CatalogSearch: ViewModifier {
     let isEnabled: Bool
     @Binding var text: String

@@ -162,7 +162,6 @@ struct MaintenanceDiskCard: View {
             .frame(width: 74, alignment: .trailing)
         default:
             if buttonTitle(for: id) != nil, model.diskBytes[id] == 0 {
-                // Centred under the trailing-aligned pills above it.
                 cleanGlyph
                     .frame(width: 60)
                     .frame(width: 74, alignment: .trailing)

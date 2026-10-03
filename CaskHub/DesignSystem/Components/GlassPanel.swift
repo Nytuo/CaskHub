@@ -73,7 +73,6 @@ private struct ToolbarScrollEdge: ViewModifier {
     }
 }
 
-/// Native card: solid fill, bright top edge, hairline outer edge; depth without blurred shadows.
 private struct NativeCardSurface: View {
     let shape: RoundedRectangle
     let fill: Color
@@ -97,8 +96,6 @@ private struct NativeCardSurface: View {
 }
 
 extension View {
-    /// Reports when content has scrolled under the window toolbar, and gives it the system edge
-    /// effect there, so the toolbar only gains a background once something is behind it.
     func toolbarScrollEdge() -> some View {
         modifier(ToolbarScrollEdge())
     }

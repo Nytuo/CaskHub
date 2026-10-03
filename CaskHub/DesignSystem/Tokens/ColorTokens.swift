@@ -150,8 +150,7 @@ private enum Classic {
     static let shadowHero = adaptive(light: NSColor(hex: 0x33304A, alpha: 0.12), dark: NSColor(hex: 0x000000, alpha: 0.35))
 }
 
-/// Design "1a Floating glass": light uses the 6a glass edge, dark the 5b Tahoe glass edge,
-/// actions use 3d Richer tonal.
+/// Design 1a with the 6a/5b glass edges and 3d buttons.
 private enum Native {
     static let window = adaptive(0xF2F2F4, 0x1C1C1E)
     static let sidebar = adaptive(0xFBFBFC, 0x2C2C2E)

@@ -27,7 +27,6 @@ struct CaskOperationCapsule: View {
             }
 
             if let byteProgress = downloadByteProgress {
-                // Narrow list-row slots drop the byte count instead of spilling past the capsule.
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 0) {
                         downloadPhaseLabel

@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-/// Page title and count, inline on the window toolbar's leading edge.
 struct TopBarTitle: ToolbarContent {
     let title: String
     var summary: String?
@@ -35,13 +34,12 @@ struct TopBarTitle: ToolbarContent {
             .lineLimit(1)
             .fixedSize()
             .padding(.leading, 4)
-            // Toolbar items keep their first measured width; a new identity per page re-measures it.
+            // Toolbar items keep their first measured width; a new identity re-measures.
             .id(title)
         }
     }
 }
 
-/// Catalog filters and view mode as system toolbar items; search is attached with `.searchable`.
 struct CatalogToolbar: ToolbarContent {
     @Binding var sortOption: SortOption
     var sortOptions: [SortOption] = SortOption.standard
@@ -73,7 +71,7 @@ struct CatalogToolbar: ToolbarContent {
             }
         }
         if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
-            // Keeps Greedy in its own glass capsule instead of merging with Update All.
+            // Without it macOS merges Greedy into Update All's capsule.
             ToolbarSpacer(.fixed)
         }
         if let onUpdateAll {
@@ -119,7 +117,6 @@ struct CatalogToolbar: ToolbarContent {
     }
 }
 
-/// Toolbar menu that shows the current choice and checks it in the list.
 private struct OptionMenu<Option: Identifiable & Equatable>: View {
     let current: Option
     let options: [Option]
@@ -136,7 +133,7 @@ private struct OptionMenu<Option: Identifiable & Equatable>: View {
             Label(current[keyPath: label], systemImage: systemImage)
                 .labelStyle(.titleAndIcon)
         }
-        // Toolbar items keep their first measured width; a new identity per choice re-measures it.
+        // Toolbar items keep their first measured width; a new identity re-measures.
         .fixedSize()
         .id(current.id)
     }

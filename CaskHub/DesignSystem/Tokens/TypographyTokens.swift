@@ -12,7 +12,6 @@ enum CHType {
     static let uiFamily = "Nunito"
     static let monoFamily = "JetBrains Mono"
 
-    /// Native swaps the display and UI faces for SF Pro; mono stays for data.
     static var isNative: Bool {
         AppStyle.current == .native
     }

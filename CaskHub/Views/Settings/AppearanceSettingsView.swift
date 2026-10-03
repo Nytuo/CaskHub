@@ -87,7 +87,6 @@ struct AppearanceSettingsView: View {
         }
     }
 
-    /// While following macOS, a card picks the theme only; otherwise the clicked half sets the mode too.
     static func theme(afterPicking mode: AppTheme, current: AppTheme) -> AppTheme {
         current == .system ? .system : mode
     }
@@ -106,7 +105,6 @@ struct AppearanceSettingsView: View {
             : theme.title
     }
 
-    /// Turning it off keeps whichever half is showing, so the window doesn't flip.
     private var matchesSystem: Binding<Bool> {
         Binding(
             get: { theme == .system },
@@ -126,7 +124,6 @@ struct AppearanceSettingsView: View {
 
 // MARK: - Split card
 
-/// One theme previewed as a mini window: light on the left half, dark on the right.
 private struct ThemeSplitCard: View {
     let style: AppStyle
     let isSelected: Bool
@@ -308,7 +305,7 @@ private struct DotGrid: View {
     }
 }
 
-/// Colours from the Appearance design's split-card previews; fixed per half, independent of the live theme.
+/// Fixed design colours, independent of the live theme.
 private struct ThemePreviewPalette {
     var background: Color
     var dots: Color?
