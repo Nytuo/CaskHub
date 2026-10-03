@@ -14,6 +14,8 @@ extension ContentView {
         ScrollView {
             catalogContent
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .modifier(ResetScrollOnChange(trigger: selectedSidebar))

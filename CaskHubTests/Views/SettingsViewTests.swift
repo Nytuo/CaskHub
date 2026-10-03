@@ -288,9 +288,37 @@ final class SettingsViewTests: XCTestCase {
     }
 
     @MainActor
-    func test_theme_preview_assets_are_bundled() {
-        for theme in AppTheme.allCases {
-            XCTAssertNotNil(theme.previewImage, "missing theme preview for \(theme.rawValue)")
+    func test_style_resolution_keeps_upgraders_classic_and_starts_new_installs_native() throws {
+        let suite = "style-resolution-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { true }, .classic)
+        XCTAssertEqual(defaults.string(forKey: AppStyle.storageKey), "classic")
+
+        defaults.removeObject(forKey: AppStyle.storageKey)
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { false }, .native)
+        XCTAssertEqual(defaults.string(forKey: AppStyle.storageKey), "native")
+
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { XCTFail("stored choice wins"); return true }, .native)
+    }
+
+    @MainActor
+    func test_picking_a_split_card_half_keeps_following_the_system() {
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .light, current: .system), .system)
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .dark, current: .light), .dark)
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .light, current: .dark), .light)
+    }
+
+    @MainActor
+    func test_appearance_split_cards_fit_the_settings_window_in_both_styles() {
+        defer { AppStyle.current = .classic }
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let host = NSHostingView(rootView: AppearanceSettingsView())
+            host.frame = NSRect(x: 0, y: 0, width: 650, height: 560)
+            host.layoutSubtreeIfNeeded()
+            XCTAssertLessThanOrEqual(host.fittingSize.width, 650, "\(style)")
         }
     }
 

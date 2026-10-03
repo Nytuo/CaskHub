@@ -6,6 +6,58 @@
 //
 
 import AppKit
+import Observation
+
+enum AppStyle: String, CaseIterable, Identifiable {
+    case native
+    case classic
+
+    static let storageKey = "appStyle"
+
+    /// Observed so token reads inside view bodies re-render when the style changes.
+    static var current: AppStyle {
+        get { AppStyleState.shared.style }
+        set { AppStyleState.shared.style = newValue }
+    }
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .native: return String(localized: "Native")
+        case .classic: return String(localized: "Classic")
+        }
+    }
+
+    static func resolveStored(in defaults: UserDefaults, hasPriorInstall: () -> Bool) -> AppStyle {
+        if let raw = defaults.string(forKey: storageKey), let style = AppStyle(rawValue: raw) {
+            return style
+        }
+        let style: AppStyle = hasPriorInstall() ? .classic : .native
+        defaults.set(style.rawValue, forKey: storageKey)
+        return style
+    }
+
+    // ponytail: heuristic; a user who wiped prefs and caches reads as a new install
+    static func hasPriorInstall() -> Bool {
+        let fileManager = FileManager.default
+        if let bundleID = Bundle.main.bundleIdentifier,
+           UserDefaults.standard.persistentDomain(forName: bundleID)?.isEmpty == false {
+            return true
+        }
+        let roots = [FileManager.SearchPathDirectory.cachesDirectory, .applicationSupportDirectory]
+            .compactMap { fileManager.urls(for: $0, in: .userDomainMask).first }
+        return roots.contains { fileManager.fileExists(atPath: $0.appendingPathComponent("CaskHub").path) }
+    }
+}
+
+@Observable
+final class AppStyleState {
+    static let shared = AppStyleState()
+    var style: AppStyle = .classic
+}
 
 enum AppTheme: String, CaseIterable, Identifiable {
     case system = "System"
@@ -17,17 +69,13 @@ enum AppTheme: String, CaseIterable, Identifiable {
     }
 
     /// Localized label for display. `rawValue` stays language-independent because
-    /// it is persisted in `@AppStorage("appTheme")` and used to build asset names.
+    /// it is persisted in `@AppStorage("appTheme")`.
     var title: String {
         switch self {
         case .system: return String(localized: "System")
         case .light: return String(localized: "Light")
         case .dark: return String(localized: "Dark")
         }
-    }
-
-    var previewImage: NSImage? {
-        NSImage(named: "ThemePreview-\(rawValue.lowercased())")
     }
 
     static func apply(_ raw: String) {

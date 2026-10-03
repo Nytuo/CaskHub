@@ -33,6 +33,7 @@ enum CaskHubMain {
 
 struct CaskHubApp: App {
     @AppStorage("appTheme") private var selectedTheme: String = AppTheme.system.rawValue
+    @AppStorage(AppStyle.storageKey) private var selectedStyle: AppStyle = .classic
     @NSApplicationDelegateAdaptor(ApplicationTerminationCoordinator.self)
     private var terminationCoordinator
 
@@ -50,6 +51,8 @@ struct CaskHubApp: App {
     init() {
         // Tooltip delay in ms; registered (not set) so it never persists to prefs.
         UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 500])
+        // Must run before anything persists prefs or caches, or a new install reads as an upgrade.
+        AppStyle.current = AppStyle.resolveStored(in: .standard) { AppStyle.hasPriorInstall() }
         BrandFonts.register()
         CrashReporter.start()
         Analytics.start()
@@ -105,6 +108,9 @@ struct CaskHubApp: App {
                     .onChange(of: selectedTheme, initial: true) { _, newValue in
                         AppTheme.apply(newValue)
                     }
+                    .onChange(of: selectedStyle) { _, newValue in
+                        AppStyle.current = newValue
+                    }
                     .environment(categoryService)
                     .environment(recentlyAdded)
                     .environment(localHomebrew)
@@ -112,7 +118,7 @@ struct CaskHubApp: App {
                     .environment(maintenance)
             }
             .defaultSize(width: 1360, height: 880)
-            .windowStyle(.hiddenTitleBar)
+            .windowToolbarStyle(.unified(showsTitle: false))
             .commandsRemoved()
             .commands {
                 CommandGroup(replacing: .newItem) {}

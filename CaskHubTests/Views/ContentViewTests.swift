@@ -276,23 +276,24 @@ final class TopBarViewTests: XCTestCase {
         let isUpdatingHomebrew: Bool
         var greedyUpdates: Bool?
         let onAppear: () -> Void
-        @FocusState private var searchFocused: Bool
 
         var body: some View {
-            TopBarView(
-                title: "Updates",
-                caskCount: 2,
-                sortOption: .constant(.mostPopular),
-                viewMode: .constant(.grid),
-                searchText: .constant(""),
-                searchFocus: $searchFocused,
-                onUpdateAll: {},
-                isUpdatingAll: isUpdatingAll,
-                isUpdatingHomebrew: isUpdatingHomebrew,
-                greedyUpdates: greedyUpdates,
-                onToggleGreedy: { _ in }
-            )
-            .onAppear(perform: onAppear)
+            NavigationStack {
+                Color.clear
+                    .toolbar {
+                        TopBarTitle(title: "Updates", summary: "2 casks")
+                        CatalogToolbar(
+                            sortOption: .constant(.mostPopular),
+                            viewMode: .constant(.grid),
+                            onUpdateAll: {},
+                            isUpdatingAll: isUpdatingAll,
+                            isUpdatingHomebrew: isUpdatingHomebrew,
+                            greedyUpdates: greedyUpdates,
+                            onToggleGreedy: { _ in }
+                        )
+                    }
+                    .onAppear(perform: onAppear)
+            }
         }
     }
 
@@ -309,13 +310,13 @@ final class TopBarViewTests: XCTestCase {
     ) {
         let probe = RenderProbe()
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 900, height: 80),
-            styleMask: .borderless,
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 200),
+            styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false
         )
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(
+        window.contentViewController = NSHostingController(
             rootView: TopBarHarness(
                 isUpdatingAll: isUpdatingAll,
                 isUpdatingHomebrew: isUpdatingHomebrew,
@@ -325,12 +326,13 @@ final class TopBarViewTests: XCTestCase {
         window.orderFrontRegardless()
 
         let deadline = Date().addingTimeInterval(2)
-        while !probe.appeared, Date() < deadline {
+        while !probe.appeared || (window.toolbar?.items.isEmpty ?? true), Date() < deadline {
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
         XCTAssertTrue(probe.appeared, "top bar never rendered")
+        XCTAssertFalse(window.toolbar?.items.isEmpty ?? true, "toolbar items never installed")
 
-        window.contentView = NSView()
+        window.contentViewController = nil
         window.close()
     }
 
@@ -463,12 +465,61 @@ final class TopBarViewTests: XCTestCase {
             UserDefaults.standard.set(storedMode, forKey: "viewMode")
             UserDefaults.standard.set(storedSize, forKey: "catalogTextSize")
         }
-        for mode in [ViewMode.grid, .list] {
-            UserDefaults.standard.set(mode.rawValue, forKey: "viewMode")
-            UserDefaults.standard.set(CatalogTextSize.largest.rawValue, forKey: "catalogTextSize")
-            let window = renderInWindow(vm, categories: categories, local: local, width: 1008)
-            XCTAssertLessThanOrEqual(window.contentView?.fittingSize.width ?? .infinity, 1008)
+        defer { AppStyle.current = .classic }
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            for mode in [ViewMode.grid, .list] {
+                UserDefaults.standard.set(mode.rawValue, forKey: "viewMode")
+                UserDefaults.standard.set(CatalogTextSize.largest.rawValue, forKey: "catalogTextSize")
+                let window = renderInWindow(vm, categories: categories, local: local, width: 1008)
+                XCTAssertLessThanOrEqual(window.contentView?.fittingSize.width ?? .infinity, 1008, "\(style) \(mode)")
+            }
         }
+    }
+
+    @MainActor
+    func test_downloading_capsule_stays_inside_list_action_slot() {
+        defer { AppStyle.current = .classic }
+        let progress = CaskOperationProgress(
+            token: "codexbar",
+            displayName: "CodexBar",
+            action: .updating,
+            phase: .downloading,
+            completedBytes: 84_000_000,
+            totalBytes: 245_000_000
+        )
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let capsule = CaskOperationCapsule(
+                action: .updating,
+                progress: progress,
+                isCanceling: false,
+                canCancel: false,
+                fullWidth: true,
+                onCancel: {}
+            )
+            let slot = CGSize(width: CHSize.listActionWidth, height: 100)
+            XCTAssertLessThanOrEqual(NSHostingController(rootView: capsule).sizeThatFits(in: slot).width, slot.width, "\(style)")
+        }
+    }
+
+    @MainActor
+    func test_design_tokens_follow_app_style() {
+        defer { AppStyle.current = .classic }
+        let environment = EnvironmentValues()
+
+        AppStyle.current = .classic
+        XCTAssertGreaterThan(Color.chHairlineStrong.resolve(in: environment).opacity, 0)
+        XCTAssertGreaterThan(Color.chActionInstallBorder.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(CHRadius.card, 18)
+        XCTAssertEqual(CHType.trackingLabel, 2)
+
+        AppStyle.current = .native
+        XCTAssertEqual(Color.chHairlineStrong.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(Color.chActionInstallBorder.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(Color.chBadgeBorder.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(CHRadius.card, 14)
+        XCTAssertEqual(CHType.trackingLabel, 0.9)
     }
 
     @MainActor

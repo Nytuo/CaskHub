@@ -14,6 +14,14 @@ private struct GlassPanelModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        if CHType.isNative {
+            content.background { NativeCardSurface(shape: shape, fill: surface) }
+        } else {
+            classic(content, shape: shape)
+        }
+    }
+
+    private func classic(_ content: Content, shape: RoundedRectangle) -> some View {
         content
             .background {
                 shape
@@ -34,7 +42,64 @@ private struct GlassPanelModifier: ViewModifier {
     }
 }
 
+struct ScrolledUnderToolbarKey: PreferenceKey {
+    static let defaultValue = false
+
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = value || nextValue()
+    }
+}
+
+private struct ToolbarScrollEdge: ViewModifier {
+    @State private var isScrolled = false
+
+    func body(content: Content) -> some View {
+        edgeEffect(content)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top > 0.5
+            } action: { _, scrolled in
+                isScrolled = scrolled
+            }
+            .preference(key: ScrolledUnderToolbarKey.self, value: isScrolled)
+    }
+
+    @ViewBuilder
+    private func edgeEffect(_ content: Content) -> some View {
+        if #available(macOS 26, *) {
+            content.scrollEdgeEffectStyle(.hard, for: .top)
+        } else {
+            content
+        }
+    }
+}
+
+private struct NativeCardSurface: View {
+    let shape: RoundedRectangle
+    let fill: Color
+
+    var body: some View {
+        shape
+            .fill(fill)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [Color.chNativeCardHighlight, .clear],
+                        startPoint: .top,
+                        endPoint: UnitPoint(x: 0.5, y: 0.08)
+                    ),
+                    lineWidth: 1
+                )
+            }
+            .overlay { shape.stroke(Color.chNativeCardEdge, lineWidth: 0.5) }
+            .shadow(color: Color.chNativeCardShadow, radius: 1.5, y: 1)
+    }
+}
+
 extension View {
+    func toolbarScrollEdge() -> some View {
+        modifier(ToolbarScrollEdge())
+    }
+
     func glassPanel(
         radius: CGFloat = CHRadius.card,
         surface: Color = .chSurfaceCard,
@@ -46,6 +111,14 @@ extension View {
 
 struct WindowBackdrop: View {
     var body: some View {
+        if CHType.isNative {
+            Color.chNativeWindow.ignoresSafeArea()
+        } else {
+            classic
+        }
+    }
+
+    private var classic: some View {
         GeometryReader { geo in
             ZStack {
                 LinearGradient(
@@ -76,17 +149,21 @@ struct WindowBackdrop: View {
 }
 
 struct HalftoneTexture: View {
+    var color: Color = .chHalftoneDot
+    var step: CGFloat = 9
+    var dot: CGFloat = 2
+
     var body: some View {
-        // ponytail: O(w·h/81) dots per redraw; switch to a tiled image if resize ever stutters
+        // ponytail: O(w·h/step²) dots per redraw; switch to a tiled image if resize ever stutters
         Canvas { ctx, size in
-            let step: CGFloat = 9
-            var dotY: CGFloat = 4
+            let start = (step - 1) / 2
+            var dotY = start
             while dotY < size.height {
-                var dotX: CGFloat = 4
+                var dotX = start
                 while dotX < size.width {
                     ctx.fill(
-                        Path(ellipseIn: CGRect(x: dotX, y: dotY, width: 2, height: 2)),
-                        with: .color(.chHalftoneDot)
+                        Path(ellipseIn: CGRect(x: dotX, y: dotY, width: dot, height: dot)),
+                        with: .color(color)
                     )
                     dotX += step
                 }

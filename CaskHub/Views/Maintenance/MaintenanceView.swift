@@ -29,6 +29,8 @@ struct MaintenanceView: View {
             .animation(.easeOut(duration: 0.25), value: model.checks)
             .animation(.easeOut(duration: 0.2), value: model.advisoriesExpanded)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .task { await model.refreshDisk() }
@@ -92,7 +94,7 @@ struct MaintenanceView: View {
                     .font(CHType.button)
             }
             .foregroundStyle(Color.chActionInstallFg)
-            .padding(.vertical, 5)
+            .frame(height: CHSize.pillHeight)
             .padding(.horizontal, 16)
             .background(Capsule().fill(Color.chActionInstallBg))
             .overlay(Capsule().strokeBorder(Color.chActionInstallBorder, lineWidth: 1))
@@ -316,7 +318,7 @@ struct WorkingPill: View {
                 .font(CHType.button)
         }
         .foregroundStyle(Color.chTextMuted)
-        .padding(.vertical, 4)
+        .frame(height: CHSize.pillHeight)
         .padding(.horizontal, 13)
         .background(Capsule().fill(Color.chSurfaceField))
         .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
@@ -330,7 +332,7 @@ struct StatusPill: View {
         Text(title)
             .font(CHType.button)
             .foregroundStyle(Color.chActionDoneFg)
-            .padding(.vertical, 4)
+            .frame(height: CHSize.pillHeight)
             .padding(.horizontal, 13)
             .background(Capsule().fill(Color.chActionDoneBg))
             .overlay(Capsule().strokeBorder(Color.chActionDoneBorder, lineWidth: 1))

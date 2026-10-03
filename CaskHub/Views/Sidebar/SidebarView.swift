@@ -71,6 +71,13 @@ struct SidebarView: View {
             .contentMargins(.bottom, 44, for: .scrollContent)
         }
         .ignoresSafeArea(.container, edges: .top)
+        .background {
+            if CHType.isNative {
+                Color.chNativeSidebar
+                    .overlay(alignment: .trailing) { Color.chHairline.frame(width: 1) }
+                    .ignoresSafeArea()
+            }
+        }
         .onChange(of: showAdoptApps) { _, shown in
             if !shown, selection == .library(.adopt) {
                 selection = .library(.installed)
@@ -94,11 +101,11 @@ struct SidebarView: View {
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 12 * textScale, weight: .medium))
-                    .foregroundStyle(isSelected ? Color.chActionInstallFg : Color.chTextMuted)
+                    .foregroundStyle(isSelected ? Color.chSelectionFg : Color.chTextMuted)
                     .frame(width: 16 * textScale)
                 Text(title)
                     .font(isSelected ? typography.navigationActive : typography.navigation)
-                    .foregroundStyle(isSelected ? Color.chActionInstallFg : Color.chTextNav)
+                    .foregroundStyle(isSelected ? Color.chSelectionFg : Color.chTextNav)
                     .lineLimit(1)
                     .help(title)
                 Spacer(minLength: 4)
@@ -107,7 +114,7 @@ struct SidebarView: View {
                 } else if let count, count > 0 {
                     Text("\(count)")
                         .font(typography.status)
-                        .foregroundStyle(isSelected ? Color.chActionInstallFg : Color.chTextFaint)
+                        .foregroundStyle(isSelected ? Color.chSelectionFg : Color.chTextFaint)
                 }
             }
             .padding(.vertical, 6)
@@ -115,7 +122,7 @@ struct SidebarView: View {
             .background {
                 if isSelected {
                     Capsule()
-                        .fill(Color.chActionInstallBg)
+                        .fill(Color.chSelectionBg)
                         .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
                 }
             }

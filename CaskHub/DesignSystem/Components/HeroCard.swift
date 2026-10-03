@@ -56,11 +56,11 @@ struct HeroCard: View {
                 .frame(width: 104, height: 104)
                 .background(
                     RoundedRectangle(cornerRadius: CHRadius.iconLg, style: .continuous)
-                        .fill(Color.chSurfaceField)
+                        .fill(Color.chSurfaceWell)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: CHRadius.iconLg, style: .continuous)
-                        .strokeBorder(Color.chHairlineStrong, lineWidth: 1)
+                        .strokeBorder(Color.chEdge, lineWidth: CHType.isNative ? 0.5 : 1)
                 )
         }
         .padding(.vertical, 22)

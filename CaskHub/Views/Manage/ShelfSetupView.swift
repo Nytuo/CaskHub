@@ -25,6 +25,8 @@ struct ShelfSetupView: View {
             .padding(.horizontal, CHSpace.s5)
             .frame(maxWidth: .infinity)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .sheet(isPresented: $showsIgnorePicker) {
@@ -255,29 +257,6 @@ struct ShelfSetupView: View {
     }
 }
 
-// MARK: - Page Chrome
-
-struct UtilityTopBar: View {
-    let title: String
-    var summary: String?
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(CHType.topBarTitle)
-                .foregroundStyle(Color.chTextTitle)
-            Spacer(minLength: 10)
-            if let summary {
-                Text(summary)
-                    .font(CHType.countMeta)
-                    .foregroundStyle(Color.chTextMuted)
-            }
-        }
-        .padding(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
-        .glassPanel(radius: 999, surface: .chSurfaceToolbar)
-    }
-}
-
 // MARK: - Picker Sheet
 
 struct AdoptIgnorePickerSheet: View {
@@ -366,7 +345,7 @@ struct PillButton: View {
             Text(title)
                 .font(CHType.button)
                 .foregroundStyle(foreground)
-                .padding(.vertical, 4)
+                .frame(height: CHSize.pillHeight)
                 .padding(.horizontal, 13)
                 .background(Capsule().fill(background))
                 .overlay(Capsule().strokeBorder(border, lineWidth: 1))

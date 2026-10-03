@@ -28,7 +28,7 @@ struct MaintenanceDiskCard: View {
         .overlay {
             if !model.hasDiskSnapshot {
                 RoundedRectangle(cornerRadius: CHRadius.card)
-                    .fill(Color.chInk.opacity(0.50))
+                    .fill(Color.chScrim)
                     .overlay {
                         ProgressView(String(localized: .maintenanceDiskMeasuring))
                             .font(CHType.body)
@@ -159,11 +159,12 @@ struct MaintenanceDiskCard: View {
             ) {
                 Task { await model.clean(id) }
             }
-            .frame(width: 74)
+            .frame(width: 74, alignment: .trailing)
         default:
             if buttonTitle(for: id) != nil, model.diskBytes[id] == 0 {
                 cleanGlyph
-                    .frame(width: 74)
+                    .frame(width: 60)
+                    .frame(width: 74, alignment: .trailing)
             } else {
                 Color.clear.frame(width: 74, height: 1)
             }
