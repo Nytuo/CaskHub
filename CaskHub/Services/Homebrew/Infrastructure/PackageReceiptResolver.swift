@@ -275,7 +275,8 @@ extension PackageReceiptResolver {
                       let application = applications.first,
                       let location = receipts[identity.packageIdentifier]?.location,
                       let files = receipts[identity.packageIdentifier]?.files,
-                      Self.verifies(identity, application: application, location: location, files: files)
+                      Self.verifies(identity, application: application, location: location, files: files,
+                                    isReviewedProduct: signature.productIdentities != nil)
                 else { continue }
                 claims[identity.bundleName, default: []].insert(signature.token)
             }
@@ -292,7 +293,7 @@ extension PackageReceiptResolver {
 
     private static func verifies(
         _ identity: PackageApplicationIdentity, application: DetectedApplication,
-        location: ReceiptLocation, files: String
+        location: ReceiptLocation, files: String, isReviewedProduct: Bool
     ) -> Bool {
         guard identity.bundleName.hasSuffix(".app"), !identity.bundleName.contains("/"),
               identity.installedPath == "/Applications/\(identity.bundleName)",
@@ -303,9 +304,14 @@ extension PackageReceiptResolver {
         else { return false }
         let installRoot = URL(fileURLWithPath: "/").appendingPathComponent(location.installLocation)
         let expectedPlist = identity.installedPath + "/Contents/Info.plist"
+        // Microsoft AutoUpdate replaces component receipts with staging receipts.
+        // Only reviewed products may use this known staging root; the live app path remains exact.
+        let isAutoUpdateStage = isReviewedProduct
+            && installRoot.path == "/Library/Caches/com.microsoft.autoupdate.helper/Clones.noindex"
         return files.split(whereSeparator: \.isNewline).contains { line in
             guard !line.hasPrefix("/"), !line.split(separator: "/").contains("..") else { return false }
             return installRoot.appendingPathComponent(String(line)).standardizedFileURL.path == expectedPlist
+                || (isAutoUpdateStage && line == "\(identity.bundleName)/Contents/Info.plist")
         }
     }
 }

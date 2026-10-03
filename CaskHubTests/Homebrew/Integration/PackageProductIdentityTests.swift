@@ -15,6 +15,107 @@ final class PackageProductIdentityTests: XCTestCase {
         packageIdentifier: "org.example.component", installedPath: "/Applications/Renamed.app"
     )
 
+    private let excel = PackageApplicationIdentity(
+        bundleName: "Microsoft Excel.app", bundleIdentifier: "com.microsoft.Excel",
+        packageIdentifier: "com.microsoft.package.Microsoft_Excel.app", installedPath: "/Applications/Microsoft Excel.app"
+    )
+    private let autoUpdateLocation = "Library/Caches/com.microsoft.autoupdate.helper/Clones.noindex"
+
+    func test_autoupdated_excel_remains_installed_adoptable_and_launches_without_claiming_office() async throws {
+        let volume = FileManager.default.temporaryDirectory.appendingPathComponent("excel-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: volume) }
+        let apps = volume.appendingPathComponent("Applications")
+        let app = try makeApplicationBundle(in: apps, named: excel.bundleName, bundleIdentifier: excel.bundleIdentifier)
+        try setApplicationVersion("16.113.3", at: app)
+        let replies = try excelReceiptReplies(volume: volume)
+        let launcher = RecordingApplicationLauncher()
+        let local = LocalHomebrewService(defaults: makeScratchDefaults("autoupdated-excel")) {
+            $0.applicationDirectories = [apps]
+            $0.softwareScanner = HomebrewInstallationScanner(
+                packageReceiptResolver: PackageReceiptResolver { replies[$0.joined(separator: " ")] }
+            )
+            $0.applicationLauncher = launcher
+        }
+        let categories = CategoryService()
+        categories.applyData(try metadata(products: [
+            "microsoft-excel": [excel], "microsoft-office": [], "microsoft-office-businesspro": []
+        ]))
+        let api = MockBrewAPIClient()
+        api.casks = ["microsoft-excel", "microsoft-office", "microsoft-office-businesspro"].map {
+            makeCask($0, packageIdentifiers: ["com.microsoft.package.Microsoft_Excel.app"], packageAppNames: [excel.bundleName])
+        }
+        let viewModel = makeViewModel(api: api, categories: categories, localHomebrew: local)
+        await viewModel.fetchCasks()
+        let cask = try XCTUnwrap(viewModel.casks.first { $0.token == "microsoft-excel" })
+        let state = local.localState(for: cask)
+        XCTAssertEqual(state.installationSource, .packageInstaller)
+        XCTAssertEqual(state.externalVersion, "16.113.3")
+        XCTAssertTrue(state.isAdoptable)
+        XCTAssertTrue(state.canOpen)
+        for sidebar: SidebarSelection in [.library(.installed), .library(.adopt)] {
+            viewModel.selectedSidebar = sidebar
+            XCTAssertEqual(viewModel.filteredCasks.map(\.token), ["microsoft-excel"])
+        }
+        for suite in viewModel.casks where suite.token != cask.token {
+            XCTAssertNil(local.localState(for: suite).installationSource)
+            local.open(suite)
+            XCTAssertNil(launcher.lastOpenedURL)
+        }
+        local.open(cask)
+        XCTAssertEqual(launcher.lastOpenedURL?.standardizedFileURL, app.standardizedFileURL)
+    }
+
+    private func excelReceiptReplies(volume: URL) throws -> [String: String] {
+        // Captured from the external Excel installation in the macOS VM on 03/10/2026.
+        // AutoUpdate's receipt describes a staged patch, while the live app remains in /Applications.
+        let info = try PropertyListSerialization.data(fromPropertyList: [
+            "pkgid": excel.packageIdentifier, "pkg-version": "16.113.26092714",
+            "volume": volume.path, "install-location": autoUpdateLocation
+        ], format: .xml, options: 0)
+        return [
+            "--pkgs": excel.packageIdentifier,
+            "--pkg-info-plist \(excel.packageIdentifier)": try XCTUnwrap(String(data: info, encoding: .utf8)),
+            "--files \(excel.packageIdentifier)": """
+            Microsoft Excel.app/Contents/Frameworks/ADAL4.framework/Versions/A/ADAL4.patchfile
+            Microsoft Excel.app/Contents/Info.plist
+            """
+        ]
+    }
+
+    func test_autoupdate_receipts_keep_exact_identity_path_and_review_requirements() {
+        let file = "Microsoft Excel.app/Contents/Info.plist"
+        for mode in ["valid", "unreviewed", "ambiguous", "store", "duplicate-app", "other-location", "other-volume",
+                     "wrong-id", "wrong-app-path", "missing-receipt", "missing-files", "helper-only", "absolute-path", "parent-path"] {
+            let signature = PackageCaskSignature(
+                token: "microsoft-excel", displayName: "Microsoft Excel", receiptPatterns: [excel.packageIdentifier],
+                appNameCandidates: [excel.bundleName], verifiedBundleIdentifiersByName: [:], receiptCandidates: [excel],
+                productIdentities: mode == "unreviewed" ? nil : [excel]
+            )
+            let files = ["missing-files": "", "helper-only": "Microsoft Excel.app/Contents/Frameworks/Helper.app/Contents/Info.plist",
+                         "absolute-path": "/" + file, "parent-path": "../" + file][mode] ?? file
+            let receipt = PackageReceiptResolver.Receipt(files: files, location: .init(
+                volume: URL(fileURLWithPath: mode == "other-volume" ? "/Volumes/Other" : "/"),
+                installLocation: mode == "other-location" ? "Library/Unrelated" : autoUpdateLocation
+            ))
+            let app = makeDetectedApplication(
+                excel.bundleName, id: mode == "wrong-id" ? "org.example.other" : excel.bundleIdentifier,
+                isMacAppStore: mode == "store",
+                url: URL(fileURLWithPath: mode == "wrong-app-path" ? "/Applications/Other/Microsoft Excel.app" : excel.installedPath)
+            )
+            let variant = PackageCaskSignature(
+                token: "excel-variant", displayName: "Excel Variant", receiptPatterns: [excel.packageIdentifier],
+                appNameCandidates: [excel.bundleName], verifiedBundleIdentifiersByName: [:],
+                receiptCandidates: [], productIdentities: [excel]
+            )
+            let result = PackageReceiptResolver().resolve(
+                signatures: mode == "ambiguous" ? [signature, variant] : [signature],
+                receipts: mode == "missing-receipt" ? [:] : [excel.packageIdentifier: receipt],
+                availableAppNames: [excel.bundleName], applications: mode == "duplicate-app" ? [app, app] : [app]
+            )
+            XCTAssertEqual(Set(result.keys), mode == "valid" ? ["microsoft-excel"] : [], mode)
+        }
+    }
+
     func test_reviewed_product_flows_through_scanning_projection_version_and_open() async throws {
         for mode in ["valid", "missing-receipt", "wrong-path", "wrong-id", "store", "store-wrong-id"] {
             try await checkProduct(mode)
