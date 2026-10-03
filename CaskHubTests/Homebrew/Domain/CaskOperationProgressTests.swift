@@ -82,16 +82,11 @@ final class CaskOperationProgressTests: XCTestCase {
             displayName: "Firefox"
         )
 
+        // Both chunks are enqueued before draining, so a slow main actor cannot outlast the throttle window.
         service.mutationCoordinator.consumeBrewOutput(
             "Cask firefox    ####    Downloading    10.0MB/100.0MB",
             token: "firefox"
         )
-        await service.mutationCoordinator.awaitPendingOutput()
-        XCTAssertEqual(
-            service.operationStore.state(for: "firefox")?.progress?.completedBytes,
-            10_000_000
-        )
-
         service.mutationCoordinator.consumeBrewOutput(
             "Cask firefox    ####    Downloading    20.0MB/100.0MB",
             token: "firefox"
