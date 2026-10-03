@@ -72,6 +72,10 @@ struct CatalogToolbar: ToolbarContent {
                 .help("Also list apps that update themselves (brew upgrade --greedy)")
             }
         }
+        if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
+            // Keeps Greedy in its own glass capsule instead of merging with Update All.
+            ToolbarSpacer(.fixed)
+        }
         if let onUpdateAll {
             ToolbarItem(placement: .automatic) {
                 UpdateAllButton(

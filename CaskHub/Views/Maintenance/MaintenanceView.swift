@@ -29,6 +29,7 @@ struct MaintenanceView: View {
             .animation(.easeOut(duration: 0.25), value: model.checks)
             .animation(.easeOut(duration: 0.2), value: model.advisoriesExpanded)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .task { await model.refreshDisk() }

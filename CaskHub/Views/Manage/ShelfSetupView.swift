@@ -25,6 +25,7 @@ struct ShelfSetupView: View {
             .padding(.horizontal, CHSpace.s5)
             .frame(maxWidth: .infinity)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .sheet(isPresented: $showsIgnorePicker) {
