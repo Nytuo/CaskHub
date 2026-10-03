@@ -52,7 +52,7 @@ struct HeroCard: View {
 
             Spacer(minLength: 0)
 
-            CaskIconView(cask: cask, size: 76)
+            CaskIconView(cask: cask, size: 76, alignment: .center)
                 .frame(width: 104, height: 104)
                 .background(
                     RoundedRectangle(cornerRadius: CHRadius.iconLg, style: .continuous)

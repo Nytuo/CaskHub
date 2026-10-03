@@ -10,6 +10,7 @@ import SwiftUI
 struct CaskIconView: View {
     let cask: Cask
     var size: CGFloat = 44
+    var alignment: Alignment = .top
 
     @Environment(ImageCacheService.self) private var imageCache
     @State private var loadedImage: NSImage?
@@ -21,25 +22,18 @@ struct CaskIconView: View {
 
     var body: some View {
         ZStack {
-            if let loadedImage {
-                wellShape
-                    .fill(Color.chSurfaceWell)
-                    .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
-                    .frame(width: size, height: size)
-                Image(nsImage: loadedImage)
+            if let image = imageCache.cachedImage(for: cask.token) ?? loadedImage {
+                Image(nsImage: image)
                     .resizable()
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: size * 0.9, height: size * 0.9)
-                    .clipShape(RoundedRectangle(cornerRadius: size * 0.18, style: .continuous))
+                    .clipShape(IconCorners())
+                    .frame(width: size, height: size, alignment: alignment)
                     .transition(.opacity)
             } else if cask.isCLI {
                 cliTile
             } else {
-                wellShape
-                    .fill(Color.chSurfaceWell)
-                    .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
-                    .frame(width: size, height: size)
+                well(.chSurfaceWell)
                 if didResolve {
                     Image(systemName: "macwindow")
                         .font(.system(size: size * 0.4))
@@ -61,15 +55,25 @@ struct CaskIconView: View {
     }
 
     private var cliTile: some View {
-        wellShape
-            .fill(Color.chSurfaceTerminal)
-            .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
+        well(.chSurfaceTerminal)
             .overlay(
                 Text(">_")
                     .font(Font.custom(CHType.monoFamily, size: size * 0.34).weight(.bold))
                     .foregroundStyle(Color.chCream)
             )
+    }
+
+    private func well(_ fill: Color) -> some View {
+        wellShape
+            .fill(fill)
+            .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
             .frame(width: size, height: size)
+    }
+}
+
+private nonisolated struct IconCorners: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path(roundedRect: rect, cornerRadius: min(rect.width, rect.height) * 0.2, style: .continuous)
     }
 }
 

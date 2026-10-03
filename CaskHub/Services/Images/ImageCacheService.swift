@@ -42,7 +42,7 @@ final class ImageCacheService {
     init(session: URLSession = .shared, diskCache: IconDiskCache = .shared) {
         self.session = session
         self.diskCache = diskCache
-        memoryCache.countLimit = 500
+        memoryCache.totalCostLimit = 96 * 1024 * 1024
         Task {
             do {
                 try await diskCache.purgeGeneratedIconsIfNeeded()
@@ -50,6 +50,15 @@ final class ImageCacheService {
                 CrashReporter.capture(error)
             }
         }
+    }
+
+    func cachedImage(for token: String) -> NSImage? {
+        memoryCache.object(forKey: token as NSString)
+    }
+
+    private func remember(_ image: NSImage, token: String) {
+        let cost = Int(image.size.width * image.size.height) * 4
+        memoryCache.setObject(image, forKey: token as NSString, cost: cost)
     }
 
     func image(for cask: Cask) async -> NSImage? {
@@ -77,7 +86,7 @@ final class ImageCacheService {
            let diskImage = await Self.preparedImage(from: data) {
             guard !Task.isCancelled, await diskCache.isCurrent(generation) else { return nil }
             if iconHash(for: token) != nil { return await image(for: cask) }
-            memoryCache.setObject(diskImage, forKey: token as NSString)
+            remember(diskImage, token: token)
             memoryHashes.removeValue(forKey: token)
             await maybeUpgradeFallbackIcon(token: token, generation: generation)
             return diskImage
@@ -185,7 +194,7 @@ final class ImageCacheService {
             ) else { return nil }
             guard !Task.isCancelled, await diskCache.isCurrent(generation),
                   iconHash(for: token) == expectedHash else { return nil }
-            memoryCache.setObject(image, forKey: token as NSString)
+            remember(image, token: token)
             memoryHashes.removeValue(forKey: token)
         } catch {
             CrashReporter.capture(error)
@@ -243,7 +252,7 @@ final class ImageCacheService {
     }
 
     private nonisolated static func preparedImage(from data: Data) async -> NSImage? {
-        await Task.detached(priority: .utility) {
+        await Task.detached(priority: .userInitiated) {
             guard let image = NSImage(data: data), image.isValid else { return nil }
             return normalizedIcon(image)
         }.value
@@ -281,7 +290,7 @@ extension ImageCacheService {
             if Self.gitBlobHash(data) == hash {
                 guard !Task.isCancelled, await diskCache.isCurrent(generation),
                       iconHash(for: token) == hash else { return previous }
-                memoryCache.setObject(image, forKey: token as NSString)
+                remember(image, token: token)
                 memoryHashes[token] = hash
                 return image
             }
@@ -318,7 +327,7 @@ extension ImageCacheService {
             }
             guard !Task.isCancelled, await diskCache.isCurrent(generation),
                   iconHash(for: token) == hash else { return nil }
-            memoryCache.setObject(image, forKey: token as NSString)
+            remember(image, token: token)
             memoryHashes[token] = hash
             return image
         }
@@ -364,10 +373,28 @@ extension ImageCacheService {
         return true
     }
 
+    private nonisolated struct PixelBounds {
+        var minX = Int.max, minY = Int.max, maxX = -1, maxY = -1
+
+        mutating func include(_ column: Int, _ row: Int) {
+            minX = min(minX, column)
+            minY = min(minY, row)
+            maxX = max(maxX, column)
+            maxY = max(maxY, row)
+        }
+
+        var rect: CGRect? {
+            maxX < 0 ? nil : CGRect(x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1)
+        }
+    }
+
     private nonisolated struct IconManifest: Decodable {
         let version: Int
         let hashes: [String: String]
     }
+
+    // Largest on-screen icon is the 76pt hero at 2x.
+    private nonisolated static let iconPixelCap: CGFloat = 160
 
     nonisolated static func normalizedIcon(_ image: NSImage) -> NSImage {
         guard let source = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return image }
@@ -379,23 +406,30 @@ extension ImageCacheService {
         ), let data = context.data else { return image }
         context.draw(source, in: CGRect(x: 0, y: 0, width: width, height: height))
         let pixels = data.assumingMemoryBound(to: UInt8.self)
-        var minX = width, minY = height, maxX = -1, maxY = -1
+        var visible = PixelBounds(), body = PixelBounds()
         for row in 0..<height {
-            for column in 0..<width where pixels[row * context.bytesPerRow + column * 4 + 3] > 8 {
-                minX = min(minX, column)
-                minY = min(minY, row)
-                maxX = max(maxX, column)
-                maxY = max(maxY, row)
+            for column in 0..<width {
+                let alpha = pixels[row * context.bytesPerRow + column * 4 + 3]
+                guard alpha > 8 else { continue }
+                visible.include(column, row)
+                if alpha > 128 { body.include(column, row) }
             }
         }
-        guard maxX >= minX, maxY >= minY else { return image }
-        // Ignore near-invisible shadow tails, retaining a 3% margin for soft edges.
-        let bounds = CGRect(x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1)
-        let margin = ceil(max(bounds.width, bounds.height) * 0.03)
-        let crop = bounds.insetBy(dx: -margin, dy: -margin).intersection(
-            CGRect(x: 0, y: 0, width: width, height: height)
-        )
+        guard let visibleRect = visible.rect else { return image }
+        // Crop to the solid body so drop shadows do not shrink the icon. Translucent icons keep full bounds.
+        let crop = body.rect.flatMap {
+            max($0.width, $0.height) >= 0.8 * max(visibleRect.width, visibleRect.height) ? $0 : nil
+        } ?? visibleRect
         guard let raster = context.makeImage(), let cropped = raster.cropping(to: crop) else { return image }
-        return NSImage(cgImage: cropped, size: crop.size)
+        let scale = min(1, iconPixelCap / max(crop.width, crop.height))
+        let size = CGSize(width: (crop.width * scale).rounded(), height: (crop.height * scale).rounded())
+        guard scale < 1, let target = CGContext(
+            data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: context.bitmapInfo.rawValue
+        ) else { return NSImage(cgImage: cropped, size: crop.size) }
+        target.interpolationQuality = .high
+        target.draw(cropped, in: CGRect(origin: .zero, size: size))
+        guard let scaled = target.makeImage() else { return NSImage(cgImage: cropped, size: crop.size) }
+        return NSImage(cgImage: scaled, size: size)
     }
 }
