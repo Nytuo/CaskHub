@@ -23,6 +23,7 @@ struct ContentView: View {
     @State private var sidebarVisibility: NavigationSplitViewVisibility = .all
     @State private var showsResultsHeader = false
     @State private var searchSignalTask: Task<Void, Never>?
+    @State private var isScrolledUnderToolbar = false
 
     @State private var detailWidth: CGFloat = CHSize.contentWidth + 2 * CHSize.catalogInset
 
@@ -67,6 +68,11 @@ struct ContentView: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { detailWidth = $0 }
+            .onPreferenceChange(ScrolledUnderToolbarKey.self) { scrolled in
+                isScrolledUnderToolbar = scrolled
+            }
+            // Transparent at rest; the backing and edge effect appear once content scrolls under it.
+            .toolbarBackgroundVisibility(isScrolledUnderToolbar ? .visible : .hidden, for: .windowToolbar)
             .toolbar {
                 TopBarTitle(title: sectionName, summary: topBarSummary)
                 if !isUtilityPage {

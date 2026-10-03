@@ -118,7 +118,7 @@ struct CaskHubApp: App {
                     .environment(maintenance)
             }
             .defaultSize(width: 1360, height: 880)
-            .windowStyle(.hiddenTitleBar)
+            .windowToolbarStyle(.unified(showsTitle: false))
             .commandsRemoved()
             .commands {
                 CommandGroup(replacing: .newItem) {}

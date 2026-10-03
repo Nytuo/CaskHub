@@ -42,6 +42,37 @@ private struct GlassPanelModifier: ViewModifier {
     }
 }
 
+struct ScrolledUnderToolbarKey: PreferenceKey {
+    static let defaultValue = false
+
+    static func reduce(value: inout Bool, nextValue: () -> Bool) {
+        value = value || nextValue()
+    }
+}
+
+private struct ToolbarScrollEdge: ViewModifier {
+    @State private var isScrolled = false
+
+    func body(content: Content) -> some View {
+        edgeEffect(content)
+            .onScrollGeometryChange(for: Bool.self) { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top > 0.5
+            } action: { _, scrolled in
+                isScrolled = scrolled
+            }
+            .preference(key: ScrolledUnderToolbarKey.self, value: isScrolled)
+    }
+
+    @ViewBuilder
+    private func edgeEffect(_ content: Content) -> some View {
+        if #available(macOS 26, *) {
+            content.scrollEdgeEffectStyle(.hard, for: .top)
+        } else {
+            content
+        }
+    }
+}
+
 /// Native card: solid fill, bright top edge, hairline outer edge; depth without blurred shadows.
 private struct NativeCardSurface: View {
     let shape: RoundedRectangle
@@ -66,6 +97,12 @@ private struct NativeCardSurface: View {
 }
 
 extension View {
+    /// Reports when content has scrolled under the window toolbar, and gives it the system edge
+    /// effect there, so the toolbar only gains a background once something is behind it.
+    func toolbarScrollEdge() -> some View {
+        modifier(ToolbarScrollEdge())
+    }
+
     func glassPanel(
         radius: CGFloat = CHRadius.card,
         surface: Color = .chSurfaceCard,
