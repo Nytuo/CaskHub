@@ -463,12 +463,35 @@ final class TopBarViewTests: XCTestCase {
             UserDefaults.standard.set(storedMode, forKey: "viewMode")
             UserDefaults.standard.set(storedSize, forKey: "catalogTextSize")
         }
-        for mode in [ViewMode.grid, .list] {
-            UserDefaults.standard.set(mode.rawValue, forKey: "viewMode")
-            UserDefaults.standard.set(CatalogTextSize.largest.rawValue, forKey: "catalogTextSize")
-            let window = renderInWindow(vm, categories: categories, local: local, width: 1008)
-            XCTAssertLessThanOrEqual(window.contentView?.fittingSize.width ?? .infinity, 1008)
+        defer { AppStyle.current = .classic }
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            for mode in [ViewMode.grid, .list] {
+                UserDefaults.standard.set(mode.rawValue, forKey: "viewMode")
+                UserDefaults.standard.set(CatalogTextSize.largest.rawValue, forKey: "catalogTextSize")
+                let window = renderInWindow(vm, categories: categories, local: local, width: 1008)
+                XCTAssertLessThanOrEqual(window.contentView?.fittingSize.width ?? .infinity, 1008, "\(style) \(mode)")
+            }
         }
+    }
+
+    @MainActor
+    func test_design_tokens_follow_app_style() {
+        defer { AppStyle.current = .classic }
+        let environment = EnvironmentValues()
+
+        AppStyle.current = .classic
+        XCTAssertGreaterThan(Color.chHairlineStrong.resolve(in: environment).opacity, 0)
+        XCTAssertGreaterThan(Color.chActionInstallBorder.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(CHRadius.card, 18)
+        XCTAssertEqual(CHType.trackingLabel, 2)
+
+        AppStyle.current = .native
+        XCTAssertEqual(Color.chHairlineStrong.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(Color.chActionInstallBorder.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(Color.chSurfaceStatusbar.resolve(in: environment).opacity, 0)
+        XCTAssertEqual(CHRadius.card, 14)
+        XCTAssertEqual(CHType.trackingLabel, 0.9)
     }
 
     @MainActor

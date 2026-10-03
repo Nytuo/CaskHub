@@ -79,7 +79,7 @@ struct StatusBarView: View {
     private func operationView(_ operation: CaskOperationStatus) -> some View {
         HStack(spacing: 8) {
             Rectangle()
-                .fill(Color.chHairlineStrong)
+                .fill(Color.chDivider)
                 .frame(width: 1, height: 13)
 
             ProgressView()

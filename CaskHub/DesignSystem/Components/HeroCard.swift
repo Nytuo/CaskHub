@@ -56,7 +56,7 @@ struct HeroCard: View {
                 .frame(width: 104, height: 104)
                 .background(
                     RoundedRectangle(cornerRadius: CHRadius.iconLg, style: .continuous)
-                        .fill(Color.chSurfaceField)
+                        .fill(Color.chSurfaceWell)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: CHRadius.iconLg, style: .continuous)

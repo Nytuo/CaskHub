@@ -23,7 +23,7 @@ struct CaskIconView: View {
         ZStack {
             if let loadedImage {
                 wellShape
-                    .fill(Color.chSurfaceField)
+                    .fill(Color.chSurfaceWell)
                     .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
                     .frame(width: size, height: size)
                 Image(nsImage: loadedImage)
@@ -37,7 +37,7 @@ struct CaskIconView: View {
                 cliTile
             } else {
                 wellShape
-                    .fill(Color.chSurfaceField)
+                    .fill(Color.chSurfaceWell)
                     .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
                     .frame(width: size, height: size)
                 if didResolve {
@@ -62,7 +62,7 @@ struct CaskIconView: View {
 
     private var cliTile: some View {
         wellShape
-            .fill(Color.chInk)
+            .fill(Color.chSurfaceTerminal)
             .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
             .overlay(
                 Text(">_")

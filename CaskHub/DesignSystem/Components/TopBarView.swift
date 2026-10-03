@@ -197,19 +197,19 @@ struct TopBarView: View {
             HStack {
                 Text(label)
                     .font(isSelected ? CHType.navActive : CHType.navItem)
-                    .foregroundStyle(isSelected ? Color.chActionInstallFg : Color.chTextNav)
+                    .foregroundStyle(isSelected ? Color.chSelectionFg : Color.chTextNav)
                 Spacer(minLength: 8)
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.chActionInstallFg)
+                        .foregroundStyle(Color.chSelectionFg)
                 }
             }
             .padding(.vertical, 5)
             .padding(.horizontal, 10)
             .background {
                 if isSelected {
-                    Capsule().fill(Color.chActionInstallBg)
+                    Capsule().fill(Color.chSelectionBg)
                 }
             }
             .contentShape(Rectangle())
@@ -239,7 +239,7 @@ struct TopBarView: View {
                 .frame(width: 34, height: 22)
                 .background {
                     if viewMode == mode {
-                        Capsule().fill(Color.chTextTitle)
+                        Capsule().fill(Color.chSegmentSelected)
                     }
                 }
                 .contentShape(Capsule())

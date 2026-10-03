@@ -101,7 +101,7 @@ struct ContentView: View {
         .focusedSceneValue(\.catalogViewMode, $viewMode)
         .focusedSceneValue(\.sidebarVisibility, $sidebarVisibility)
         .windowToolbarFullScreenVisibility(.onHover)
-        .tint(Color.chTerracotta)
+        .tint(Color.chAccent)
         .task {
             async let icons: Void = imageCache.refreshIconManifest()
             await viewModel.load()
