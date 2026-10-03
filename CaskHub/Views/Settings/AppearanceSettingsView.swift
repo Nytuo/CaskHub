@@ -233,7 +233,7 @@ private struct ThemeMiniWindow: View {
         .frame(width: Self.size.width, height: Self.size.height, alignment: .topLeading)
         .background {
             if let dots = palette.dots {
-                DotGrid(color: dots)
+                HalftoneTexture(color: dots, step: 6, dot: 1)
             }
         }
         .background(palette.background)
@@ -284,24 +284,6 @@ private struct ThemeMiniWindow: View {
         .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 60, alignment: .topLeading)
         .background(shape.fill(palette.card).shadow(color: palette.cardShadow, radius: 3, y: 2))
         .overlay { shape.strokeBorder(palette.cardEdge, lineWidth: 1) }
-    }
-}
-
-private struct DotGrid: View {
-    let color: Color
-
-    var body: some View {
-        Canvas { ctx, size in
-            var dotY: CGFloat = 0
-            while dotY < size.height {
-                var dotX: CGFloat = 0
-                while dotX < size.width {
-                    ctx.fill(Path(ellipseIn: CGRect(x: dotX + 2.5, y: dotY + 2.5, width: 1, height: 1)), with: .color(color))
-                    dotX += 6
-                }
-                dotY += 6
-            }
-        }
     }
 }
 
@@ -362,18 +344,6 @@ private struct ThemePreviewPalette {
                         Color(hex: 0xC46246, alpha: 0.36), Color(hex: 0xC46246, alpha: 0.36)]
             )
         }
-    }
-}
-
-private extension Color {
-    init(hex: UInt32, alpha: Double = 1) {
-        self.init(
-            .sRGB,
-            red: Double((hex >> 16) & 0xFF) / 255,
-            green: Double((hex >> 8) & 0xFF) / 255,
-            blue: Double(hex & 0xFF) / 255,
-            opacity: alpha
-        )
     }
 }
 

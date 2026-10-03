@@ -41,12 +41,10 @@ enum AppStyle: String, CaseIterable, Identifiable {
     }
 
     // ponytail: heuristic; a user who wiped prefs and caches reads as a new install
-    static func hasPriorInstall(
-        defaults: UserDefaults = .standard,
-        fileManager: FileManager = .default
-    ) -> Bool {
+    static func hasPriorInstall() -> Bool {
+        let fileManager = FileManager.default
         if let bundleID = Bundle.main.bundleIdentifier,
-           defaults.persistentDomain(forName: bundleID)?.isEmpty == false {
+           UserDefaults.standard.persistentDomain(forName: bundleID)?.isEmpty == false {
             return true
         }
         let roots = [FileManager.SearchPathDirectory.cachesDirectory, .applicationSupportDirectory]

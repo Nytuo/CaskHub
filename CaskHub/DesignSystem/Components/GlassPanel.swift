@@ -149,17 +149,21 @@ struct WindowBackdrop: View {
 }
 
 struct HalftoneTexture: View {
+    var color: Color = .chHalftoneDot
+    var step: CGFloat = 9
+    var dot: CGFloat = 2
+
     var body: some View {
-        // ponytail: O(w·h/81) dots per redraw; switch to a tiled image if resize ever stutters
+        // ponytail: O(w·h/step²) dots per redraw; switch to a tiled image if resize ever stutters
         Canvas { ctx, size in
-            let step: CGFloat = 9
-            var dotY: CGFloat = 4
+            let start = (step - 1) / 2
+            var dotY = start
             while dotY < size.height {
-                var dotX: CGFloat = 4
+                var dotX = start
                 while dotX < size.width {
                     ctx.fill(
-                        Path(ellipseIn: CGRect(x: dotX, y: dotY, width: 2, height: 2)),
-                        with: .color(.chHalftoneDot)
+                        Path(ellipseIn: CGRect(x: dotX, y: dotY, width: dot, height: dot)),
+                        with: .color(color)
                     )
                     dotX += step
                 }

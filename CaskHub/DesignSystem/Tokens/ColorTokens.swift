@@ -18,6 +18,12 @@ private extension NSColor {
     }
 }
 
+extension Color {
+    init(hex: UInt32, alpha: CGFloat = 1) {
+        self.init(nsColor: NSColor(hex: hex, alpha: alpha))
+    }
+}
+
 private func adaptive(light: NSColor, dark: NSColor) -> Color {
     Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light
@@ -89,7 +95,6 @@ extension Color {
     static var chSelectionFg: Color { styled(Classic.actionInstallFg, Native.selectionFg) }
 
     // ── Badge ──────────────────────────────────────────
-    static var chBadgeBg: Color { styled(Classic.badgeBg, Native.badgeBg) }
     static var chBadgeBorder: Color { styled(Classic.badgeBorder, .clear) }
     static var chBadgeFg: Color { styled(Classic.badgeFg, Native.badgeFg) }
 
@@ -142,7 +147,6 @@ private enum Classic {
     static let actionDoneBorder = adaptive(light: NSColor(hex: 0x6FA287, alpha: 0.60), dark: NSColor(hex: 0x6FA287, alpha: 0.50))
     static let actionDoneFg = adaptive(light: NSColor(hex: 0x3E6E55), dark: NSColor(hex: 0x8FC4A8))
 
-    static let badgeBg = adaptive(light: NSColor(hex: 0xD99A4E, alpha: 0.35), dark: NSColor(hex: 0xE2AB60, alpha: 0.28))
     static let badgeBorder = adaptive(light: NSColor(hex: 0xFFFFFF, alpha: 0.80), dark: NSColor(hex: 0xFFFFFF, alpha: 0.30))
     static let badgeFg = adaptive(light: NSColor(hex: 0x8A5A1A), dark: NSColor(hex: 0xECC084))
 
@@ -150,7 +154,6 @@ private enum Classic {
     static let shadowHero = adaptive(light: NSColor(hex: 0x33304A, alpha: 0.12), dark: NSColor(hex: 0x000000, alpha: 0.35))
 }
 
-/// Design 1a with the 6a/5b glass edges and 3d buttons.
 private enum Native {
     static let window = adaptive(0xF2F2F4, 0x1C1C1E)
     static let sidebar = adaptive(0xFBFBFC, 0x2C2C2E)
@@ -181,6 +184,5 @@ private enum Native {
     static let selectionBg = adaptive(0xC8674A, 0xE8916F, alpha: (0.15, 0.20))
     static let selectionFg = adaptive(0xA5492D, 0xF4B49A)
 
-    static let badgeBg = adaptive(0xD99A4E, 0xE8B26C, alpha: (0.22, 0.20))
     static let badgeFg = adaptive(0xB07624, 0xF0C68E)
 }

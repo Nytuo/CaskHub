@@ -71,7 +71,6 @@ struct CatalogToolbar: ToolbarContent {
             }
         }
         if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
-            // Without it macOS merges Greedy into Update All's capsule.
             ToolbarSpacer(.fixed)
         }
         if let onUpdateAll {

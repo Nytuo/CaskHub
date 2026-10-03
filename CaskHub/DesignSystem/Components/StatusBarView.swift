@@ -66,13 +66,9 @@ struct StatusBarView: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 7)
         .background {
-            if CHType.isNative {
-                Rectangle().fill(Color.chSurfaceStatusbar)
-            } else {
-                Rectangle()
-                    .fill(Color.chSurfaceStatusbar)
-                    .background(.ultraThinMaterial)
-            }
+            Rectangle()
+                .fill(Color.chSurfaceStatusbar)
+                .background(.ultraThinMaterial.opacity(CHType.isNative ? 0 : 1))
         }
         .overlay(alignment: .top) {
             Rectangle().fill(Color.chHairline).frame(height: 1)
