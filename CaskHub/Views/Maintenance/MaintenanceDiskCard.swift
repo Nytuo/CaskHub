@@ -159,11 +159,13 @@ struct MaintenanceDiskCard: View {
             ) {
                 Task { await model.clean(id) }
             }
-            .frame(width: 74)
+            .frame(width: 74, alignment: .trailing)
         default:
             if buttonTitle(for: id) != nil, model.diskBytes[id] == 0 {
+                // Centred under the trailing-aligned pills above it.
                 cleanGlyph
-                    .frame(width: 74)
+                    .frame(width: 60)
+                    .frame(width: 74, alignment: .trailing)
             } else {
                 Color.clear.frame(width: 74, height: 1)
             }
