@@ -35,6 +35,8 @@ struct TopBarTitle: ToolbarContent {
             .lineLimit(1)
             .fixedSize()
             .padding(.leading, 4)
+            // Toolbar items keep their first measured width; a new identity per page re-measures it.
+            .id(title)
         }
     }
 }
@@ -103,7 +105,7 @@ struct CatalogToolbar: ToolbarContent {
             }
         }
         ToolbarItem(placement: .automatic) {
-            Picker("View", selection: $viewMode) {
+            Picker("View Mode", selection: $viewMode) {
                 Label("Grid", systemImage: "square.grid.2x2").tag(ViewMode.grid)
                 Label("List", systemImage: "list.bullet").tag(ViewMode.list)
             }
@@ -130,6 +132,9 @@ private struct OptionMenu<Option: Identifiable & Equatable>: View {
             Label(current[keyPath: label], systemImage: systemImage)
                 .labelStyle(.titleAndIcon)
         }
+        // Toolbar items keep their first measured width; a new identity per choice re-measures it.
+        .fixedSize()
+        .id(current.id)
     }
 }
 
