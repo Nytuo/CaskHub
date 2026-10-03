@@ -26,7 +26,7 @@ enum AppStyle: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .native: return String(localized: "Native")
+        case .native: return String(localized: .appearanceStyleStandard)
         case .classic: return String(localized: "Classic")
         }
     }
