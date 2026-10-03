@@ -27,7 +27,7 @@ struct AppearanceSettingsView: View {
                             theme: theme
                         ) { mode in
                             selectedStyle = style
-                            selectedTheme = mode.rawValue
+                            selectedTheme = Self.theme(afterPicking: mode, current: theme).rawValue
                         }
                     }
                 }
@@ -87,6 +87,11 @@ struct AppearanceSettingsView: View {
         }
     }
 
+    /// While following macOS, a card picks the theme only; otherwise the clicked half sets the mode too.
+    static func theme(afterPicking mode: AppTheme, current: AppTheme) -> AppTheme {
+        current == .system ? .system : mode
+    }
+
     private var theme: AppTheme {
         AppTheme(rawValue: selectedTheme) ?? .system
     }
@@ -97,7 +102,7 @@ struct AppearanceSettingsView: View {
 
     private var modeSummary: String {
         theme == .system
-            ? String(localized: "System (currently \(currentMode.title))")
+            ? String(localized: "System (Currently \(currentMode.title))")
             : theme.title
     }
 
@@ -142,11 +147,13 @@ private struct ThemeSplitCard: View {
                         half(.dark)
                     }
                 }
-            HStack(spacing: 0) {
-                modeLabel(.light)
-                modeLabel(.dark)
+            if theme != .system {
+                HStack(spacing: 0) {
+                    modeLabel(.light)
+                    modeLabel(.dark)
+                }
+                .font(.system(size: 11, weight: .medium))
             }
-            .font(.system(size: 11, weight: .medium))
             Text(style.title)
                 .font(.system(size: 13, weight: isSelected ? .bold : .regular))
                 .foregroundStyle(isSelected ? .primary : .secondary)
@@ -177,7 +184,7 @@ private struct ThemeSplitCard: View {
     }
 
     private func isHighlighted(_ mode: AppTheme) -> Bool {
-        isSelected && (theme == mode || theme == .system)
+        isSelected && theme == mode
     }
 
     private func half(_ mode: AppTheme) -> some View {
@@ -200,7 +207,7 @@ private struct ThemeSplitCard: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text(verbatim: "\(style.title), \(mode.title)"))
+        .accessibilityLabel(Text(verbatim: theme == .system ? style.title : "\(style.title), \(mode.title)"))
         .accessibilityAddTraits(isSelected && theme == mode ? .isSelected : [])
     }
 

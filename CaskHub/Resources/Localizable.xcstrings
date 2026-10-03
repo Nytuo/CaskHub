@@ -401,18 +401,18 @@
         }
       }
     },
-    "System (currently %@)" : {
+    "System (Currently %@)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Системная (сейчас %@)"
+            "value" : "Системная (Сейчас %@)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Системна (зараз %@)"
+            "value" : "Системна (Зараз %@)"
           }
         },
         "zh-Hans" : {

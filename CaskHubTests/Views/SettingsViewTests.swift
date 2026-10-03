@@ -304,6 +304,13 @@ final class SettingsViewTests: XCTestCase {
     }
 
     @MainActor
+    func test_picking_a_split_card_half_keeps_following_the_system() {
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .light, current: .system), .system)
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .dark, current: .light), .dark)
+        XCTAssertEqual(AppearanceSettingsView.theme(afterPicking: .light, current: .dark), .light)
+    }
+
+    @MainActor
     func test_appearance_split_cards_fit_the_settings_window_in_both_styles() {
         defer { AppStyle.current = .classic }
         for style in AppStyle.allCases {
