@@ -297,7 +297,7 @@ private struct BrewfileEntryIcon: View {
 
     var body: some View {
         if let cask = entry.cask {
-            CaskIconView(cask: cask, size: 26)
+            CaskIconView(cask: cask, size: 26, alignment: .center)
         } else {
             RoundedRectangle(cornerRadius: 7)
                 .fill(Color.chSurfaceField)

@@ -26,8 +26,10 @@ struct CaskRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            CaskIconView(cask: cask, size: 40)
-            appInfo
+            HStack(alignment: .iconTitleTop, spacing: 12) {
+                CaskIconView(cask: cask, size: 40)
+                appInfo
+            }
             Spacer()
             metadata
             actionsControl
@@ -54,6 +56,7 @@ struct CaskRowView: View {
                 .font(typography.title)
                 .foregroundStyle(Color.chTextTitle)
                 .lineLimit(1)
+                .alignmentGuide(.iconTitleTop) { $0[.top] - CHSize.titleInsetBelowIcon * textScale }
             if let desc = cask.desc {
                 Text(desc)
                     .font(typography.description)
@@ -154,6 +157,14 @@ struct CaskRowView: View {
     private var actionPresentation: CaskActionPresentation {
         localHomebrew.actionPresentation(for: cask, localState: localState)
     }
+}
+
+private extension VerticalAlignment {
+    private nonisolated enum IconTitleTop: AlignmentID {
+        static func defaultValue(in context: ViewDimensions) -> CGFloat { context[.top] }
+    }
+
+    static let iconTitleTop = VerticalAlignment(IconTitleTop.self)
 }
 
 struct CaskRowActionsMenuButton: View {

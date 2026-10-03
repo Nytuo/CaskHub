@@ -311,7 +311,7 @@ struct AdoptIgnorePickerSheet: View {
 
     private func adoptableRow(_ cask: Cask) -> some View {
         HStack(spacing: 10) {
-            CaskIconView(cask: cask, size: 28)
+            CaskIconView(cask: cask, size: 28, alignment: .center)
             Text(cask.displayName)
                 .font(CHType.cardTitle)
                 .foregroundStyle(Color.chTextTitle)
