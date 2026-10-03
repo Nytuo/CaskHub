@@ -288,6 +288,22 @@ final class SettingsViewTests: XCTestCase {
     }
 
     @MainActor
+    func test_style_resolution_keeps_upgraders_classic_and_starts_new_installs_native() throws {
+        let suite = "style-resolution-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { true }, .classic)
+        XCTAssertEqual(defaults.string(forKey: AppStyle.storageKey), "classic")
+
+        defaults.removeObject(forKey: AppStyle.storageKey)
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { false }, .native)
+        XCTAssertEqual(defaults.string(forKey: AppStyle.storageKey), "native")
+
+        XCTAssertEqual(AppStyle.resolveStored(in: defaults) { XCTFail("stored choice wins"); return true }, .native)
+    }
+
+    @MainActor
     func test_theme_preview_assets_are_bundled() {
         for theme in AppTheme.allCases {
             XCTAssertNotNil(theme.previewImage, "missing theme preview for \(theme.rawValue)")

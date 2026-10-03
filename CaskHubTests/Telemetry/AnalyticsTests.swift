@@ -339,6 +339,7 @@ final class AnalyticsTests: XCTestCase {
         Analytics.recentWindowChanged(.days30)
         Analytics.viewModeChanged(.list)
         Analytics.themeChanged("Dark")
+        Analytics.styleChanged(.native)
         Analytics.analyticsReEnabled()
 
         XCTAssertEqual(spy.signals.map(\.name), [
@@ -346,7 +347,7 @@ final class AnalyticsTests: XCTestCase {
             "Filter.periodChanged",
             "Filter.windowChanged",
             "View.modeChanged",
-            "Settings.themeChanged",
+            "Settings.themeChanged", "Settings.styleChanged",
             "Settings.analyticsEnabled"
         ])
         XCTAssertEqual(spy.signals.map(\.parameters), [
@@ -355,6 +356,7 @@ final class AnalyticsTests: XCTestCase {
             ["window": "30d"],
             ["mode": "list"],
             ["theme": "Dark"],
+            ["style": "native"],
             [:]
         ])
     }

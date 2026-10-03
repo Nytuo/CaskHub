@@ -127,6 +127,10 @@ extension Analytics {
         send("Settings.themeChanged", parameters: ["theme": theme])
     }
 
+    static func styleChanged(_ style: AppStyle) {
+        send("Settings.styleChanged", parameters: ["style": style.rawValue])
+    }
+
     /// Turning telemetry OFF sends nothing — the opt-out applies instantly.
     static func analyticsReEnabled() {
         send("Settings.analyticsEnabled")
