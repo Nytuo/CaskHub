@@ -476,6 +476,32 @@ final class TopBarViewTests: XCTestCase {
     }
 
     @MainActor
+    func test_downloading_capsule_stays_inside_list_action_slot() {
+        defer { AppStyle.current = .classic }
+        let progress = CaskOperationProgress(
+            token: "codexbar",
+            displayName: "CodexBar",
+            action: .updating,
+            phase: .downloading,
+            completedBytes: 84_000_000,
+            totalBytes: 245_000_000
+        )
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let capsule = CaskOperationCapsule(
+                action: .updating,
+                progress: progress,
+                isCanceling: false,
+                canCancel: false,
+                fullWidth: true,
+                onCancel: {}
+            )
+            let slot = CGSize(width: CHSize.listActionWidth, height: 100)
+            XCTAssertLessThanOrEqual(NSHostingController(rootView: capsule).sizeThatFits(in: slot).width, slot.width, "\(style)")
+        }
+    }
+
+    @MainActor
     func test_design_tokens_follow_app_style() {
         defer { AppStyle.current = .classic }
         let environment = EnvironmentValues()
