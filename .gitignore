@@ -67,3 +67,6 @@ skills/
 *.txt
 
 Configs/Secrets.xcconfig
+
+# Coverage profiles written by test runs
+*.profraw
