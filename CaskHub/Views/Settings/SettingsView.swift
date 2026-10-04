@@ -402,46 +402,6 @@ private struct HomebrewSettingsContent: View {
     }
 }
 
-struct PrivacySettingsView: View {
-    @AppStorage(Analytics.enabledKey) private var analyticsEnabled = true
-    @AppStorage(CrashReporter.enabledKey) private var crashReportingEnabled = true
-
-    var body: some View {
-        Form {
-            Section("Usage Analytics") {
-                Toggle(
-                    "Share anonymous usage analytics",
-                    isOn: $analyticsEnabled
-                )
-
-                Text(.settingsPrivacyUsageAnalytics)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            }
-
-            Section("Crash Reports") {
-                Toggle(
-                    "Share crash reports",
-                    isOn: $crashReportingEnabled
-                )
-
-                Text(.settingsPrivacyCrashReports)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
-        .padding()
-        .onChange(of: analyticsEnabled) { _, isOn in
-            Analytics.refresh()
-            if isOn { Analytics.analyticsReEnabled() }
-        }
-        .onChange(of: crashReportingEnabled) { _, _ in
-            CrashReporter.refresh()
-        }
-    }
-}
-
 #Preview {
     SettingsView(selection: .constant(.general))
         .environment(UpdaterService())
