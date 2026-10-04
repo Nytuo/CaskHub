@@ -5853,6 +5853,414 @@
         }
       }
     },
+    "launchCard.button.back" : {
+      "comment" : "Welcome tour button that returns to the previous page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "launchCard.button.continue" : {
+      "comment" : "What's New card button that closes the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "launchCard.button.getStarted" : {
+      "comment" : "Welcome tour button on the last page that closes the tour",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "launchCard.button.next" : {
+      "comment" : "Welcome tour button that advances to the next page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "launchCard.button.skip" : {
+      "comment" : "Welcome tour button that closes the tour early",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.adopt.detail" : {
+      "comment" : "Welcome tour, Adopt Apps page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed apps by hand? Adopt them so Homebrew keeps them up to date."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.adopt.title" : {
+      "comment" : "Welcome tour, Adopt Apps page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adopt Your Existing Apps"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.categories.detail" : {
+      "comment" : "Welcome tour, categories page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thousands of casks sorted into categories, so finding a design tool or a database client takes seconds."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.categories.title" : {
+      "comment" : "Welcome tour, categories page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse by Category"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.icons.detail" : {
+      "comment" : "Welcome tour, app icons page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every app shows its original icon, so the catalog looks like your Dock, not a package list."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.icons.title" : {
+      "comment" : "Welcome tour, app icons page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Real App Icons"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.intro.detail" : {
+      "comment" : "Welcome tour, first page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A native home for every Homebrew cask. Browse, install, update, and tidy up without opening Terminal."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.intro.title" : {
+      "comment" : "Welcome tour, first page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to CaskHub"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.look.detail" : {
+      "comment" : "Welcome tour, appearance style page description. Standard and Classic are the two style names",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard feels native to macOS. Classic is warm and playful. Change it any time in Settings."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.look.title" : {
+      "comment" : "Welcome tour, appearance style page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick Your Look"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.manage.detail" : {
+      "comment" : "Welcome tour, installed apps and updates page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See every installed app, check what is outdated, and update all of them with one click."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.manage.title" : {
+      "comment" : "Welcome tour, installed apps and updates page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in One Place"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.pageIndicator" : {
+      "comment" : "Welcome tour, VoiceOver label for the page dots: current page, total pages",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.privacy.detail" : {
+      "comment" : "Welcome tour, privacy page description shown above the analytics and crash report toggles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous usage and crash data help improve CaskHub. Nothing personal is collected, and you can turn either off."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.privacy.title" : {
+      "comment" : "Welcome tour, privacy page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Privacy"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.ready.detail" : {
+      "comment" : "Welcome tour, last page description shown above a list of keyboard shortcuts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A few shortcuts to get around faster."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.ready.title" : {
+      "comment" : "Welcome tour, last page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're All Set"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.recentlyAdded.detail" : {
+      "comment" : "Welcome tour, Recently Added page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently Added tracks new casks as they arrive in Homebrew."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.recentlyAdded.title" : {
+      "comment" : "Welcome tour, Recently Added page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See What Just Landed"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.search" : {
+      "comment" : "Welcome tour, label next to the Command-F keycap",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search the catalog"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.settings" : {
+      "comment" : "Welcome tour, label next to the Command-comma keycap",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.viewMode" : {
+      "comment" : "Welcome tour, label next to the Command-1 and Command-2 keycaps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between grid and list"
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.icons.detail" : {
+      "comment" : "What's New card, 0.9.0: description of the app icons feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons fill their tiles at full size and load without flicker."
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.icons.title" : {
+      "comment" : "What's New card, 0.9.0: title of the app icons feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharper App Icons"
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.standardLook.detail" : {
+      "comment" : "What's New card, 0.9.0: description of the Standard appearance feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cleaner, native appearance joins Classic. Switch any time in Settings, Appearance."
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.standardLook.title" : {
+      "comment" : "What's New card, 0.9.0: title of the Standard appearance feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A New Standard Look"
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.title" : {
+      "comment" : "Title of the What's New card and of its Help menu item",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's New in CaskHub"
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.toolbar.detail" : {
+      "comment" : "What's New card, 0.9.0: description of the system toolbar feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search, sorting, and view controls now live in the system toolbar."
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.toolbar.title" : {
+      "comment" : "What's New card, 0.9.0: title of the system toolbar feature row",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native Toolbar"
+          }
+        }
+      }
+    },
     "Library" : {
       "localizations" : {
         "ru" : {

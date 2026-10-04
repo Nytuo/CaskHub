@@ -97,6 +97,7 @@ final class ApplicationMenuTests: XCTestCase {
         XCTAssertTrue(helpTitles.contains("Homebrew Setup"), "Help menu: \(helpTitles)")
         XCTAssertTrue(helpTitles.contains("Adopting Apps"), "Help menu: \(helpTitles)")
         XCTAssertTrue(helpTitles.contains("App Management Permission"), "Help menu: \(helpTitles)")
+        XCTAssertTrue(helpTitles.contains("What's New in CaskHub"), "Help menu: \(helpTitles)")
     }
 
     @MainActor
@@ -153,6 +154,31 @@ final class ApplicationMenuTests: XCTestCase {
         addTeardownBlock { @MainActor in
             helpWindow.close()
         }
+    }
+
+    @MainActor
+    func test_help_menu_presents_whats_new_card() throws {
+        let helpMenu = try XCTUnwrap(NSApp.mainMenu?.item(withTitle: "Help")?.submenu)
+        let item = try XCTUnwrap(helpMenu.item(withTitle: "What's New in CaskHub"))
+        let action = try XCTUnwrap(item.action)
+        XCTAssertTrue(NSApp.sendAction(action, to: item.target, from: item))
+
+        func attachedSheet() -> NSWindow? {
+            NSApp.windows.lazy.compactMap(\.attachedSheet).first
+        }
+        func wait(until condition: () -> Bool) {
+            let deadline = Date().addingTimeInterval(2)
+            while !condition(), Date() < deadline {
+                RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+            }
+        }
+
+        wait { attachedSheet() != nil }
+        let sheet = try XCTUnwrap(attachedSheet())
+
+        sheet.sheetParent?.endSheet(sheet)
+        wait { attachedSheet() == nil }
+        XCTAssertNil(attachedSheet())
     }
 
     @MainActor

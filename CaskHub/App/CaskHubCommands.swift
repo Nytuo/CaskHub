@@ -101,6 +101,7 @@ struct CaskHubViewCommands: Commands {
 
 struct CaskHubHelpCommands: Commands {
     @Binding var selection: HelpTopic
+    @Binding var launchCard: LaunchCard?
     @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
@@ -109,6 +110,11 @@ struct CaskHubHelpCommands: Commands {
                 show(.gettingStarted)
             }
             .keyboardShortcut("?", modifiers: .command)
+
+            Button(String(localized: .launchCardWhatsNewTitle)) {
+                launchCard = .whatsNew(.latest)
+                openWindow(id: CaskHubWindowID.main)
+            }
 
             Divider()
 

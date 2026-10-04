@@ -40,6 +40,7 @@ struct CaskHubApp: App {
     @State private var updaterService = UpdaterService()
     @State private var helpTopic: HelpTopic = .gettingStarted
     @State private var settingsSection: SettingsSection = .general
+    @State private var launchCard: LaunchCard?
 
     @State private var categoryService: CategoryService
     @State private var recentlyAdded: RecentlyAddedService
@@ -52,7 +53,14 @@ struct CaskHubApp: App {
         // Tooltip delay in ms; registered (not set) so it never persists to prefs.
         UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 500])
         // Must run before anything persists prefs or caches, or a new install reads as an upgrade.
-        AppStyle.current = AppStyle.resolveStored(in: .standard) { AppStyle.hasPriorInstall() }
+        let hadPriorInstall = AppStyle.hasPriorInstall()
+        AppStyle.current = AppStyle.resolveStored(in: .standard) { hadPriorInstall }
+        _launchCard = State(initialValue: CrashReporter.isRunningTests ? nil : LaunchCardGate.resolve(
+            in: .standard,
+            currentVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
+            hasPriorInstall: hadPriorInstall,
+            latest: .latest
+        ))
         BrandFonts.register()
         CrashReporter.start()
         Analytics.start()
@@ -111,6 +119,9 @@ struct CaskHubApp: App {
                     .onChange(of: selectedStyle) { _, newValue in
                         AppStyle.current = newValue
                     }
+                    .sheet(item: $launchCard) { card in
+                        LaunchCardView(card: card)
+                    }
                     .environment(categoryService)
                     .environment(recentlyAdded)
                     .environment(localHomebrew)
@@ -146,7 +157,7 @@ struct CaskHubApp: App {
         }
         .commands {
             CaskHubApplicationCommands(updater: updaterService)
-            CaskHubHelpCommands(selection: $helpTopic)
+            CaskHubHelpCommands(selection: $helpTopic, launchCard: $launchCard)
         }
     }
 }
