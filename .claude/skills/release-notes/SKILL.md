@@ -38,6 +38,10 @@ Each release adds one entry at the top of `CHANGELOG.md`:
   mismatch, so forgetting to add the new entry fails loudly.
 - Omit any section that would be empty. A patch release may be Bug Fixes only.
 - Never rewrite past entries; only add the new one on top.
+- When the new entry has a `### What's New` section, replace
+  `WhatsNewRelease.latest` in `CaskHub/Models/LaunchCard.swift` (version plus
+  up to four rows) and its `launchCard.whatsNew.*` catalog keys. Patch
+  releases leave the card alone.
 
 ## Writing the bullets
 

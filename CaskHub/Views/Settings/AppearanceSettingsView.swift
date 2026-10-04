@@ -19,20 +19,9 @@ struct AppearanceSettingsView: View {
     var body: some View {
         Form {
             Section {
-                HStack(alignment: .top, spacing: 24) {
-                    ForEach(AppStyle.allCases) { style in
-                        ThemeSplitCard(
-                            style: style,
-                            isSelected: style == selectedStyle,
-                            theme: theme
-                        ) { mode in
-                            selectedStyle = style
-                            selectedTheme = Self.theme(afterPicking: mode, current: theme).rawValue
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
+                AppStylePicker()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
 
                 Toggle(isOn: matchesSystem) {
                     Text("Match system appearance")
@@ -79,12 +68,6 @@ struct AppearanceSettingsView: View {
         }
         .formStyle(.grouped)
         .padding()
-        .onChange(of: selectedTheme) { _, newValue in
-            Analytics.themeChanged(newValue)
-        }
-        .onChange(of: selectedStyle) { _, newValue in
-            Analytics.styleChanged(newValue)
-        }
     }
 
     static func theme(afterPicking mode: AppTheme, current: AppTheme) -> AppTheme {
@@ -119,6 +102,38 @@ struct AppearanceSettingsView: View {
             get: { Double(CatalogTextSize.allCases.firstIndex(of: catalogTextSize) ?? 0) },
             set: { catalogTextSize = CatalogTextSize.allCases[Int(min(2, max(0, $0.rounded())))] }
         )
+    }
+}
+
+// MARK: - Style picker
+
+struct AppStylePicker: View {
+    @AppStorage("appTheme") private var selectedTheme: String = AppTheme.system.rawValue
+    @AppStorage(AppStyle.storageKey) private var selectedStyle: AppStyle = .classic
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 24) {
+            ForEach(AppStyle.allCases) { style in
+                ThemeSplitCard(
+                    style: style,
+                    isSelected: style == selectedStyle,
+                    theme: theme
+                ) { mode in
+                    selectedStyle = style
+                    selectedTheme = AppearanceSettingsView.theme(afterPicking: mode, current: theme).rawValue
+                }
+            }
+        }
+        .onChange(of: selectedTheme) { _, newValue in
+            Analytics.themeChanged(newValue)
+        }
+        .onChange(of: selectedStyle) { _, newValue in
+            Analytics.styleChanged(newValue)
+        }
+    }
+
+    private var theme: AppTheme {
+        AppTheme(rawValue: selectedTheme) ?? .system
     }
 }
 
