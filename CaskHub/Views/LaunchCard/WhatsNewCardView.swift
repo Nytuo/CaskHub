@@ -37,7 +37,7 @@ struct WhatsNewCardView: View {
         .padding(.trailing, 20)
         .padding(.bottom, 36)
         .frame(width: 480, height: 600)
-        .onDisappear { Analytics.launchCardDismissed(.whatsNew(release)) }
+        .onDisappear { Analytics.launchCardDismissed(.whatsNew) }
     }
 }
 

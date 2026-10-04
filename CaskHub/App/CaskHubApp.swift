@@ -59,7 +59,7 @@ struct CaskHubApp: App {
             in: .standard,
             currentVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
             hasPriorInstall: hadPriorInstall,
-            latest: .latest
+            latestVersion: WhatsNewRelease.latest.version
         ))
         BrandFonts.register()
         CrashReporter.start()

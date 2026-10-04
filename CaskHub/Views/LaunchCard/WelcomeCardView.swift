@@ -10,51 +10,37 @@ import SwiftUI
 enum WelcomePage: Int, CaseIterable {
     case intro, categories, recentlyAdded, manage, adopt, look, privacy, ready
 
-    var symbol: String? {
-        switch self {
-        case .intro: nil
-        case .categories: DiscoverItem.browse.icon
-        case .recentlyAdded: DiscoverItem.recentlyAdded.icon
-        case .manage: LibraryItem.updates.icon
-        case .adopt: LibraryItem.adopt.icon
-        case .look: "paintbrush"
-        case .privacy: "hand.raised"
-        case .ready: "checkmark.seal.fill"
-        }
+    struct Spec {
+        let symbol: String?
+        let tint: Color
+        let title: LocalizedStringResource
+        let detail: LocalizedStringResource
     }
 
-    var tint: Color {
+    var spec: Spec {
         switch self {
-        case .intro, .manage: .chTerracotta
-        case .privacy: .chAmber
-        case .categories, .adopt, .ready: .chSage
-        case .recentlyAdded, .look: .chPlum
-        }
-    }
-
-    var title: LocalizedStringResource {
-        switch self {
-        case .intro: .launchCardWelcomeIntroTitle
-        case .categories: .launchCardWelcomeCategoriesTitle
-        case .recentlyAdded: .launchCardWelcomeRecentlyAddedTitle
-        case .manage: .launchCardWelcomeManageTitle
-        case .adopt: .launchCardWelcomeAdoptTitle
-        case .look: .launchCardWelcomeLookTitle
-        case .privacy: .launchCardWelcomePrivacyTitle
-        case .ready: .launchCardWelcomeReadyTitle
-        }
-    }
-
-    var detail: LocalizedStringResource {
-        switch self {
-        case .intro: .launchCardWelcomeIntroDetail
-        case .categories: .launchCardWelcomeCategoriesDetail
-        case .recentlyAdded: .launchCardWelcomeRecentlyAddedDetail
-        case .manage: .launchCardWelcomeManageDetail
-        case .adopt: .launchCardWelcomeAdoptDetail
-        case .look: .launchCardWelcomeLookDetail
-        case .privacy: .launchCardWelcomePrivacyDetail
-        case .ready: .launchCardWelcomeReadyDetail
+        case .intro:
+            Spec(symbol: nil, tint: .chTerracotta, title: .launchCardWelcomeIntroTitle, detail: .launchCardWelcomeIntroDetail)
+        case .categories:
+            Spec(symbol: DiscoverItem.browse.icon, tint: .chSage,
+                 title: .launchCardWelcomeCategoriesTitle, detail: .launchCardWelcomeCategoriesDetail)
+        case .recentlyAdded:
+            Spec(symbol: DiscoverItem.recentlyAdded.icon, tint: .chPlum,
+                 title: .launchCardWelcomeRecentlyAddedTitle, detail: .launchCardWelcomeRecentlyAddedDetail)
+        case .manage:
+            Spec(symbol: LibraryItem.updates.icon, tint: .chTerracotta,
+                 title: .launchCardWelcomeManageTitle, detail: .launchCardWelcomeManageDetail)
+        case .adopt:
+            Spec(symbol: LibraryItem.adopt.icon, tint: .chSage,
+                 title: .launchCardWelcomeAdoptTitle, detail: .launchCardWelcomeAdoptDetail)
+        case .look:
+            Spec(symbol: "paintbrush", tint: .chPlum, title: .launchCardWelcomeLookTitle, detail: .launchCardWelcomeLookDetail)
+        case .privacy:
+            Spec(symbol: "hand.raised", tint: .chAmber,
+                 title: .launchCardWelcomePrivacyTitle, detail: .launchCardWelcomePrivacyDetail)
+        case .ready:
+            Spec(symbol: "checkmark.seal.fill", tint: .chSage,
+                 title: .launchCardWelcomeReadyTitle, detail: .launchCardWelcomeReadyDetail)
         }
     }
 }
@@ -166,13 +152,13 @@ private struct WelcomePageView: View {
     private var content: some View {
         VStack(spacing: 14) {
             hero
-            Text(page.title)
+            Text(page.spec.title)
                 .font(CHType.Catalog(scale: 0.8).hero)
                 .foregroundStyle(Color.chTextTitle)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .frame(height: 30)
-            Text(page.detail)
+            Text(page.spec.detail)
                 .font(CHType.body)
                 .foregroundStyle(Color.chTextBody)
                 .multilineTextAlignment(.center)
@@ -197,10 +183,10 @@ private struct WelcomePageView: View {
     }
 
     @ViewBuilder private var hero: some View {
-        if let symbol = page.symbol {
+        if let symbol = page.spec.symbol {
             Image(systemName: symbol)
                 .font(.system(size: 52))
-                .foregroundStyle(page.tint)
+                .foregroundStyle(page.spec.tint)
                 .frame(height: 64)
                 .scaleEffect(isHeldBack ? 0.3 : 1)
                 .rotationEffect(.degrees(isHeldBack ? -30 : 0))

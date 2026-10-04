@@ -112,7 +112,7 @@ struct CaskHubHelpCommands: Commands {
             .keyboardShortcut("?", modifiers: .command)
 
             Button(String(localized: .launchCardWhatsNewTitle)) {
-                launchCard = .whatsNew(.latest)
+                launchCard = .whatsNew
                 openWindow(id: CaskHubWindowID.main)
             }
 

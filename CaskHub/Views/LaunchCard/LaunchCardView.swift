@@ -15,8 +15,8 @@ struct LaunchCardView: View {
             switch card {
             case .welcome:
                 WelcomeCardView()
-            case let .whatsNew(release):
-                WhatsNewCardView(release: release)
+            case .whatsNew:
+                WhatsNewCardView(release: .latest)
             }
         }
         .background(Color.chSurfaceHero)

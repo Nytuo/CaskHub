@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct WhatsNewRelease: Equatable {
-    struct Feature: Equatable {
+struct WhatsNewRelease {
+    struct Feature {
         let symbol: String
         let title: LocalizedStringResource
         let detail: LocalizedStringResource
@@ -36,16 +36,10 @@ struct WhatsNewRelease: Equatable {
     ])
 }
 
-enum LaunchCard: Identifiable, Equatable {
-    case welcome
-    case whatsNew(WhatsNewRelease)
+enum LaunchCard: String, Identifiable {
+    case welcome, whatsNew
 
-    var id: String {
-        switch self {
-        case .welcome: "welcome"
-        case let .whatsNew(release): "whatsNew.\(release.version)"
-        }
-    }
+    var id: Self { self }
 }
 
 enum LaunchCardGate {
@@ -56,11 +50,11 @@ enum LaunchCardGate {
         in defaults: UserDefaults,
         currentVersion: String,
         hasPriorInstall: Bool,
-        latest: WhatsNewRelease
+        latestVersion: String
     ) -> LaunchCard? {
         switch defaults.string(forKey: previewKey) {
         case "welcome": return .welcome
-        case "whatsNew": return .whatsNew(latest)
+        case "whatsNew": return .whatsNew
         default: break
         }
 
@@ -68,9 +62,9 @@ enum LaunchCardGate {
         defaults.set(currentVersion, forKey: lastSeenVersionKey)
         if stored == nil, !hasPriorInstall { return .welcome }
 
-        let isUnseen = NumericVersionComparison.compare(latest.version, stored ?? "0") == .orderedDescending
-        let isShipped = NumericVersionComparison.compare(latest.version, currentVersion)
+        let isUnseen = NumericVersionComparison.compare(latestVersion, stored ?? "0") == .orderedDescending
+        let isShipped = NumericVersionComparison.compare(latestVersion, currentVersion)
             .map { $0 != .orderedDescending } ?? false
-        return isUnseen && isShipped ? .whatsNew(latest) : nil
+        return isUnseen && isShipped ? .whatsNew : nil
     }
 }

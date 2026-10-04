@@ -11,8 +11,6 @@ import XCTest
 
 @MainActor
 final class LaunchCardTests: XCTestCase {
-    private let release = WhatsNewRelease(version: "0.9.0", features: [])
-
     private func resolve(
         _ defaults: UserDefaults,
         current: String,
@@ -22,7 +20,7 @@ final class LaunchCardTests: XCTestCase {
             in: defaults,
             currentVersion: current,
             hasPriorInstall: hasPriorInstall,
-            latest: release
+            latestVersion: "0.9.0"
         )
     }
 
@@ -41,7 +39,7 @@ final class LaunchCardTests: XCTestCase {
     func test_upgrade_from_build_without_gate_shows_whats_new_once() {
         let defaults = makeScratchDefaults()
 
-        XCTAssertEqual(resolve(defaults, current: "0.9.0"), .whatsNew(release))
+        XCTAssertEqual(resolve(defaults, current: "0.9.0"), .whatsNew)
         XCTAssertEqual(lastSeen(defaults), "0.9.0")
         XCTAssertNil(resolve(defaults, current: "0.9.0"))
     }
@@ -58,7 +56,7 @@ final class LaunchCardTests: XCTestCase {
         let defaults = makeScratchDefaults()
         defaults.set("0.8.3", forKey: LaunchCardGate.lastSeenVersionKey)
 
-        XCTAssertEqual(resolve(defaults, current: "0.9.1"), .whatsNew(release))
+        XCTAssertEqual(resolve(defaults, current: "0.9.1"), .whatsNew)
         XCTAssertEqual(lastSeen(defaults), "0.9.1")
     }
 
@@ -67,7 +65,7 @@ final class LaunchCardTests: XCTestCase {
 
         XCTAssertNil(resolve(defaults, current: "0.8.4"))
         XCTAssertEqual(lastSeen(defaults), "0.8.4")
-        XCTAssertEqual(resolve(defaults, current: "0.9.0"), .whatsNew(release))
+        XCTAssertEqual(resolve(defaults, current: "0.9.0"), .whatsNew)
     }
 
     func test_unparseable_stored_version_stays_silent_and_heals() {
@@ -85,7 +83,7 @@ final class LaunchCardTests: XCTestCase {
         XCTAssertEqual(resolve(defaults, current: "0.9.0"), .welcome)
 
         defaults.set("whatsNew", forKey: LaunchCardGate.previewKey)
-        XCTAssertEqual(resolve(defaults, current: "0.8.3"), .whatsNew(release))
+        XCTAssertEqual(resolve(defaults, current: "0.8.3"), .whatsNew)
 
         XCTAssertNil(lastSeen(defaults))
     }
@@ -96,7 +94,7 @@ final class LaunchCardTests: XCTestCase {
 
         for style in AppStyle.allCases {
             AppStyle.current = style
-            render(LaunchCardView(card: .whatsNew(.latest)), width: 480, height: 600)
+            render(LaunchCardView(card: .whatsNew), width: 480, height: 600)
             render(LaunchCardView(card: .welcome), width: 600, height: 480)
             for page in WelcomePage.allCases {
                 render(WelcomeCardView(page: page), width: 600, height: 480)

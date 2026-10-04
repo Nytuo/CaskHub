@@ -139,11 +139,11 @@ extension Analytics {
     // MARK: - Launch cards
 
     static func launchCardShown(_ card: LaunchCard) {
-        send("LaunchCard.shown", parameters: ["kind": card.analyticsName])
+        send("LaunchCard.shown", parameters: ["kind": card.rawValue])
     }
 
     static func launchCardDismissed(_ card: LaunchCard, page: Int? = nil) {
-        var parameters = ["kind": card.analyticsName]
+        var parameters = ["kind": card.rawValue]
         parameters["page"] = page.map { "\($0)" }
         send("LaunchCard.dismissed", parameters: parameters)
     }
@@ -195,15 +195,6 @@ private extension DiscoverItem {
         case .featured: return "featured"
         case .topCharts: return "topCharts"
         case .recentlyAdded: return "recentlyAdded"
-        }
-    }
-}
-
-private extension LaunchCard {
-    var analyticsName: String {
-        switch self {
-        case .welcome: return "welcome"
-        case .whatsNew: return "whatsNew"
         }
     }
 }

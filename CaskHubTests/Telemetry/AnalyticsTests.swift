@@ -318,11 +318,10 @@ final class AnalyticsTests: XCTestCase {
     // MARK: - Launch cards
 
     func test_launch_card_event_names_and_parameters() {
-        let release = WhatsNewRelease(version: "0.9.0", features: [])
         Analytics.launchCardShown(.welcome)
         Analytics.launchCardDismissed(.welcome, page: 3)
-        Analytics.launchCardShown(.whatsNew(release))
-        Analytics.launchCardDismissed(.whatsNew(release))
+        Analytics.launchCardShown(.whatsNew)
+        Analytics.launchCardDismissed(.whatsNew)
 
         XCTAssertEqual(spy.signals.map(\.name), [
             "LaunchCard.shown", "LaunchCard.dismissed",
