@@ -8,12 +8,11 @@
 import SwiftUI
 
 enum WelcomePage: Int, CaseIterable {
-    case intro, icons, categories, recentlyAdded, manage, adopt, look, privacy, ready
+    case intro, categories, recentlyAdded, manage, adopt, look, privacy, ready
 
     var symbol: String? {
         switch self {
         case .intro: nil
-        case .icons: "sparkles.square.filled.on.square"
         case .categories: DiscoverItem.browse.icon
         case .recentlyAdded: DiscoverItem.recentlyAdded.icon
         case .manage: LibraryItem.updates.icon
@@ -27,7 +26,7 @@ enum WelcomePage: Int, CaseIterable {
     var tint: Color {
         switch self {
         case .intro, .manage: .chTerracotta
-        case .icons, .privacy: .chAmber
+        case .privacy: .chAmber
         case .categories, .adopt, .ready: .chSage
         case .recentlyAdded, .look: .chPlum
         }
@@ -36,7 +35,6 @@ enum WelcomePage: Int, CaseIterable {
     var title: LocalizedStringResource {
         switch self {
         case .intro: .launchCardWelcomeIntroTitle
-        case .icons: .launchCardWelcomeIconsTitle
         case .categories: .launchCardWelcomeCategoriesTitle
         case .recentlyAdded: .launchCardWelcomeRecentlyAddedTitle
         case .manage: .launchCardWelcomeManageTitle
@@ -50,7 +48,6 @@ enum WelcomePage: Int, CaseIterable {
     var detail: LocalizedStringResource {
         switch self {
         case .intro: .launchCardWelcomeIntroDetail
-        case .icons: .launchCardWelcomeIconsDetail
         case .categories: .launchCardWelcomeCategoriesDetail
         case .recentlyAdded: .launchCardWelcomeRecentlyAddedDetail
         case .manage: .launchCardWelcomeManageDetail
@@ -77,68 +74,21 @@ struct WelcomeCardView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ViewThatFits(in: .vertical) {
-                content.frame(maxHeight: .infinity)
-                ScrollView { content }
+            ZStack {
+                ForEach(WelcomePage.allCases, id: \.self) { item in
+                    WelcomePageView(page: item, isActive: item == page)
+                        .opacity(item == page ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.3), value: page)
+                        .allowsHitTesting(item == page)
+                        .disabled(item != page)
+                        .accessibilityHidden(item != page)
+                }
             }
+            .frame(maxHeight: .infinity)
             footer
         }
         .frame(width: 600, height: 480)
         .onDisappear { Analytics.launchCardDismissed(.welcome, page: page.rawValue + 1) }
-    }
-
-    private var content: some View {
-        VStack(spacing: 14) {
-            hero
-            Text(page.title)
-                .font(CHType.Catalog(scale: 0.8).hero)
-                .foregroundStyle(Color.chTextTitle)
-            Text(page.detail)
-                .font(CHType.body)
-                .foregroundStyle(Color.chTextBody)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 400)
-                .fixedSize(horizontal: false, vertical: true)
-            accessory
-                .padding(.top, 6)
-        }
-        .padding(.horizontal, 40)
-        .padding(.vertical, 20)
-        .frame(maxWidth: .infinity)
-        .id(page)
-        .transition(.opacity)
-    }
-
-    @ViewBuilder private var hero: some View {
-        if let symbol = page.symbol {
-            Image(systemName: symbol)
-                .font(.system(size: 52))
-                .foregroundStyle(page.tint)
-                .frame(height: 64)
-                .accessibilityHidden(true)
-        } else {
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .frame(width: 72, height: 72)
-                .accessibilityHidden(true)
-        }
-    }
-
-    @ViewBuilder private var accessory: some View {
-        switch page {
-        case .look:
-            AppStylePicker()
-        case .privacy:
-            WelcomePrivacyToggles()
-        case .ready:
-            VStack(alignment: .leading, spacing: 10) {
-                WelcomeShortcutRow(keys: ["⌘F"], label: .launchCardWelcomeShortcutSearch)
-                WelcomeShortcutRow(keys: ["⌘1", "⌘2"], label: .launchCardWelcomeShortcutViewMode)
-                WelcomeShortcutRow(keys: ["⌘,"], label: .launchCardWelcomeShortcutSettings)
-            }
-        default:
-            EmptyView()
-        }
     }
 
     private var footer: some View {
@@ -178,19 +128,109 @@ struct WelcomeCardView: View {
     private var pageDots: some View {
         HStack(spacing: 6) {
             ForEach(WelcomePage.allCases, id: \.self) { item in
-                Circle()
-                    .fill(item == page ? Color.chAccent : Color.chTextFaint.opacity(0.5))
-                    .frame(width: 6, height: 6)
+                Button {
+                    page = item
+                } label: {
+                    Capsule()
+                        .fill(item == page ? Color.chAccent : Color.chTextFaint.opacity(0.5))
+                        .frame(width: item == page ? 20 : 6, height: 6)
+                        .frame(height: 20)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
         }
-        .accessibilityElement()
+        .animation(reduceMotion ? nil : .spring(duration: 0.45, bounce: 0.3), value: page)
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(.launchCardWelcomePageIndicator(page.rawValue + 1, WelcomePage.allCases.count)))
     }
 
     private func move(by offset: Int) {
         guard let next = WelcomePage(rawValue: page.rawValue + offset) else { return }
-        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-            page = next
+        page = next
+    }
+}
+
+private struct WelcomePageView: View {
+    let page: WelcomePage
+    let isActive: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ViewThatFits(in: .vertical) {
+            content.frame(maxHeight: .infinity)
+            ScrollView { content }
+        }
+    }
+
+    private var content: some View {
+        VStack(spacing: 14) {
+            hero
+            Text(page.title)
+                .font(CHType.Catalog(scale: 0.8).hero)
+                .foregroundStyle(Color.chTextTitle)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(height: 30)
+            Text(page.detail)
+                .font(CHType.body)
+                .foregroundStyle(Color.chTextBody)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 400)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(height: 36, alignment: .top)
+            accessory
+                .padding(.top, 6)
+        }
+        .padding(.horizontal, 40)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var isHeldBack: Bool {
+        page == .ready && !isActive && !reduceMotion
+    }
+
+    private func entrance(delay: Double) -> Animation? {
+        if reduceMotion { return nil }
+        return isActive ? .spring(duration: 0.6, bounce: 0.3).delay(delay) : .easeOut(duration: 0.2)
+    }
+
+    @ViewBuilder private var hero: some View {
+        if let symbol = page.symbol {
+            Image(systemName: symbol)
+                .font(.system(size: 52))
+                .foregroundStyle(page.tint)
+                .frame(height: 64)
+                .scaleEffect(isHeldBack ? 0.3 : 1)
+                .rotationEffect(.degrees(isHeldBack ? -30 : 0))
+                .animation(entrance(delay: 0.06), value: isActive)
+                .accessibilityHidden(true)
+        } else {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 72, height: 72)
+                .accessibilityHidden(true)
+        }
+    }
+
+    @ViewBuilder private var accessory: some View {
+        switch page {
+        case .look:
+            AppStylePicker()
+        case .privacy:
+            WelcomePrivacyToggles()
+        case .ready:
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(Array(WelcomeShortcutRow.all.enumerated()), id: \.offset) { index, row in
+                    row
+                        .opacity(isActive ? 1 : 0)
+                        .offset(x: isHeldBack ? -10 : 0)
+                        .animation(entrance(delay: 0.3 + Double(index) * 0.11), value: isActive)
+                }
+            }
+        default:
+            EmptyView()
         }
     }
 }
@@ -227,6 +267,12 @@ private struct WelcomePrivacyToggles: View {
 private struct WelcomeShortcutRow: View {
     let keys: [String]
     let label: LocalizedStringResource
+
+    static let all = [
+        WelcomeShortcutRow(keys: ["⌘F"], label: .launchCardWelcomeShortcutSearch),
+        WelcomeShortcutRow(keys: ["⌘1", "⌘2"], label: .launchCardWelcomeShortcutViewMode),
+        WelcomeShortcutRow(keys: ["⌘,"], label: .launchCardWelcomeShortcutSettings)
+    ]
 
     var body: some View {
         HStack(spacing: 12) {

@@ -5944,7 +5944,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thousands of casks sorted into categories, so finding a design tool or a database client takes seconds."
+            "value" : "Thousands of casks sorted into categories, each with its real app icon, so finding a design tool or a database client takes seconds."
           }
         }
       }
@@ -5957,30 +5957,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Browse by Category"
-          }
-        }
-      }
-    },
-    "launchCard.welcome.icons.detail" : {
-      "comment" : "Welcome tour, app icons page description",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every app shows its original icon, so the catalog looks like your Dock, not a package list."
-          }
-        }
-      }
-    },
-    "launchCard.welcome.icons.title" : {
-      "comment" : "Welcome tour, app icons page title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Real App Icons"
           }
         }
       }
