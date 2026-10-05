@@ -270,12 +270,6 @@ struct ContentView: View {
             && viewModel.appliedSearchText.isEmpty
     }
 
-    var showsExternallyManagedSection: Bool {
-        selectedSidebar == .library(.installed)
-            && showExternallyManagedApps
-            && !viewModel.filteredExternallyManagedCasks.isEmpty
-    }
-
     private var sortOptions: [SortOption] {
         switch selectedSidebar {
         case .library(.installed):

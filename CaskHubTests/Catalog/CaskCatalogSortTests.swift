@@ -153,7 +153,7 @@ final class CaskCatalogSortTests: XCTestCase {
         )
 
         let now = Date()
-        let local = LocalHomebrewService(defaults: makeScratchDefaults("library-sort-defaults"))
+        let local = await makePlatformResolvedHomebrew(defaults: makeScratchDefaults("library-sort-defaults"))
         updateInstallationSnapshot(of: local) {
             $0.installedCasks = [
                 "alpha": LocalCaskInstallation(
@@ -284,7 +284,7 @@ final class CaskCatalogSortTests: XCTestCase {
 
     @MainActor
     func test_cached_projections_invalidate_for_each_catalog_dependency() async {
-        let local = LocalHomebrewService(
+        let local = await makePlatformResolvedHomebrew(
             defaults: makeScratchDefaults("projection-invalidation")
         )
         let categories = CategoryService()

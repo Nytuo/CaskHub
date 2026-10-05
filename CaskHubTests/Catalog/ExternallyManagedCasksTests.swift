@@ -65,9 +65,7 @@ final class ExternallyManagedCasksTests: XCTestCase {
 
     @MainActor
     private func makeCatalog() async -> (CaskCatalogViewModel, LocalHomebrewService) {
-        let local = LocalHomebrewService(defaults: makeScratchDefaults(UUID().uuidString)) {
-            $0.softwareScanner = MutableInstalledSoftwareScanner()
-        }
+        let local = await makePlatformResolvedHomebrew(defaults: makeScratchDefaults(UUID().uuidString))
         let manual = makeCask("manual", name: "Alpha", version: "2.0", appNames: ["Alpha.app"])
         let store = makeCask(
             "store", name: "Beta", appNames: ["Beta.app"],
