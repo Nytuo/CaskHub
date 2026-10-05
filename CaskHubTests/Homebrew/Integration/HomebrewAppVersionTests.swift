@@ -15,20 +15,13 @@ private struct DeliveryScenario {
     let short: String
     let build: String
     let expected: Bool
-
-    init(_ receipt: String, _ tap: String, _ short: String, _ build: String, _ expected: Bool) {
-        self.receipt = receipt
-        self.tap = tap
-        self.short = short
-        self.build = build
-        self.expected = expected
-    }
 }
 
 private struct GreedyScenario {
     let homebrew: Set<String>?
     var receipt = "1.1.7"
     var receiptApp = "Antinote.app"
+    var appRemoved = false
     let short: String
     let off: Bool
     let greedy: Bool
@@ -107,14 +100,15 @@ final class HomebrewAppVersionTests: XCTestCase {
 
     func test_updates_are_offered_only_when_brew_can_deliver_a_newer_app() async throws {
         let scenarios = [
-            DeliveryScenario("1.16.0", "1.16.0", "1.15.0", "294", false),
-            DeliveryScenario("2.19.1,6046815158665216", "2.19.1,6046815158665216", "2.19.1", "2.19.1", false),
-            DeliveryScenario("11.1.1,1111", "11.1.1,1111", "11.1.1", "11.1.1", false),
-            DeliveryScenario("3.32.721", "3.32.721", "3.32", "721", false),
-            DeliveryScenario("2.19.0,111", "2.19.1,6046815158665216", "2.19.1", "2.19.1", false),
-            DeliveryScenario("1.1.7", "2.1.3,abcdef", "2.2.0", "2.2.0", false),
-            DeliveryScenario("1.1.7", "2.1.3,abcdef", "2.1.0", "2.1.0", true),
-            DeliveryScenario("152.0.6", "157.0", "150.0.2", "15026.5.6", true)
+            DeliveryScenario(receipt: "1.16.0", tap: "1.16.0", short: "1.15.0", build: "294", expected: false),
+            DeliveryScenario(receipt: "2.19.1,6046815158665216", tap: "2.19.1,6046815158665216",
+                short: "2.19.1", build: "2.19.1", expected: false),
+            DeliveryScenario(receipt: "11.1.1,1111", tap: "11.1.1,1111", short: "11.1.1", build: "11.1.1", expected: false),
+            DeliveryScenario(receipt: "3.32.721", tap: "3.32.721", short: "3.32", build: "721", expected: false),
+            DeliveryScenario(receipt: "2.19.0,111", tap: "2.19.1,6046815158665216", short: "2.19.1", build: "2.19.1", expected: false),
+            DeliveryScenario(receipt: "1.1.7", tap: "2.1.3,abcdef", short: "2.2.0", build: "2.2.0", expected: false),
+            DeliveryScenario(receipt: "1.1.7", tap: "2.1.3,abcdef", short: "2.1.0", build: "2.1.0", expected: true),
+            DeliveryScenario(receipt: "152.0.6", tap: "157.0", short: "150.0.2", build: "15026.5.6", expected: true)
         ]
         for scenario in scenarios {
             let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -147,13 +141,15 @@ final class HomebrewAppVersionTests: XCTestCase {
             GreedyScenario(homebrew: ["antinote"], short: "2.1.3", off: true, greedy: true),
             GreedyScenario(homebrew: ["antinote"], receipt: "2.1.3", short: "2.1.0", off: false, greedy: false),
             GreedyScenario(homebrew: ["antinote"], receiptApp: "Renamed.app", short: "2.1.0", off: true, greedy: true),
-            GreedyScenario(homebrew: [], receiptApp: "Renamed.app", short: "2.1.0", off: false, greedy: false)
+            GreedyScenario(homebrew: [], receiptApp: "Renamed.app", short: "2.1.0", off: false, greedy: false),
+            GreedyScenario(homebrew: ["antinote"], appRemoved: true, short: "2.1.0", off: false, greedy: false)
         ]
         for (index, scenario) in scenarios.enumerated() {
             let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             defer { try? FileManager.default.removeItem(at: root) }
             let app = try makeInstallation(in: root, receiptVersion: scenario.receipt, receiptApp: scenario.receiptApp)
             try setApplicationVersion(scenario.short, at: app)
+            if scenario.appRemoved { try FileManager.default.removeItem(at: app) }
             let service = makeService(in: root, homebrewOutdated: scenario.homebrew)
             await service.refresh()
             await service.refreshHomebrewOutdated()

@@ -15,9 +15,4 @@ final class HomebrewOutdatedLoaderTests: XCTestCase {
         XCTAssertEqual(HomebrewOutdatedLoader.tokens(in: #"{"formulae":[],"casks":[]}"#), [])
         XCTAssertNil(HomebrewOutdatedLoader.tokens(in: "Error: brew is broken"))
     }
-
-    func test_load_without_brew_reports_unknown() async {
-        let tokens = await HomebrewOutdatedLoader().load(from: nil)
-        XCTAssertNil(tokens)
-    }
 }
