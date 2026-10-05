@@ -69,7 +69,7 @@ extension LocalHomebrewService {
             snapshot: installationSnapshot,
             hasRegisteredApplicationCatalog: !applicationCaskSignatures.isEmpty,
             greedyUpdates: greedyUpdates,
-            homebrewOutdatedTokens: homebrewOutdatedTokens,
+            homebrewOutdated: homebrewOutdated,
             applicationDirectories: applicationDirectories,
             fileManager: fileManager
         )

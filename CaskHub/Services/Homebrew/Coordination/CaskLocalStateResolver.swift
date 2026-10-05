@@ -11,7 +11,7 @@ struct CaskLocalStateResolver {
     let snapshot: InstallationSnapshot
     let hasRegisteredApplicationCatalog: Bool
     let greedyUpdates: Bool
-    let homebrewOutdatedTokens: Set<String>?
+    let homebrewOutdated: HomebrewOutdatedReport?
     let applicationDirectories: [URL]
     let fileManager: FileManager
 
@@ -130,6 +130,7 @@ struct CaskLocalStateResolver {
                 : nil,
             uninstallAvailability: uninstallAvailability(for: cask),
             hasAvailableUpdate: outdated
+                && homebrewOutdated?.pinned.contains(cask.token) != true
                 && (greedyUpdates || cask.autoUpdates != true || isListedByHomebrew(cask.token)),
             isOutdated: outdated,
             isZombie: isZombie(cask),
@@ -228,7 +229,7 @@ struct CaskLocalStateResolver {
     }
 
     private func isListedByHomebrew(_ token: String) -> Bool {
-        homebrewOutdatedTokens?.contains(token) == true
+        homebrewOutdated?.upgradable.contains(token) == true
     }
 
     private static func comparableVersion(_ version: String) -> Substring {

@@ -22,6 +22,7 @@ private struct GreedyScenario {
     var receipt = "1.1.7"
     var receiptApp = "Antinote.app"
     var appRemoved = false
+    var pinned = false
     let short: String
     let off: Bool
     let greedy: Bool
@@ -139,6 +140,7 @@ final class HomebrewAppVersionTests: XCTestCase {
             GreedyScenario(homebrew: [], short: "2.1.0", off: false, greedy: true),
             GreedyScenario(homebrew: nil, short: "2.1.0", off: false, greedy: true),
             GreedyScenario(homebrew: ["antinote"], short: "2.1.3", off: false, greedy: false),
+            GreedyScenario(homebrew: [], pinned: true, short: "2.1.0", off: false, greedy: false),
             GreedyScenario(homebrew: ["antinote"], receipt: "2.1.3", short: "2.1.0", off: false, greedy: false),
             GreedyScenario(homebrew: ["antinote"], receiptApp: "Renamed.app", short: "2.1.0", off: true, greedy: true),
             GreedyScenario(homebrew: [], receiptApp: "Renamed.app", short: "2.1.0", off: false, greedy: false),
@@ -150,7 +152,9 @@ final class HomebrewAppVersionTests: XCTestCase {
             let app = try makeInstallation(in: root, receiptVersion: scenario.receipt, receiptApp: scenario.receiptApp)
             try setApplicationVersion(scenario.short, at: app)
             if scenario.appRemoved { try FileManager.default.removeItem(at: app) }
-            let service = makeService(in: root, homebrewOutdated: scenario.homebrew)
+            let service = makeService(
+                in: root, homebrewOutdated: scenario.homebrew, pinned: scenario.pinned ? ["antinote"] : []
+            )
             await service.refresh()
             await service.refreshHomebrewOutdated()
             let (vm, _) = await makeSUT(casks: [makeAntinote()], categories: makeCategories(), localHomebrew: service)
@@ -175,18 +179,18 @@ final class HomebrewAppVersionTests: XCTestCase {
             $0.applicationDirectories = [root.appendingPathComponent("Applications")]
             $0.brewBinaryProvider = { nil }
             $0.brewVersionProvider = { "test" }
-            $0.outdatedTokensProvider = {
+            $0.homebrewOutdatedProvider = {
                 queries += 1
-                return ["antinote"]
+                return HomebrewOutdatedReport(upgradable: ["antinote"], pinned: [])
             }
         }
         await service.refresh()
         await service.refresh()
         XCTAssertEqual(queries, 0)
-        XCTAssertNil(service.homebrewOutdatedTokens)
+        XCTAssertNil(service.homebrewOutdated)
         await service.refreshHomebrewOutdated()
         XCTAssertEqual(queries, 1)
-        XCTAssertEqual(service.homebrewOutdatedTokens, ["antinote"])
+        XCTAssertEqual(service.homebrewOutdated?.upgradable, ["antinote"])
     }
 
     func test_newer_app_evidence_overrides_a_cached_homebrew_listing() async throws {
@@ -312,14 +316,18 @@ final class HomebrewAppVersionTests: XCTestCase {
         try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: url)
     }
 
-    private func makeService(in root: URL, homebrewOutdated: Set<String>? = nil) -> LocalHomebrewService {
+    private func makeService(
+        in root: URL, homebrewOutdated: Set<String>? = nil, pinned: Set<String> = []
+    ) -> LocalHomebrewService {
         let defaults = makeScratchDefaults("app-version-\(UUID().uuidString)")
         defaults.set(root.path, forKey: HomebrewLocator.customPrefixKey)
         return LocalHomebrewService(defaults: defaults) {
             $0.applicationDirectories = [root.appendingPathComponent("Applications")]
             $0.brewBinaryProvider = { nil }
             $0.brewVersionProvider = { "test" }
-            $0.outdatedTokensProvider = { homebrewOutdated }
+            $0.homebrewOutdatedProvider = {
+                homebrewOutdated.map { HomebrewOutdatedReport(upgradable: $0, pinned: pinned) }
+            }
         }
     }
 

@@ -9,10 +9,16 @@
 import XCTest
 
 final class HomebrewOutdatedLoaderTests: XCTestCase {
-    func test_tokens_reads_cask_names_and_rejects_unparseable_output() {
-        let output = #"{"formulae":[],"casks":[{"name":"brewy","installed_versions":["0.26.0"],"current_version":"0.26.2"}]}"#
-        XCTAssertEqual(HomebrewOutdatedLoader.tokens(in: output), ["brewy"])
-        XCTAssertEqual(HomebrewOutdatedLoader.tokens(in: #"{"formulae":[],"casks":[]}"#), [])
-        XCTAssertNil(HomebrewOutdatedLoader.tokens(in: "Error: brew is broken"))
+    func test_report_separates_pinned_casks_and_rejects_unparseable_output() {
+        let output = #"{"formulae":[],"casks":[{"name":"brewy","pinned":false},{"name":"vlc","pinned":true},{"name":"old"}]}"#
+        XCTAssertEqual(
+            HomebrewOutdatedLoader.report(in: output),
+            HomebrewOutdatedReport(upgradable: ["brewy", "old"], pinned: ["vlc"])
+        )
+        XCTAssertEqual(
+            HomebrewOutdatedLoader.report(in: #"{"formulae":[],"casks":[]}"#),
+            HomebrewOutdatedReport(upgradable: [], pinned: [])
+        )
+        XCTAssertNil(HomebrewOutdatedLoader.report(in: "Error: brew is broken"))
     }
 }
