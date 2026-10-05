@@ -180,6 +180,12 @@ extension ContentView {
         .padding(.top, CHSpace.s3)
     }
 
+    var showsExternallyManagedSection: Bool {
+        selectedSidebar == .library(.installed)
+            && showExternallyManagedApps
+            && !viewModel.filteredExternallyManagedCasks.isEmpty
+    }
+
     // MARK: - Error View
 
     func errorView(_ error: String) -> some View {

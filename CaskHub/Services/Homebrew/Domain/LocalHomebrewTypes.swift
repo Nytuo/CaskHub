@@ -221,6 +221,11 @@ nonisolated enum CaskUninstallAvailability: Equatable, Sendable {
     }
 }
 
+nonisolated struct HomebrewOutdatedReport: Equatable, Sendable {
+    let upgradable: Set<String>
+    let pinned: Set<String>
+}
+
 nonisolated struct CaskLocalState: Equatable, Sendable {
     let installationSource: CaskInstallationSource?
     let externalVersion: String?

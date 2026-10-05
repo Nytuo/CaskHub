@@ -1337,30 +1337,30 @@
         }
       }
     },
-    "Also list apps that update themselves (brew upgrade --greedy)" : {
+    "Also list self-updating apps Homebrew cannot verify" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Также показывать приложения, которые обновляются сами (brew upgrade --greedy)"
+            "state" : "needs_review",
+            "value" : "Также показывать самообновляющиеся приложения, которые Homebrew не может проверить"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Також перелічіть програми, які оновлюються самостійно (brew upgrade --greedy)"
+            "state" : "needs_review",
+            "value" : "Також показувати програми із самооновленням, які Homebrew не може перевірити"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "同时列出会自我更新的应用（brew upgrade --greedy）"
+            "state" : "needs_review",
+            "value" : "同时列出 Homebrew 无法验证的自动更新应用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "同時列出會自我更新的 App（brew upgrade --greedy）"
+            "state" : "needs_review",
+            "value" : "同時列出 Homebrew 無法驗證的自動更新 App"
           }
         }
       }
@@ -4802,25 +4802,25 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable Greedy to include casks that normally update themselves. Leave it off when you prefer each app's built-in updater."
+            "value" : "Updates lists what Homebrew reports as outdated. Enable Greedy to also include self-updating apps Homebrew cannot verify."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Включите режим --greedy, чтобы учитывать пакеты Cask, которые обычно обновляются сами. Оставьте его выключенным, если предпочитаете встроенный механизм обновления каждого приложения."
+            "state" : "needs_review",
+            "value" : "В разделе «Обновления» показано то, что Homebrew считает устаревшим. Включите режим --greedy, чтобы также учитывать самообновляющиеся приложения, которые Homebrew не может проверить."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Увімкніть Greedy, щоб додати пакети Cask, які зазвичай оновлюються самостійно. Не вмикайте, якщо надаєте перевагу вбудованому засобу оновлення кожної програми."
+            "state" : "needs_review",
+            "value" : "У розділі «Оновлення» показано те, що Homebrew вважає застарілим. Увімкніть Greedy, щоб також додати програми із самооновленням, які Homebrew не може перевірити."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "啟用 Greedy 可納入通常會自行更新的 Cask。如果你偏好使用各 App 內建的更新程式，請保持關閉。"
+            "state" : "needs_review",
+            "value" : "「更新」會列出 Homebrew 回報為過期的項目。啟用 Greedy 可同時納入 Homebrew 無法驗證的自動更新 App。"
           }
         }
       }
@@ -10255,6 +10255,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近安裝"
+          }
+        }
+      }
+    },
+    "Refresh Updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Обновить список обновлений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Оновити список оновлень"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "刷新更新列表"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新整理更新列表"
           }
         }
       }

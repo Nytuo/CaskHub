@@ -13,6 +13,12 @@ nonisolated protocol BrewAPIClientProtocol {
 }
 
 nonisolated final class BrewAPIClient: BrewAPIClientProtocol {
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
     struct HTTPError: LocalizedError {
         let statusCode: Int
 
@@ -43,7 +49,7 @@ nonisolated final class BrewAPIClient: BrewAPIClientProtocol {
     }
 
     @concurrent private func fetchOnce<T: Decodable & Sendable>(_ url: URL) async throws -> T {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await session.data(from: url)
         if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
             throw HTTPError(statusCode: http.statusCode)
         }

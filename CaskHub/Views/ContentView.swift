@@ -27,6 +27,7 @@ struct ContentView: View {
     @State private var showsResultsHeader = false
     @State private var searchSignalTask: Task<Void, Never>?
     @State private var isScrolledUnderToolbar = false
+    @State private var isRefreshingUpdates = false
 
     @State private var detailWidth: CGFloat = CHSize.contentWidth + 2 * CHSize.catalogInset
 
@@ -190,6 +191,8 @@ struct ContentView: View {
             updateAllCount: viewModel.updatesCount,
             isUpdatingAll: localHomebrew.isUpdatingAll,
             isUpdatingHomebrew: localHomebrew.isUpdatingHomebrew,
+            onRefreshUpdates: selectedSidebar == .library(.updates) ? { refreshUpdates() } : nil,
+            isRefreshingUpdates: isRefreshingUpdates,
             greedyUpdates: selectedSidebar == .library(.updates) ? localHomebrew.greedyUpdates : nil,
             onToggleGreedy: { enabled in
                 Analytics.greedyUpdatesChanged(enabled)
@@ -267,12 +270,6 @@ struct ContentView: View {
             && viewModel.appliedSearchText.isEmpty
     }
 
-    var showsExternallyManagedSection: Bool {
-        selectedSidebar == .library(.installed)
-            && showExternallyManagedApps
-            && !viewModel.filteredExternallyManagedCasks.isEmpty
-    }
-
     private var sortOptions: [SortOption] {
         switch selectedSidebar {
         case .library(.installed):
@@ -286,6 +283,16 @@ struct ContentView: View {
 
     func categoryInfo(for cask: Cask) -> CaskCategoryPresentation? {
         viewModel.categoryPresentation(for: cask)
+    }
+}
+
+private extension ContentView {
+    func refreshUpdates() {
+        isRefreshingUpdates = true
+        Task {
+            await viewModel.load()
+            isRefreshingUpdates = false
+        }
     }
 }
 
