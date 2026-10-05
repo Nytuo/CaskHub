@@ -331,30 +331,6 @@ struct AdoptIgnorePickerSheet: View {
     }
 }
 
-// MARK: - Shared Bits
-
-struct PillButton: View {
-    let title: String
-    let background: Color
-    let border: Color
-    let foreground: Color
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(CHType.button)
-                .foregroundStyle(foreground)
-                .frame(height: CHSize.pillHeight)
-                .padding(.horizontal, 13)
-                .background(Capsule().fill(background))
-                .overlay(Capsule().strokeBorder(border, lineWidth: 1))
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 #Preview {
     let categories = CategoryService()
     let recent = RecentlyAddedService()
