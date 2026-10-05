@@ -274,6 +274,7 @@ final class TopBarViewTests: XCTestCase {
     private struct TopBarHarness: View {
         let isUpdatingAll: Bool
         let isUpdatingHomebrew: Bool
+        var isRefreshingUpdates = false
         var greedyUpdates: Bool?
         let onAppear: () -> Void
 
@@ -288,6 +289,8 @@ final class TopBarViewTests: XCTestCase {
                             onUpdateAll: {},
                             isUpdatingAll: isUpdatingAll,
                             isUpdatingHomebrew: isUpdatingHomebrew,
+                            onRefreshUpdates: {},
+                            isRefreshingUpdates: isRefreshingUpdates,
                             greedyUpdates: greedyUpdates,
                             onToggleGreedy: { _ in }
                         )
@@ -306,6 +309,7 @@ final class TopBarViewTests: XCTestCase {
     private func renderTopBar(
         isUpdatingAll: Bool,
         isUpdatingHomebrew: Bool,
+        isRefreshingUpdates: Bool = false,
         greedyUpdates: Bool? = nil
     ) {
         let probe = RenderProbe()
@@ -320,6 +324,7 @@ final class TopBarViewTests: XCTestCase {
             rootView: TopBarHarness(
                 isUpdatingAll: isUpdatingAll,
                 isUpdatingHomebrew: isUpdatingHomebrew,
+                isRefreshingUpdates: isRefreshingUpdates,
                 greedyUpdates: greedyUpdates
             ) { probe.appeared = true }
         )
@@ -334,6 +339,11 @@ final class TopBarViewTests: XCTestCase {
 
         window.contentViewController = nil
         window.close()
+    }
+
+    @MainActor
+    func test_refresh_button_renders_refreshing_state() {
+        renderTopBar(isUpdatingAll: false, isUpdatingHomebrew: false, isRefreshingUpdates: true)
     }
 
     @MainActor

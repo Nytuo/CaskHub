@@ -52,6 +52,8 @@ struct CatalogToolbar: ToolbarContent {
     var updateAllCount = 0
     var isUpdatingAll: Bool
     var isUpdatingHomebrew: Bool
+    let onRefreshUpdates: (() -> Void)?
+    let isRefreshingUpdates: Bool
     var greedyUpdates: Bool?
     var onToggleGreedy: ((Bool) -> Void)?
     var showsSort = true
@@ -77,6 +79,17 @@ struct CatalogToolbar: ToolbarContent {
                     onUpdateAll: onUpdateAll
                 )
             }
+        }
+        if onRefreshUpdates != nil, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
+        }
+        if let onRefreshUpdates {
+            ToolbarItem(placement: .automatic) {
+                RefreshUpdatesButton(isRefreshing: isRefreshingUpdates, action: onRefreshUpdates)
+            }
+        }
+        if onRefreshUpdates != nil, showsSort, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
         }
         if showsSort {
             ToolbarItem(placement: .automatic) {
@@ -145,6 +158,24 @@ private struct OptionMenu<Option: Identifiable & Equatable>: View {
     }
 }
 
+private struct RefreshUpdatesButton: View {
+    let isRefreshing: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            if isRefreshing {
+                ProgressView().controlSize(.small)
+            } else {
+                Image(systemName: CaskActionStyle.update.icon)
+            }
+        }
+        .disabled(isRefreshing)
+        .help("Refresh Updates")
+        .accessibilityLabel("Refresh Updates")
+    }
+}
+
 private struct GreedyButton: View {
     let isOn: Bool
     let onToggle: (Bool) -> Void
@@ -194,7 +225,7 @@ private struct UpdateAllButton: View {
                         Text("Updating…")
                     }
                 } else {
-                    Label("Update All", systemImage: CaskActionStyle.update.icon)
+                    Label("Update All", systemImage: LibraryItem.updates.icon)
                         .labelStyle(.titleAndIcon)
                 }
             }
