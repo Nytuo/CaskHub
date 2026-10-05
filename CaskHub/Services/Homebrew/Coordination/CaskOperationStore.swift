@@ -19,7 +19,6 @@ final class CaskOperationBox {
 final class CaskOperationStore {
     private(set) var boxes: [String: CaskOperationBox] = [:]
     private(set) var isUpdatingAll = false
-    private(set) var updateAllProgress: CaskUpdateAllProgress?
 
     func state(for token: String) -> CaskOperationState? {
         boxes[token]?.state
@@ -44,16 +43,8 @@ final class CaskOperationStore {
         return true
     }
 
-    func setUpdateAllProgress(_ progress: CaskUpdateAllProgress) {
-        guard isUpdatingAll else { return }
-        guard updateAllProgress != progress else { return }
-        updateAllProgress = progress
-    }
-
     func finishUpdateAll() {
-        guard isUpdatingAll || updateAllProgress != nil else { return }
         isUpdatingAll = false
-        updateAllProgress = nil
     }
 
     func canBeginOperation(_ action: CaskAction, for token: String) -> Bool {
@@ -82,9 +73,6 @@ final class CaskOperationStore {
     }
 
     var status: CaskOperationStatus? {
-        CaskOperationStatus.make(
-            operations: boxes.values.compactMap(\.state?.progress),
-            updateAll: updateAllProgress
-        )
+        CaskOperationStatus.make(operations: boxes.values.compactMap(\.state?.progress))
     }
 }

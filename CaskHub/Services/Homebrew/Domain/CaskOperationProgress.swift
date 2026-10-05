@@ -145,13 +145,6 @@ nonisolated struct CaskByteProgress: Equatable, Sendable {
     }
 }
 
-nonisolated struct CaskUpdateAllProgress: Equatable, Sendable {
-    let currentIndex: Int
-    let totalCount: Int
-    let currentToken: String
-    let currentDisplayName: String
-}
-
 nonisolated struct CaskOperationStatus: Equatable, Sendable {
     let label: String
     let byteProgress: CaskByteProgress?
@@ -166,22 +159,7 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
         return "\(label) · \(byteProgress.text)"
     }
 
-    static func make(
-        operations: [CaskOperationProgress],
-        updateAll: CaskUpdateAllProgress?
-    ) -> CaskOperationStatus? {
-        if let updateAll {
-            let label = [
-                String(localized: "Updating \(updateAll.currentIndex) of \(updateAll.totalCount)"),
-                updateAll.currentDisplayName
-            ].joined(separator: " · ")
-            let current = operations.first(where: { $0.token == updateAll.currentToken })
-            let byteProgress = current?.phase.showsByteProgress == true
-                ? current?.byteProgress
-                : nil
-            return CaskOperationStatus(label: label, byteProgress: byteProgress)
-        }
-
+    static func make(operations: [CaskOperationProgress]) -> CaskOperationStatus? {
         let sortedOperations = operations.sorted {
             if $0.displayName == $1.displayName { return $0.token < $1.token }
             return $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending

@@ -170,6 +170,28 @@ final class ConcurrentDownloadTests: XCTestCase {
         XCTAssertEqual(executor.requests.filter { $0.arguments.first == "install" }.map(\.token), ["b"])
     }
 
+    func test_update_all_downloads_together_and_upgrades_one_at_a_time() async {
+        let executor = ControlledHomebrewCommandExecutor()
+        let service = makeService(executor)
+        let batch = Task { await service.updateAll(tokens: ["a", "b", "c"]) }
+        await executor.waitForRequests(3)
+
+        XCTAssertEqual(Set(executor.running("fetch")), ["a", "b", "c"])
+        XCTAssertTrue(service.isUpdatingAll)
+        XCTAssertEqual(service.statusBarOperation?.message.hasPrefix(String(localized: "\(3) operations in progress")), true)
+
+        let deadline = Date().addingTimeInterval(10)
+        while service.isUpdatingAll, Date() < deadline {
+            if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }
+        }
+        await batch.value
+        XCTAssertFalse(service.isUpdatingAll)
+        XCTAssertEqual(executor.maxActive["fetch"], 3)
+        XCTAssertEqual(executor.maxActive["upgrade"], 1)
+        XCTAssertEqual(Set(executor.requests.filter { $0.arguments.first == "upgrade" }.map(\.token)), ["a", "b", "c"])
+        XCTAssertNil(service.statusBarOperation)
+    }
+
     func test_maintenance_probe_does_not_wait_for_a_running_download() async {
         let executor = ControlledHomebrewCommandExecutor()
         let service = makeService(executor, sharingLanesWithMaintenance: true)

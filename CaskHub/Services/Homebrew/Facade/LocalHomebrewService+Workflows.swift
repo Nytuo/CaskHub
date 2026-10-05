@@ -188,15 +188,10 @@ extension LocalHomebrewService {
         ) {
             operationStore.send(.enqueue(.updating), for: token)
         }
-        for (index, token) in tokens.enumerated() {
-            operationStore.setUpdateAllProgress(CaskUpdateAllProgress(
-                currentIndex: index + 1,
-                totalCount: tokens.count,
-                currentToken: token,
-                currentDisplayName: displayName(for: token)
-            ))
-            try? await upgrade(token: token, origin: .updateAll)
+        let updates = tokens.map { token in
+            Task { try? await upgrade(token: token, origin: .updateAll) }
         }
+        for update in updates { await update.value }
     }
 
     func cancelInstall(token: String) {

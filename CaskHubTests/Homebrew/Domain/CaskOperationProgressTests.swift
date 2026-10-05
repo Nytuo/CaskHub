@@ -229,34 +229,22 @@ final class CaskOperationProgressTests: XCTestCase {
             .label(for: .updatingHomebrew)
             .lowercased()
         XCTAssertEqual(
-            CaskOperationStatus.make(operations: operations, updateAll: nil)?.message,
+            CaskOperationStatus.make(operations: operations)?.message,
             "\(summary) · 1 \(downloading) · 1 \(updating) · 1 \(updatingHomebrew)"
         )
     }
 
-    func test_operation_status_appends_current_update_all_download() {
-        let operation = CaskOperationProgress(
-            token: "docker",
-            displayName: "Docker Desktop",
-            action: .updating,
-            phase: .downloading,
-            completedBytes: 84_000_000,
-            totalBytes: 245_000_000
-        )
-        let updateAll = CaskUpdateAllProgress(
-            currentIndex: 3,
-            totalCount: 8,
-            currentToken: "docker",
-            currentDisplayName: "Docker Desktop"
-        )
-        let message = CaskOperationStatus.make(
-            operations: [operation],
-            updateAll: updateAll
-        )?.message
+    func test_operation_status_counts_queued_work_last() {
+        let operations = ["a", "b", "c"].map {
+            CaskOperationProgress(token: $0, displayName: $0, action: .updating, phase: $0 == "a" ? .downloading : .queued)
+        }
+        let summary = String(localized: "\(3) operations in progress")
+        let downloading = CaskOperationPhase.downloading.label(for: .updating).lowercased()
+        let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
 
         XCTAssertEqual(
-            message,
-            "Updating 3 of 8 · Docker Desktop · 84 / 245 MB"
+            CaskOperationStatus.make(operations: operations)?.message,
+            "\(summary) · 1 \(downloading) · 2 \(queued)"
         )
     }
 

@@ -13255,34 +13255,6 @@
         }
       }
     },
-    "Updating %lld of %lld" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обновление %lld из %lld"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Оновлення %lld із %lld"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在更新 %lld/%lld"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在更新 %lld/%lld"
-          }
-        }
-      }
-    },
     "Updating Homebrew…" : {
       "localizations" : {
         "ru" : {
