@@ -62,35 +62,7 @@ struct CatalogToolbar: ToolbarContent {
         if #available(macOS 26, *) {
             ToolbarSpacer(.flexible)
         }
-        if let greedyUpdates {
-            ToolbarItem(placement: .automatic) {
-                GreedyButton(isOn: greedyUpdates) { onToggleGreedy?($0) }
-            }
-        }
-        if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
-            ToolbarSpacer(.fixed)
-        }
-        if let onUpdateAll {
-            ToolbarItem(placement: .automatic) {
-                UpdateAllButton(
-                    count: updateAllCount,
-                    isUpdatingAll: isUpdatingAll,
-                    isUpdatingHomebrew: isUpdatingHomebrew,
-                    onUpdateAll: onUpdateAll
-                )
-            }
-        }
-        if onRefreshUpdates != nil, #available(macOS 26, *) {
-            ToolbarSpacer(.fixed)
-        }
-        if let onRefreshUpdates {
-            ToolbarItem(placement: .automatic) {
-                RefreshUpdatesButton(isRefreshing: isRefreshingUpdates, action: onRefreshUpdates)
-            }
-        }
-        if onRefreshUpdates != nil, showsSort, #available(macOS 26, *) {
-            ToolbarSpacer(.fixed)
-        }
+        updatesControls
         if showsSort {
             ToolbarItem(placement: .automatic) {
                 OptionMenu(current: sortOption, options: sortOptions, label: \.title, systemImage: "arrow.up.arrow.down") {
@@ -126,6 +98,39 @@ struct CatalogToolbar: ToolbarContent {
             }
             .pickerStyle(.segmented)
             .labelStyle(.iconOnly)
+        }
+    }
+
+    // ToolbarContentBuilder takes at most ten statements on Xcode 26.
+    @ToolbarContentBuilder private var updatesControls: some ToolbarContent {
+        if let greedyUpdates {
+            ToolbarItem(placement: .automatic) {
+                GreedyButton(isOn: greedyUpdates) { onToggleGreedy?($0) }
+            }
+        }
+        if greedyUpdates != nil, onUpdateAll != nil, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
+        }
+        if let onUpdateAll {
+            ToolbarItem(placement: .automatic) {
+                UpdateAllButton(
+                    count: updateAllCount,
+                    isUpdatingAll: isUpdatingAll,
+                    isUpdatingHomebrew: isUpdatingHomebrew,
+                    onUpdateAll: onUpdateAll
+                )
+            }
+        }
+        if onRefreshUpdates != nil, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
+        }
+        if let onRefreshUpdates {
+            ToolbarItem(placement: .automatic) {
+                RefreshUpdatesButton(isRefreshing: isRefreshingUpdates, action: onRefreshUpdates)
+            }
+        }
+        if onRefreshUpdates != nil, showsSort, #available(macOS 26, *) {
+            ToolbarSpacer(.fixed)
         }
     }
 }
