@@ -174,6 +174,7 @@ struct GeneralSettingsView: View {
     @Environment(LocalHomebrewService.self) private var localHomebrew
     @State private var settingsModel = GeneralSettingsModel()
     @AppStorage(SidebarView.showAdoptKey) private var showAdoptApps = true
+    @AppStorage(ContentView.showExternallyManagedAppsKey) private var showExternallyManagedApps = true
 
     var body: some View {
         Form {
@@ -189,6 +190,13 @@ struct GeneralSettingsView: View {
             Section("Sidebar") {
                 Toggle("Show Adopt Apps", isOn: $showAdoptApps)
                 Text("Adopt Apps lists installed apps that Homebrew can start managing for you.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Installed") {
+                Toggle("Show apps managed outside Homebrew", isOn: $showExternallyManagedApps)
+                    .toggleStyle(.switch)
+                Text("Show installed apps available in Homebrew but managed elsewhere.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
