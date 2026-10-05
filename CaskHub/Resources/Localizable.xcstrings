@@ -10800,31 +10800,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export…"
+            "value" : "Export"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Экспортировать…"
+            "value" : "Экспортировать"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Експорт…"
+            "value" : "Експорт"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导出…"
+            "value" : "导出"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "匯出…"
+            "value" : "匯出"
           }
         }
       }
@@ -10980,31 +10980,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose file…"
+            "value" : "Choose file"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выбрать файл…"
+            "value" : "Выбрать файл"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть файл…"
+            "value" : "Виберіть файл"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择文件…"
+            "value" : "选择文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選擇檔案…"
+            "value" : "選擇檔案"
           }
         }
       }
@@ -11520,31 +11520,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Ignore an app…"
+            "value" : "Ignore an app"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Исключить приложение…"
+            "value" : "Исключить приложение"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Ігнорувати програму…"
+            "value" : "Ігнорувати програму"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ 忽略应用…"
+            "value" : "忽略应用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ 忽略 App…"
+            "value" : "忽略 App"
           }
         }
       }

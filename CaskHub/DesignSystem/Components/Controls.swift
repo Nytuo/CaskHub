@@ -68,24 +68,59 @@ enum CaskActionStyle {
     }
 }
 
+/// Shared geometry and appearance for card, Health, and Shelf controls.
+struct ActionCapsule<Content: View>: View {
+    let background: Color
+    let border: Color
+    let foreground: Color
+    var fullWidth = false
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        content
+            .font(CHType.button)
+            .foregroundStyle(foreground)
+            .lineLimit(1)
+            .frame(maxWidth: fullWidth ? .infinity : nil)
+            .frame(height: CHSize.actionCapsuleHeight)
+            .padding(.horizontal, fullWidth ? 4 : 22)
+            .background(Capsule().fill(background))
+            .overlay(Capsule().strokeBorder(border, lineWidth: 1))
+    }
+}
+
+struct PillButton: View {
+    let title: String
+    let background: Color
+    let border: Color
+    let foreground: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            ActionCapsule(background: background, border: border, foreground: foreground) {
+                Text(title)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct ActionCapsuleLabel: View {
     let action: CaskActionStyle
     var fullWidth = true
 
     var body: some View {
-        HStack(spacing: 5) {
-            Image(systemName: action.icon)
-                .font(.system(size: action.iconSize, weight: .bold))
-            Text(action.title)
-                .font(CHType.button)
+        ActionCapsule(
+            background: action.background, border: action.border, foreground: action.foreground, fullWidth: fullWidth
+        ) {
+            HStack(spacing: 5) {
+                Image(systemName: action.icon)
+                    .font(.system(size: action.iconSize, weight: .bold))
+                Text(action.title)
+            }
         }
-        .foregroundStyle(action.foreground)
-        .lineLimit(1)
-        .frame(maxWidth: fullWidth ? .infinity : nil)
-        .frame(height: CHSize.actionCapsuleHeight)
-        .padding(.horizontal, fullWidth ? 4 : 22)
-        .background(Capsule().fill(action.background))
-        .overlay(Capsule().strokeBorder(action.border, lineWidth: 1))
     }
 }
 
