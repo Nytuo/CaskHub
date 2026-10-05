@@ -9,6 +9,22 @@
 @testable import CaskHub
 import XCTest
 
+private struct DeliveryScenario {
+    let receipt: String
+    let tap: String
+    let short: String
+    let build: String
+    let expected: Bool
+
+    init(_ receipt: String, _ tap: String, _ short: String, _ build: String, _ expected: Bool) {
+        self.receipt = receipt
+        self.tap = tap
+        self.short = short
+        self.build = build
+        self.expected = expected
+    }
+}
+
 @MainActor
 final class HomebrewAppVersionTests: XCTestCase {
     func test_self_updated_app_uses_bundle_version_and_preserves_update_opt_in() async throws {
@@ -58,18 +74,13 @@ final class HomebrewAppVersionTests: XCTestCase {
             (("4.2.19", "317"), false),
             (("4.2.19", "318"), false),
             (("4.2.20", "1"), false),
-            (("4.2.19", nil), true),
-            (("4.2.19", "317beta"), true),
-            (("4.2.19", ""), true)
+            (("4.2.19", nil), false),
+            (("4.2.19", "317beta"), false),
+            (("4.2.19", ""), false)
         ]
         for ((release, build), expectedOutdated) in scenarios {
             try setApplicationVersion(release, at: app)
-            let plistURL = app.appendingPathComponent("Contents/Info.plist")
-            var info = try XCTUnwrap(
-                PropertyListSerialization.propertyList(from: Data(contentsOf: plistURL), format: nil) as? [String: Any]
-            )
-            info["CFBundleVersion"] = build
-            try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: plistURL)
+            try setBuildVersion(build, at: app)
             await service.refresh()
             XCTAssertEqual(service.installationSnapshot.installationIndex.homebrewApplications[cask.token]?.buildVersion, build)
             for greedy in [false, true] {
@@ -85,15 +96,49 @@ final class HomebrewAppVersionTests: XCTestCase {
         }
     }
 
+    func test_updates_are_offered_only_when_brew_can_deliver_a_newer_app() async throws {
+        let scenarios = [
+            DeliveryScenario("1.16.0", "1.16.0", "1.15.0", "294", false),
+            DeliveryScenario("2.19.1,6046815158665216", "2.19.1,6046815158665216", "2.19.1", "2.19.1", false),
+            DeliveryScenario("11.1.1,1111", "11.1.1,1111", "11.1.1", "11.1.1", false),
+            DeliveryScenario("3.32.721", "3.32.721", "3.32", "721", false),
+            DeliveryScenario("2.19.0,111", "2.19.1,6046815158665216", "2.19.1", "2.19.1", false),
+            DeliveryScenario("1.1.7", "2.1.3,abcdef", "2.2.0", "2.2.0", false),
+            DeliveryScenario("1.1.7", "2.1.3,abcdef", "2.1.0", "2.1.0", true),
+            DeliveryScenario("152.0.6", "157.0", "150.0.2", "15026.5.6", true)
+        ]
+        for scenario in scenarios {
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            defer { try? FileManager.default.removeItem(at: root) }
+            let app = try makeInstallation(in: root, receiptVersion: scenario.receipt)
+            try setApplicationVersion(scenario.short, at: app)
+            try setBuildVersion(scenario.build, at: app)
+            let service = makeService(in: root)
+            await service.refresh()
+            let (vm, _) = await makeSUT(
+                casks: [makeAntinote(version: scenario.tap)], categories: makeCategories(), localHomebrew: service
+            )
+            let cask = try XCTUnwrap(vm.casks.first)
+            vm.selectedSidebar = .library(.updates)
+            service.setGreedyUpdates(true)
+            let label = "\(scenario.short)/\(scenario.build) receipt \(scenario.receipt) tap \(scenario.tap)"
+            XCTAssertEqual(service.installationSnapshot.installedCasks[cask.token]?.installedVersion, scenario.receipt, label)
+            XCTAssertEqual(infoValues(for: cask, service: service)[String(localized: "Outdated")],
+                           scenario.expected ? String(localized: "Yes") : String(localized: "No"), label)
+            XCTAssertEqual(service.localState(for: cask).hasAvailableUpdate, scenario.expected, label)
+            XCTAssertEqual(vm.updatesCount, scenario.expected ? 1 : 0, label)
+        }
+    }
+
     func test_ambiguous_identity_and_uncomparable_versions_keep_receipt_policy() async throws {
         let scenarios = ["wrong-id", "store", "duplicate", "missing-id", "multiple-apps", "build-only",
-                         "composite", "beta", "beta-bundle", "manual-updates", "alias"]
+                         "beta", "beta-bundle", "manual-updates", "alias"]
         for scenario in scenarios {
             let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
             defer { try? FileManager.default.removeItem(at: root) }
             let app = try makeInstallation(in: root)
             try setApplicationVersion("2.2.0", at: app)
-            let version = scenario == "composite" ? "2.1.3,abcdef" : scenario == "beta" ? "2.1.3beta" : "2.1.3"
+            let version = scenario == "beta" ? "2.1.3beta" : "2.1.3"
             var cask = makeAntinote(version: version, autoUpdates: scenario != "manual-updates")
             try configure(scenario, app: app, cask: &cask)
             var casks = [cask]
@@ -110,7 +155,7 @@ final class HomebrewAppVersionTests: XCTestCase {
             let enriched = try XCTUnwrap(vm.casks.first { $0.token == "antinote" })
             service.setGreedyUpdates(true)
             let expectedVersion = scenario == "beta-bundle" ? "2.1.3beta"
-                : ["composite", "beta", "manual-updates"].contains(scenario) ? "2.2.0" : "1.1.7"
+                : ["beta", "manual-updates"].contains(scenario) ? "2.2.0" : "1.1.7"
             XCTAssertEqual(infoValues(for: enriched, service: service)[String(localized: "Installed Version")],
                            expectedVersion, scenario)
             XCTAssertTrue(service.localState(for: enriched).hasAvailableUpdate, scenario)
@@ -144,16 +189,18 @@ final class HomebrewAppVersionTests: XCTestCase {
     }
 
     @discardableResult
-    private func makeInstallation(in root: URL, token: String = "antinote") throws -> URL {
+    private func makeInstallation(
+        in root: URL, token: String = "antinote", receiptVersion: String = "1.1.7"
+    ) throws -> URL {
         let app = try makeApplicationBundle(
             in: root.appendingPathComponent("Applications"), named: "Antinote.app",
             bundleIdentifier: "com.chabomakers.Antinote"
         )
         try setApplicationVersion("2.1.0", at: app)
         let caskroom = root.appendingPathComponent("Caskroom/\(token)")
-        let version = caskroom.appendingPathComponent("1.1.7")
+        let version = caskroom.appendingPathComponent(receiptVersion)
         let metadata = caskroom.appendingPathComponent(".metadata")
-        let caskfile = metadata.appendingPathComponent("1.1.7/20260718183151.778/Casks/\(token).json")
+        let caskfile = metadata.appendingPathComponent("\(receiptVersion)/20260718183151.778/Casks/\(token).json")
         try FileManager.default.createDirectory(at: version, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: caskfile.deletingLastPathComponent(), withIntermediateDirectories: true)
         try FileManager.default.createSymbolicLink(at: version.appendingPathComponent("Antinote.app"), withDestinationURL: app)
@@ -161,6 +208,13 @@ final class HomebrewAppVersionTests: XCTestCase {
         try Data(#"{"uninstall_artifacts":[{"app":["Antinote.app"]}]}"#.utf8)
             .write(to: metadata.appendingPathComponent("INSTALL_RECEIPT.json"))
         return app
+    }
+
+    private func setBuildVersion(_ build: String?, at app: URL) throws {
+        let url = app.appendingPathComponent("Contents/Info.plist")
+        var info = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
+        info["CFBundleVersion"] = build
+        try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: url)
     }
 
     private func makeService(in root: URL) -> LocalHomebrewService {
