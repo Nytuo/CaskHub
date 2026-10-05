@@ -43,6 +43,7 @@ nonisolated enum CatalogProjector {
     ) -> CatalogLibrarySnapshot {
         var updatableCasks: [Cask] = []
         var installedCasks: [Cask] = []
+        var homebrewInstalledCasks: [Cask] = []
         var adoptableCasks: [Cask] = []
         var casksByCategory: [String: [Cask]] = [:]
 
@@ -53,6 +54,9 @@ nonisolated enum CatalogProjector {
             }
             if localState.isPresent {
                 installedCasks.append(cask)
+            }
+            if localState.isHomebrewInstalled {
+                homebrewInstalledCasks.append(cask)
             }
             if localState.isAdoptable, !input.adoptIgnoredTokens.contains(cask.token) {
                 adoptableCasks.append(cask)
@@ -67,6 +71,7 @@ nonisolated enum CatalogProjector {
         return CatalogLibrarySnapshot(
             updatableCasks: updatableCasks,
             installedCasks: installedCasks,
+            homebrewInstalledCasks: homebrewInstalledCasks,
             adoptableCasks: adoptableCasks,
             casksByCategory: casksByCategory,
             categoryCounts: casksByCategory.mapValues(\.count),
@@ -127,6 +132,17 @@ nonisolated enum CatalogProjector {
         return applySort(input.sortOption, to: searched, input: input)
     }
 
+    static func makeExternallyManaged(
+        from input: CatalogFilteredProjectionInput
+    ) -> [Cask] {
+        let external = input.library.installedCasks.filter { cask in
+            guard let state = input.library.localStates[cask.token] else { return false }
+            return !state.isHomebrewInstalled
+        }
+        let searched = applySearch(input.searchText, to: external, keys: input.searchKeys)
+        return applySort(input.sortOption, to: searched, input: input)
+    }
+
     private static func applySidebarFilter(
         _ input: CatalogFilteredProjectionInput
     ) -> [Cask] {
@@ -145,7 +161,7 @@ nonisolated enum CatalogProjector {
                 isRecent($0.token, in: input.recentTokens, addedDates: input.addedDates)
             }
         case .library(.installed):
-            return input.library.installedCasks
+            return input.library.homebrewInstalledCasks
         case .library(.updates):
             return input.library.updatableCasks
         case .library(.adopt):

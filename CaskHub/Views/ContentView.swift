@@ -12,6 +12,8 @@ enum ViewMode: String {
 }
 
 struct ContentView: View {
+    static let showExternallyManagedAppsKey = "showExternallyManagedApps"
+
     @Bindable var viewModel: CaskCatalogViewModel
     @Environment(ImageCacheService.self) private var imageCache
     @Environment(CategoryService.self) private var categoryService
@@ -19,6 +21,7 @@ struct ContentView: View {
     @Environment(MaintenanceViewModel.self) private var maintenance
     @AppStorage("catalogTextSize") private var catalogTextSize: CatalogTextSize = .standard
     @AppStorage("viewMode") var viewMode: ViewMode = .grid
+    @AppStorage(Self.showExternallyManagedAppsKey) var showExternallyManagedApps = true
     @FocusState private var searchFocused: Bool
     @State private var sidebarVisibility: NavigationSplitViewVisibility = .all
     @State private var showsResultsHeader = false
@@ -45,7 +48,7 @@ struct ContentView: View {
                 ),
                 categoryService: categoryService,
                 updatesCount: viewModel.updatesCount,
-                installedCount: viewModel.installedCount,
+                installedCount: viewModel.installedCount(includingExternallyManaged: showExternallyManagedApps),
                 adoptableCount: viewModel.adoptableCasks.count,
                 categoryCounts: viewModel.categoryCounts
             )
@@ -197,7 +200,8 @@ struct ContentView: View {
     }
 
     private var topBarSummary: String? {
-        isUtilityPage ? utilitySummary : String(localized: "\(viewModel.filteredCasks.count) casks")
+        let externalCount = showsExternallyManagedSection ? viewModel.filteredExternallyManagedCasks.count : 0
+        return isUtilityPage ? utilitySummary : String(localized: "\(viewModel.filteredCasks.count + externalCount) casks")
     }
 
     private var utilitySummary: String? {
@@ -261,6 +265,12 @@ struct ContentView: View {
     var showsBrowseSections: Bool {
         selectedSidebar == .discover(.browse)
             && viewModel.appliedSearchText.isEmpty
+    }
+
+    var showsExternallyManagedSection: Bool {
+        selectedSidebar == .library(.installed)
+            && showExternallyManagedApps
+            && !viewModel.filteredExternallyManagedCasks.isEmpty
     }
 
     private var sortOptions: [SortOption] {

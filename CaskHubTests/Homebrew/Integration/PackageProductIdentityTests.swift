@@ -52,10 +52,11 @@ final class PackageProductIdentityTests: XCTestCase {
         XCTAssertEqual(state.externalVersion, "16.113.3")
         XCTAssertTrue(state.isAdoptable)
         XCTAssertTrue(state.canOpen)
-        for sidebar: SidebarSelection in [.library(.installed), .library(.adopt)] {
-            viewModel.selectedSidebar = sidebar
-            XCTAssertEqual(viewModel.filteredCasks.map(\.token), ["microsoft-excel"])
-        }
+        viewModel.selectedSidebar = .library(.installed)
+        XCTAssertTrue(viewModel.filteredCasks.isEmpty)
+        XCTAssertEqual(viewModel.filteredExternallyManagedCasks.map(\.token), ["microsoft-excel"])
+        viewModel.selectedSidebar = .library(.adopt)
+        XCTAssertEqual(viewModel.filteredCasks.map(\.token), ["microsoft-excel"])
         for suite in viewModel.casks where suite.token != cask.token {
             XCTAssertNil(local.localState(for: suite).installationSource)
             local.open(suite)
@@ -157,7 +158,8 @@ final class PackageProductIdentityTests: XCTestCase {
         XCTAssertNil(local.localState(for: suite).installationSource, mode)
         XCTAssertFalse(local.localState(for: suite).canOpen, mode)
         viewModel.selectedSidebar = .library(.installed)
-        XCTAssertEqual(viewModel.filteredCasks.map(\.token), expected == nil ? [] : ["product"], mode)
+        XCTAssertTrue(viewModel.filteredCasks.isEmpty, mode)
+        XCTAssertEqual(viewModel.filteredExternallyManagedCasks.map(\.token), expected == nil ? [] : ["product"], mode)
         viewModel.selectedSidebar = .library(.adopt)
         XCTAssertEqual(viewModel.filteredCasks.map(\.token), mode == "valid" ? ["product"] : [], mode)
         local.open(suite)
