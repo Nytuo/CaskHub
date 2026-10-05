@@ -138,7 +138,7 @@ final class HomebrewAppVersionTests: XCTestCase {
             GreedyScenario(homebrew: ["antinote"], short: "2.1.0", off: true, greedy: true),
             GreedyScenario(homebrew: [], short: "2.1.0", off: false, greedy: true),
             GreedyScenario(homebrew: nil, short: "2.1.0", off: false, greedy: true),
-            GreedyScenario(homebrew: ["antinote"], short: "2.1.3", off: true, greedy: true),
+            GreedyScenario(homebrew: ["antinote"], short: "2.1.3", off: false, greedy: false),
             GreedyScenario(homebrew: ["antinote"], receipt: "2.1.3", short: "2.1.0", off: false, greedy: false),
             GreedyScenario(homebrew: ["antinote"], receiptApp: "Renamed.app", short: "2.1.0", off: true, greedy: true),
             GreedyScenario(homebrew: [], receiptApp: "Renamed.app", short: "2.1.0", off: false, greedy: false),
@@ -187,6 +187,42 @@ final class HomebrewAppVersionTests: XCTestCase {
         await service.refreshHomebrewOutdated()
         XCTAssertEqual(queries, 1)
         XCTAssertEqual(service.homebrewOutdatedTokens, ["antinote"])
+    }
+
+    func test_newer_app_evidence_overrides_a_cached_homebrew_listing() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let app = try makeInstallation(in: root)
+        let service = makeService(in: root, homebrewOutdated: ["antinote"])
+        await service.refresh()
+        await service.refreshHomebrewOutdated()
+        let (vm, _) = await makeSUT(casks: [makeAntinote()], categories: makeCategories(), localHomebrew: service)
+        let cask = try XCTUnwrap(vm.casks.first)
+        vm.selectedSidebar = .library(.updates)
+        XCTAssertTrue(service.localState(for: cask).hasAvailableUpdate)
+
+        try setApplicationVersion("2.1.3", at: app)
+        await service.refresh()
+        for greedy in [false, true] {
+            service.setGreedyUpdates(greedy)
+            XCTAssertFalse(service.localState(for: cask).hasAvailableUpdate, "self-updated, greedy \(greedy)")
+            XCTAssertEqual(vm.updatesCount, 0, "self-updated, greedy \(greedy)")
+        }
+
+        try setApplicationVersion("2.2.0", at: app)
+        let caskroom = root.appendingPathComponent("Caskroom/antinote")
+        for parent in [caskroom, caskroom.appendingPathComponent(".metadata")] {
+            try FileManager.default.moveItem(
+                at: parent.appendingPathComponent("1.1.7"), to: parent.appendingPathComponent("2.2.0")
+            )
+        }
+        await service.refresh()
+        XCTAssertEqual(service.installationSnapshot.installedCasks[cask.token]?.installedVersion, "2.2.0")
+        for greedy in [false, true] {
+            service.setGreedyUpdates(greedy)
+            XCTAssertFalse(service.localState(for: cask).hasAvailableUpdate, "upgraded past the catalog, greedy \(greedy)")
+            XCTAssertEqual(vm.updatesCount, 0, "upgraded past the catalog, greedy \(greedy)")
+        }
     }
 
     func test_ambiguous_identity_and_uncomparable_versions_keep_receipt_policy() async throws {

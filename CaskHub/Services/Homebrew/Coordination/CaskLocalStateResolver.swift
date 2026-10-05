@@ -142,17 +142,17 @@ struct CaskLocalStateResolver {
               // brew upgrade does nothing once the receipt matches the tap.
               installation.installedVersion != remoteVersion
         else { return false }
-        if isListedByHomebrew(token),
-           !snapshot.installationIndex.verifiedZombieTokens.contains(token) {
-            return true
-        }
-        guard !installation.isZombie else { return false }
-        // Self-updaters can advance the app without updating Homebrew's receipt.
+        // Self-updaters can advance the app without updating Homebrew's receipt or its last answer.
         if autoUpdates == true,
            let application = snapshot.installationIndex.homebrewApplications[token],
            let outdated = Self.isBundleOutdated(application, tapVersion: remoteVersion) {
             return outdated
         }
+        if isListedByHomebrew(token),
+           !snapshot.installationIndex.verifiedZombieTokens.contains(token) {
+            return true
+        }
+        guard !installation.isZombie else { return false }
         return Self.comparableVersion(installation.installedVersion)
             != Self.comparableVersion(remoteVersion)
     }
