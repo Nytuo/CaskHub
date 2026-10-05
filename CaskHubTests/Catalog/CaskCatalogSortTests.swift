@@ -188,7 +188,8 @@ final class CaskCatalogSortTests: XCTestCase {
 
         vm.selectedSidebar = .library(.installed)
         XCTAssertEqual(vm.sortOption, .recentlyInstalled)
-        XCTAssertEqual(vm.filteredCasks.map(\.token), ["zulu", "alpha", "able", "bravo"])
+        XCTAssertEqual(vm.filteredCasks.map(\.token), ["zulu", "alpha"])
+        XCTAssertEqual(vm.filteredExternallyManagedCasks.map(\.token), ["able", "bravo"])
 
         vm.selectedSidebar = .library(.updates)
         XCTAssertEqual(vm.sortOption, .nameAZ)

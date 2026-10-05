@@ -10,6 +10,7 @@ import Foundation
 struct CatalogLibrarySnapshot {
     let updatableCasks: [Cask]
     let installedCasks: [Cask]
+    let homebrewInstalledCasks: [Cask]
     let adoptableCasks: [Cask]
     let casksByCategory: [String: [Cask]]
     let categoryCounts: [String: Int]
