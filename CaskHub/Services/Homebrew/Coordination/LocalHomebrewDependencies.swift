@@ -100,6 +100,7 @@ struct LocalHomebrewDependencies {
         )
     }
     var homebrewOutdatedProvider: (() async -> HomebrewOutdatedReport?)?
+    var laneLimiter: HomebrewLaneLimiter?
 
     func resolvedCommandExecutor() -> any HomebrewCommandExecuting {
         commandExecutor

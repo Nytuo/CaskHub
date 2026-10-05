@@ -26,7 +26,7 @@ final class HomebrewCommandExecutorTests: XCTestCase {
         ]
         for testCase in cases {
             let runner = StubBrewProcessRunner()
-            runner.queuedResults = [BrewProcessResult(exitCode: 1, output:
+            runner.queuedResults = [.success, BrewProcessResult(exitCode: 1, output:
                 "🍺  \(testCase.marker) was successfully installed!\n"
                     + "Error: Permission denied @ apply2files - /usr/local/share/doc/unrelated/file"
             )]
@@ -46,7 +46,7 @@ final class HomebrewCommandExecutorTests: XCTestCase {
             XCTAssertEqual(failure, testCase.failure)
             XCTAssertEqual(service.actionAlert(for: "zed") == nil, testCase.failure == nil)
             if testCase.marker == "zed" { XCTAssertEqual(service.installedCasks["zed"], testCase.refreshed) }
-            XCTAssertEqual(runner.requests.map(\.arguments), [["install", "--cask", "zed"]])
+            XCTAssertEqual(runner.requests.map(\.arguments), [["fetch", "--cask", "zed"], ["install", "--cask", "zed"]])
         }
     }
 
@@ -192,6 +192,8 @@ final class HomebrewCommandExecutorTests: XCTestCase {
             do { try await service.install(token: "firefox"); return true } catch { return false }
         }
         while executor.requests.isEmpty { await Task.yield() }
+        executor.finish(.success)
+        while executor.requests.count < 2 { await Task.yield() }
         if cancel { service.cancelInstall(token: "firefox") }
         XCTAssertEqual(service.operationStore.state(for: "firefox")?.cancellationRequested, cancel)
         executor.finish(result)
@@ -206,14 +208,14 @@ final class HomebrewCommandExecutorTests: XCTestCase {
         let messages = spy.breadcrumbs.map(\.message)
         XCTAssertEqual(messages.contains("Cask.actionFailed"), expectedFailure != nil)
         XCTAssertEqual(messages.contains("Cask.installed"), result.exitCode == 0)
-        XCTAssertEqual(spy.spans.first?.span.finished, true)
-        XCTAssertEqual(spy.spans.first?.span.finishedError != nil, expectedFailure != nil)
+        XCTAssertEqual(spy.spans.last?.span.finished, true)
+        XCTAssertEqual(spy.spans.last?.span.finishedError != nil, expectedFailure != nil)
         if expectedFailure != nil {
             XCTAssertEqual(spy.capturedErrorTags.first?["brew.cancellation_requested"], cancel ? "true" : nil)
         }
     }
 
-    func test_services_share_global_process_fifo() async throws {
+    func test_services_share_the_exclusive_lane() async throws {
         let overlap = expectation(description: "Homebrew processes overlap")
         overlap.isInverted = true
         let runner = ControlledBrewProcessRunner(overlapExpectation: overlap)
@@ -232,9 +234,9 @@ final class HomebrewCommandExecutorTests: XCTestCase {
         let firstService = makeService("serialized-homebrew-first")
         let secondService = makeService("serialized-homebrew-second")
 
-        let first = Task { try await firstService.install(token: "firefox") }
+        let first = Task { try await firstService.uninstall(token: "firefox") }
         await runner.waitForStarts(1)
-        let second = Task { try await secondService.install(token: "gimp") }
+        let second = Task { try await secondService.uninstall(token: "gimp") }
 
         await fulfillment(of: [overlap], timeout: 0.1)
         runner.finishNext()
@@ -245,8 +247,8 @@ final class HomebrewCommandExecutorTests: XCTestCase {
         try await second.value
         XCTAssertEqual(runner.maxActiveCount, 1)
         XCTAssertEqual(runner.requests, [
-            ["install", "--cask", "firefox"],
-            ["install", "--cask", "gimp"]
+            ["uninstall", "--cask", "firefox"],
+            ["uninstall", "--cask", "gimp"]
         ])
         XCTAssertNil(firstService.operationStore.state(for: "firefox"))
         XCTAssertNil(secondService.operationStore.state(for: "gimp"))
@@ -314,13 +316,16 @@ final class HomebrewCommandExecutorTests: XCTestCase {
 
         let install = Task { try? await service.install(token: "firefox") }
         while executor.requests.count < 3 { await Task.yield() }
-        XCTAssertEqual(executor.requests.last?.arguments, ["install", "--cask", "firefox"])
+        XCTAssertEqual(executor.requests.last?.arguments, ["fetch", "--cask", "firefox"])
         XCTAssertEqual(service.brewVersion, "test")
 
         try? await service.updateHomebrew(for: "gimp")
         XCTAssertEqual(service.brewVersion, "test")
         XCTAssertEqual(executor.requests.count, 3)
 
+        executor.finish(.success)
+        while executor.requests.count < 4 { await Task.yield() }
+        XCTAssertEqual(executor.requests.last?.arguments, ["install", "--cask", "firefox"])
         executor.finish(BrewProcessResult(exitCode: 0, output: "installed"))
         await install.value
     }

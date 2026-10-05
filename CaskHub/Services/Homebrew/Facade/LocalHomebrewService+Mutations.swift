@@ -23,36 +23,12 @@ extension LocalHomebrewService {
         origin: CaskActionOrigin = .individual,
         context: HomebrewMutationContext = .none
     ) async throws {
-        let previousInstallation = installationSnapshot.installedCasks[token]
-        try await mutationCoordinator.runSequence(
-            HomebrewMutationSequenceRequest(
-                action: action,
-                token: token,
-                displayName: displayName(for: token),
-                origin: origin,
-                steps: [
-                    HomebrewMutationStep(
-                        arguments: args,
-                        environmentOverrides: [:],
-                        lane: .exclusive,
-                        cancellation: action == .installing ? .untilPerforming : .never,
-                        recoverIf: nil,
-                        recoveryBehavior: .finishMutation
-                    )
-                ],
-                context: context
-            ),
-            callbacks: HomebrewMutationCallbacks(
-                refresh: { [self] in await refresh() },
-                strandedCopyExists: { [self] in hasStrandedCopy(token: token) },
-                postconditionSatisfied: { [self] in
-                    mutationPostconditionSatisfied(
-                        action: action,
-                        token: token,
-                        previousInstallation: previousInstallation
-                    )
-                }
-            )
+        try await runMutationSequence(
+            action,
+            token: token,
+            steps: [.exclusive(args, cancellation: .never)],
+            origin: origin,
+            context: context
         )
     }
 

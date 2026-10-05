@@ -532,7 +532,8 @@ extension AnalyticsTests {
         CrashReporter.captureCounts = [:]
 
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(exitCode: 1, output: output)]
+        let failure = BrewProcessResult(exitCode: 1, output: output)
+        runner.queuedResults = operation == .updatingHomebrew || operation == .adopting ? [failure] : [.success, failure]
         let askpass = FileManager.default.temporaryDirectory
             .appendingPathComponent("caskhub-analytics-\(UUID().uuidString)")
         if markAskpassCancelled {

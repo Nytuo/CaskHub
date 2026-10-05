@@ -33,10 +33,13 @@ extension LocalHomebrewService {
     }
 
     func install(token: String) async throws {
-        try await runMutation(
+        try await runMutationSequence(
             .installing,
             token: token,
-            args: ["install", "--cask", token],
+            steps: [
+                .fetch(token: token, cancellation: .untilPerforming),
+                .exclusive(["install", "--cask", token], cancellation: .untilPerforming)
+            ],
             origin: .individual
         )
     }
@@ -137,14 +140,7 @@ extension LocalHomebrewService {
             action,
             token: token,
             steps: [
-                HomebrewMutationStep(
-                    arguments: ["fetch", "--cask", token],
-                    environmentOverrides: [:],
-                    lane: .exclusive,
-                    cancellation: .never,
-                    recoverIf: nil,
-                    recoveryBehavior: .finishMutation
-                ),
+                .fetch(token: token, cancellation: .never),
                 HomebrewMutationStep(
                     arguments: ["uninstall", "--cask", token, "--force"],
                     environmentOverrides: ["HOMEBREW_NO_AUTOREMOVE": "1"],
@@ -159,14 +155,7 @@ extension LocalHomebrewService {
                     },
                     recoveryBehavior: .continueSequence
                 ),
-                HomebrewMutationStep(
-                    arguments: ["install", "--cask", token],
-                    environmentOverrides: [:],
-                    lane: .exclusive,
-                    cancellation: .never,
-                    recoverIf: nil,
-                    recoveryBehavior: .finishMutation
-                )
+                .exclusive(["install", "--cask", token], cancellation: .never)
             ],
             origin: origin,
             context: context
@@ -179,10 +168,13 @@ extension LocalHomebrewService {
     ) async throws {
         let args = ["upgrade", "--cask", token]
             + (greedyUpdates ? ["--greedy"] : [])
-        try await runMutation(
+        try await runMutationSequence(
             .updating,
             token: token,
-            args: args,
+            steps: [
+                .fetch(token: token, cancellation: .untilPerforming),
+                .exclusive(args, cancellation: .whileQueued)
+            ],
             origin: origin
         )
     }

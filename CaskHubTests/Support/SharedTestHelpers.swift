@@ -529,3 +529,7 @@ final class SpyAnalyticsProvider: AnalyticsProvider, SentryMetricsApiProtocol {
         attributes _: [String: SentryAttributeValue]
     ) {}
 }
+
+extension BrewProcessResult {
+    static let success = BrewProcessResult(exitCode: 0, output: "")
+}

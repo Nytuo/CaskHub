@@ -109,7 +109,8 @@ final class LocalHomebrewService {
             commandExecutor: dependencies.resolvedCommandExecutor(),
             brewBinaryProvider: dependencies.brewBinaryProvider,
             askpassProvider: dependencies.askpassProvider,
-            fileManager: dependencies.fileManager
+            fileManager: dependencies.fileManager,
+            lanes: dependencies.laneLimiter ?? .shared
         )
         softwareScanner = dependencies.softwareScanner
             ?? HomebrewInstallationScanner()

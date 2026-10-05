@@ -25,6 +25,28 @@ struct HomebrewMutationStep {
     let cancellation: HomebrewStepCancellation
     let recoverIf: (() -> Bool)?
     let recoveryBehavior: HomebrewMutationRecoveryBehavior
+
+    static func fetch(token: String, cancellation: HomebrewStepCancellation) -> HomebrewMutationStep {
+        HomebrewMutationStep(
+            arguments: ["fetch", "--cask", token],
+            environmentOverrides: [:],
+            lane: .download,
+            cancellation: cancellation,
+            recoverIf: nil,
+            recoveryBehavior: .finishMutation
+        )
+    }
+
+    static func exclusive(_ arguments: [String], cancellation: HomebrewStepCancellation) -> HomebrewMutationStep {
+        HomebrewMutationStep(
+            arguments: arguments,
+            environmentOverrides: [:],
+            lane: .exclusive,
+            cancellation: cancellation,
+            recoverIf: nil,
+            recoveryBehavior: .finishMutation
+        )
+    }
 }
 
 struct HomebrewMutationSequenceRequest {

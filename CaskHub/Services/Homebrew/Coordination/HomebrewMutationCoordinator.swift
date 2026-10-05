@@ -16,7 +16,7 @@ final class HomebrewMutationCoordinator {
     private let fileManager: FileManager
 
     private let outputAggregator: BrewOutputAggregator
-    private let lanes = HomebrewLaneLimiter.shared
+    private let lanes: HomebrewLaneLimiter
     private var heldLanes: [String: HomebrewLaneLimiter.Lane] = [:]
 
     init(
@@ -24,13 +24,15 @@ final class HomebrewMutationCoordinator {
         commandExecutor: any HomebrewCommandExecuting,
         brewBinaryProvider: @escaping () -> URL?,
         askpassProvider: @escaping @Sendable (String) async throws -> URL,
-        fileManager: FileManager
+        fileManager: FileManager,
+        lanes: HomebrewLaneLimiter
     ) {
         self.operationStore = operationStore
         self.commandExecutor = commandExecutor
         self.brewBinaryProvider = brewBinaryProvider
         self.askpassProvider = askpassProvider
         self.fileManager = fileManager
+        self.lanes = lanes
         outputAggregator = BrewOutputAggregator(fileManager: fileManager)
     }
 
@@ -95,9 +97,19 @@ final class HomebrewMutationCoordinator {
 }
 
 extension HomebrewMutationCoordinator {
-    /// A step keeps its lane until the next step asks for one, so the closing rescan stays inside it.
+    /// A step keeps its lane until a later step needs a different one, so the closing rescan stays inside it.
     private func run(_ step: HomebrewMutationStep, token: String) async throws {
         if operationStore.state(for: token)?.cancellationRequested == true { throw CancellationError() }
+        if heldLanes[token] != step.lane { try await enter(step, token: token) }
+        try await executeStreaming(
+            token: token,
+            arguments: step.arguments,
+            cancellable: step.cancellation == .untilPerforming,
+            environmentOverrides: step.environmentOverrides
+        )
+    }
+
+    private func enter(_ step: HomebrewMutationStep, token: String) async throws {
         releaseLane(token: token)
         let progress = operationStore.state(for: token)?.progress
         let admitted = await lanes.acquire(step.lane, token: token) {
@@ -111,12 +123,6 @@ extension HomebrewMutationCoordinator {
         heldLanes[token] = step.lane
         if let progress { operationStore.send(.updateProgress(progress), for: token) }
         operationStore.send(.setCancellable(false), for: token)
-        try await executeStreaming(
-            token: token,
-            arguments: step.arguments,
-            cancellable: step.cancellation == .untilPerforming,
-            environmentOverrides: step.environmentOverrides
-        )
     }
 
     private func releaseLane(token: String) {
