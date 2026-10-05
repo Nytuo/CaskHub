@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A51000000000000000000002 /* ExternallyManagedCasksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51000000000000000000001 /* ExternallyManagedCasksTests.swift */; };
 		A49100000000000000000001 /* PackageProductIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49100000000000000000002 /* PackageProductIdentityTests.swift */; };
 		D24400000000000000000002 /* AppConflictRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24400000000000000000001 /* AppConflictRecoveryTests.swift */; };
 		B23300000000000000000002 /* HomebrewAppVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23300000000000000000001 /* HomebrewAppVersionTests.swift */; };
@@ -182,6 +183,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A51000000000000000000001 /* ExternallyManagedCasksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternallyManagedCasksTests.swift; sourceTree = "<group>"; };
 		A49100000000000000000002 /* PackageProductIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageProductIdentityTests.swift; sourceTree = "<group>"; };
 		D24400000000000000000001 /* AppConflictRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConflictRecoveryTests.swift; sourceTree = "<group>"; };
 		B23300000000000000000001 /* HomebrewAppVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomebrewAppVersionTests.swift; sourceTree = "<group>"; };
@@ -807,6 +809,7 @@
 				A29100000000000000000005 /* Projection */,
 				E25000000000000000000001 /* CaskCatalogSortTests.swift */,
 				41DFD4B530028F9F00608C7A /* CaskCatalogViewModelTests.swift */,
+				A51000000000000000000001 /* ExternallyManagedCasksTests.swift */,
 			);
 			path = Catalog;
 			sourceTree = "<group>";
@@ -1188,6 +1191,7 @@
 				A29100000000000000000004 /* CaskMetadataProjectorTests.swift in Sources */,
 				41AD10162F68B00700BEABB8 /* CrashReporterTests.swift in Sources */,
 				41DFD4B630028F9F00608C7A /* CaskCatalogViewModelTests.swift in Sources */,
+				A51000000000000000000002 /* ExternallyManagedCasksTests.swift in Sources */,
 				A49000000000000000000001 /* ArtifactIdentityTests.swift in Sources */,
 				A49100000000000000000001 /* PackageProductIdentityTests.swift in Sources */,
 				F25000000000000000000001 /* CaskCatalogSortTests.swift in Sources */,

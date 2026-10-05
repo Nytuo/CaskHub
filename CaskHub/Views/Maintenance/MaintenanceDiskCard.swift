@@ -159,7 +159,7 @@ struct MaintenanceDiskCard: View {
             ) {
                 Task { await model.clean(id) }
             }
-            .frame(width: 74, alignment: .trailing)
+            .frame(minWidth: 74, alignment: .trailing)
         default:
             if buttonTitle(for: id) != nil, model.diskBytes[id] == 0 {
                 cleanGlyph

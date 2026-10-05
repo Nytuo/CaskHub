@@ -283,8 +283,10 @@ final class ExternalInstallationTests: XCTestCase {
         }
 
         vm.selectedSidebar = .library(.installed)
-        XCTAssertEqual(Set(vm.filteredCasks.map(\.token)), [store.token, package.token])
+        XCTAssertTrue(vm.filteredCasks.isEmpty)
+        XCTAssertEqual(Set(vm.filteredExternallyManagedCasks.map(\.token)), [store.token, package.token])
         XCTAssertEqual(vm.installedCount, 2)
+        XCTAssertEqual(vm.installedCount(includingExternallyManaged: false), 0)
 
         vm.selectedSidebar = .library(.adopt)
         XCTAssertEqual(vm.filteredCasks.map(\.token), [package.token])
