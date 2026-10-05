@@ -192,6 +192,29 @@ final class ConcurrentDownloadTests: XCTestCase {
         XCTAssertNil(service.statusBarOperation)
     }
 
+    func test_install_all_downloads_together_and_counts_failures() async {
+        let executor = ControlledHomebrewCommandExecutor()
+        let service = makeService(executor)
+        var finishedCounts: [Int] = []
+        let batch = Task { await service.installAll(tokens: ["a", "b", "c"]) { finishedCounts.append($0) } }
+        await executor.waitForRequests(3)
+        XCTAssertEqual(Set(executor.running("fetch")), ["a", "b", "c"])
+
+        executor.finish("b", exitCode: 1)
+        await settle { finishedCounts == [1] }
+        XCTAssertEqual(finishedCounts, [1])
+        let deadline = Date().addingTimeInterval(10)
+        while finishedCounts.count < 3, Date() < deadline {
+            if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }
+        }
+        let failedCount = await batch.value
+        XCTAssertEqual(failedCount, 1)
+        XCTAssertEqual(finishedCounts, [1, 2, 3])
+        XCTAssertEqual(executor.maxActive["fetch"], 3)
+        XCTAssertEqual(executor.maxActive["install"], 1)
+        XCTAssertEqual(Set(executor.requests.filter { $0.arguments.first == "install" }.map(\.token)), ["a", "c"])
+    }
+
     func test_maintenance_probe_does_not_wait_for_a_running_download() async {
         let executor = ControlledHomebrewCommandExecutor()
         let service = makeService(executor, sharingLanesWithMaintenance: true)

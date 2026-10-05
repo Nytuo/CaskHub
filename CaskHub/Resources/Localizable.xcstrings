@@ -11384,42 +11384,6 @@
         }
       }
     },
-    "shelfSetup.brewfile.sheet.pouring" : {
-      "comment" : "Import progress: cask name, current index, total",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pouring %1$@… (%2$lld of %3$lld)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Установка %1$@… (%2$lld из %3$lld)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Встановлення %1$@… (%2$lld із %3$lld)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在装入 %1$@…（%2$lld/%3$lld）"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在裝入 %1$@…（%2$lld/%3$lld）"
-          }
-        }
-      }
-    },
     "shelfSetup.brewfile.sheet.selectAll" : {
       "comment" : "Header checkbox label when some listed casks are deselected",
       "extractionState" : "manual",

@@ -194,6 +194,23 @@ extension LocalHomebrewService {
         for update in updates { await update.value }
     }
 
+    /// Returns how many installs failed.
+    func installAll(tokens: [String], onFinished: (Int) -> Void) async -> Int {
+        await withTaskGroup(of: Bool.self) { group in
+            for token in tokens {
+                group.addTask { await (try? self.install(token: token)) != nil }
+            }
+            var finishedCount = 0
+            var failedCount = 0
+            for await succeeded in group {
+                finishedCount += 1
+                if !succeeded { failedCount += 1 }
+                onFinished(finishedCount)
+            }
+            return failedCount
+        }
+    }
+
     func cancelInstall(token: String) {
         mutationCoordinator.cancel(token: token)
     }
