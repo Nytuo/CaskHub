@@ -43,6 +43,7 @@ final class LocalHomebrewService {
     @ObservationIgnored let mutationCoordinator: HomebrewMutationCoordinator
     @ObservationIgnored let softwareScanner: any InstalledSoftwareScanning
     @ObservationIgnored let brewBinaryProvider: () -> URL?
+    @ObservationIgnored private let caskPlatformProvider: () async -> CaskPlatform?
     @ObservationIgnored private let brewVersionProvider: () async -> String?
     @ObservationIgnored private let homebrewOutdatedProvider: () async -> HomebrewOutdatedReport?
 
@@ -61,6 +62,11 @@ final class LocalHomebrewService {
     private(set) var brewVersion: String?
 
     private(set) var customBrewPrefix: String?
+
+    /// Homebrew's platform tag, cached between refreshes; nil when detection fails.
+    private(set) var caskPlatform: CaskPlatform? {
+        didSet { if caskPlatform != oldValue { catalogStateRevision &+= 1 } }
+    }
 
     /// What `brew outdated` lists; nil until Homebrew answers.
     private(set) var homebrewOutdated: HomebrewOutdatedReport? {
@@ -116,6 +122,8 @@ final class LocalHomebrewService {
         brewBinaryProvider = dependencies.brewBinaryProvider
         brewVersionProvider = dependencies.brewVersionProvider
         let brewBinary = dependencies.brewBinaryProvider
+        caskPlatformProvider = dependencies.caskPlatformProvider
+            ?? { await HomebrewPlatformLoader().load(from: brewBinary()) }
         homebrewOutdatedProvider = dependencies.homebrewOutdatedProvider
             ?? { await HomebrewOutdatedLoader().load(from: brewBinary()) }
         zapOnUninstall = defaults.bool(forKey: Self.zapOnUninstallKey)
@@ -179,12 +187,13 @@ final class LocalHomebrewService {
         } else {
             defaults.removeObject(forKey: HomebrewLocator.customPrefixKey)
         }
-        brewVersion = nil
+        invalidateBrewVersion()
         await refresh()
     }
 
     func invalidateBrewVersion() {
         brewVersion = nil
+        caskPlatform = nil
     }
 
     func refreshHomebrewOutdated() async {
@@ -194,6 +203,10 @@ final class LocalHomebrewService {
     // MARK: - Detection
 
     func refresh() async {
+        let prefix = customBrewPrefix
+        let platform = await caskPlatformProvider()
+        guard prefix == customBrewPrefix else { return }
+        caskPlatform = platform
         if brewVersion == nil {
             brewVersion = await brewVersionProvider()
         }

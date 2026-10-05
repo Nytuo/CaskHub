@@ -12,6 +12,7 @@ struct CaskLocalStateResolver {
     let hasRegisteredApplicationCatalog: Bool
     let greedyUpdates: Bool
     let homebrewOutdated: HomebrewOutdatedReport?
+    let platform: CaskPlatform?
     let applicationDirectories: [URL]
     let fileManager: FileManager
 
@@ -112,7 +113,8 @@ struct CaskLocalStateResolver {
     func localState(for cask: Cask) -> CaskLocalState {
         let source = installationSource(for: cask)
         let externalVersion = externalApplication(for: cask)?.version
-        let outdated = isOutdated(token: cask.token, remoteVersion: cask.version, autoUpdates: cask.autoUpdates)
+        let target = cask.updateTarget(for: platform)
+        let outdated = target.map { isOutdated(token: cask.token, remoteVersion: $0.version, autoUpdates: $0.autoUpdates) } ?? false
         return CaskLocalState(
             installationSource: source,
             externalVersion: externalVersion,
@@ -131,7 +133,7 @@ struct CaskLocalStateResolver {
             uninstallAvailability: uninstallAvailability(for: cask),
             hasAvailableUpdate: outdated
                 && homebrewOutdated?.pinned.contains(cask.token) != true
-                && (greedyUpdates || cask.autoUpdates != true || isListedByHomebrew(cask.token)),
+                && (greedyUpdates || target?.autoUpdates != true || isListedByHomebrew(cask.token)),
             isOutdated: outdated,
             isZombie: isZombie(cask),
             canOpen: canOpen(cask)

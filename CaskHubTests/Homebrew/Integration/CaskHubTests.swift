@@ -474,9 +474,9 @@ final class CaskHubTests: XCTestCase {
     }
 
     @MainActor
-    func test_greedy_updates_include_auto_updating_casks_and_persist() {
+    func test_greedy_updates_include_auto_updating_casks_and_persist() async {
         let defaults = makeScratchDefaults("greedy")
-        let service = LocalHomebrewService(defaults: defaults)
+        let service = await makePlatformResolvedHomebrew(defaults: defaults)
         updateInstalledCask(installation("google-chrome", version: "137.0"), in: service)
         let update = Cask.preview(
             token: "google-chrome",

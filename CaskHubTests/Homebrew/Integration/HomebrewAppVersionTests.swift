@@ -179,6 +179,7 @@ final class HomebrewAppVersionTests: XCTestCase {
             $0.applicationDirectories = [root.appendingPathComponent("Applications")]
             $0.brewBinaryProvider = { nil }
             $0.brewVersionProvider = { "test" }
+            $0.caskPlatformProvider = { CaskPlatform(tag: "arm64_sequoia") }
             $0.homebrewOutdatedProvider = {
                 queries += 1
                 return HomebrewOutdatedReport(upgradable: ["antinote"], pinned: [])
@@ -325,6 +326,7 @@ final class HomebrewAppVersionTests: XCTestCase {
             $0.applicationDirectories = [root.appendingPathComponent("Applications")]
             $0.brewBinaryProvider = { nil }
             $0.brewVersionProvider = { "test" }
+            $0.caskPlatformProvider = { CaskPlatform(tag: "arm64_sequoia") }
             $0.homebrewOutdatedProvider = {
                 homebrewOutdated.map { HomebrewOutdatedReport(upgradable: $0, pinned: pinned) }
             }
