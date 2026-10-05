@@ -11,6 +11,7 @@ struct CaskLocalStateResolver {
     let snapshot: InstallationSnapshot
     let hasRegisteredApplicationCatalog: Bool
     let greedyUpdates: Bool
+    let homebrewOutdatedTokens: Set<String>?
     let applicationDirectories: [URL]
     let fileManager: FileManager
 
@@ -128,7 +129,8 @@ struct CaskLocalStateResolver {
                 ? externalCLIPath(cask)
                 : nil,
             uninstallAvailability: uninstallAvailability(for: cask),
-            hasAvailableUpdate: (greedyUpdates || cask.autoUpdates != true) && outdated,
+            hasAvailableUpdate: outdated
+                && (greedyUpdates || cask.autoUpdates != true || isListedByHomebrew(cask.token)),
             isOutdated: outdated,
             isZombie: isZombie(cask),
             canOpen: canOpen(cask)
@@ -137,10 +139,14 @@ struct CaskLocalStateResolver {
 
     func isOutdated(token: String, remoteVersion: String, autoUpdates: Bool?) -> Bool {
         guard let installation = snapshot.installedCasks[token],
-              !installation.isZombie,
               // brew upgrade does nothing once the receipt matches the tap.
               installation.installedVersion != remoteVersion
         else { return false }
+        if isListedByHomebrew(token),
+           !snapshot.installationIndex.verifiedZombieTokens.contains(token) {
+            return true
+        }
+        guard !installation.isZombie else { return false }
         // Self-updaters can advance the app without updating Homebrew's receipt.
         if autoUpdates == true,
            let application = snapshot.installationIndex.homebrewApplications[token],
@@ -219,6 +225,10 @@ struct CaskLocalStateResolver {
         .first {
             applicationDiscovery.metadata(at: $0, fileManager: fileManager) != nil
         }
+    }
+
+    private func isListedByHomebrew(_ token: String) -> Bool {
+        homebrewOutdatedTokens?.contains(token) == true
     }
 
     private static func comparableVersion(_ version: String) -> Substring {

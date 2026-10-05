@@ -44,6 +44,7 @@ final class LocalHomebrewService {
     @ObservationIgnored let softwareScanner: any InstalledSoftwareScanning
     @ObservationIgnored let brewBinaryProvider: () -> URL?
     @ObservationIgnored private let brewVersionProvider: () async -> String?
+    @ObservationIgnored private let outdatedTokensProvider: () async -> Set<String>?
 
     var isUpdatingAll: Bool {
         operationStore.isUpdatingAll
@@ -61,7 +62,12 @@ final class LocalHomebrewService {
 
     private(set) var customBrewPrefix: String?
 
-    /// Include self-updating casks (`auto_updates: true`) in updates, via `brew upgrade --greedy`.
+    /// What `brew outdated` lists; nil until Homebrew answers.
+    private(set) var homebrewOutdatedTokens: Set<String>? {
+        didSet { if homebrewOutdatedTokens != oldValue { catalogStateRevision &+= 1 } }
+    }
+
+    /// Also offer self-updating casks Homebrew does not list; upgrades then pass `--greedy`.
     private(set) var greedyUpdates: Bool {
         didSet { catalogStateRevision &+= 1 }
     }
@@ -109,6 +115,9 @@ final class LocalHomebrewService {
             ?? HomebrewInstallationScanner()
         brewBinaryProvider = dependencies.brewBinaryProvider
         brewVersionProvider = dependencies.brewVersionProvider
+        let brewBinary = dependencies.brewBinaryProvider
+        outdatedTokensProvider = dependencies.outdatedTokensProvider
+            ?? { await HomebrewOutdatedLoader().load(from: brewBinary()) }
         zapOnUninstall = defaults.bool(forKey: Self.zapOnUninstallKey)
         greedyUpdates = defaults.bool(forKey: Self.greedyKey)
         adoptIgnoredDates = defaults.dictionary(forKey: Self.adoptIgnoredKey) as? [String: Date] ?? [:]
@@ -176,6 +185,10 @@ final class LocalHomebrewService {
 
     func invalidateBrewVersion() {
         brewVersion = nil
+    }
+
+    func refreshHomebrewOutdated() async {
+        homebrewOutdatedTokens = await outdatedTokensProvider()
     }
 
     // MARK: - Detection

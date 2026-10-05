@@ -165,9 +165,10 @@ final class CaskCatalogViewModel {
         lastLoadedAt = .now
         async let catalog: Void = fetchCasks()
         async let local: Void = localHomebrew.refresh()
+        async let homebrewOutdated: Void = localHomebrew.refreshHomebrewOutdated()
         async let categories: Void = categoryService.refreshFromRemote()
         async let addedDates: Void = recentlyAdded.refreshFromRemote()
-        _ = await (catalog, local, categories, addedDates)
+        _ = await (catalog, local, homebrewOutdated, categories, addedDates)
         let enriched = categoryService.addingAppIdentities(to: casks)
         if enriched != casks {
             casks = enriched

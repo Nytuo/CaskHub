@@ -25,6 +25,15 @@ private struct DeliveryScenario {
     }
 }
 
+private struct GreedyScenario {
+    let homebrew: Set<String>?
+    var receipt = "1.1.7"
+    var receiptApp = "Antinote.app"
+    let short: String
+    let off: Bool
+    let greedy: Bool
+}
+
 @MainActor
 final class HomebrewAppVersionTests: XCTestCase {
     func test_self_updated_app_uses_bundle_version_and_preserves_update_opt_in() async throws {
@@ -130,6 +139,60 @@ final class HomebrewAppVersionTests: XCTestCase {
         }
     }
 
+    func test_greedy_off_lists_what_homebrew_reports() async throws {
+        let scenarios = [
+            GreedyScenario(homebrew: ["antinote"], short: "2.1.0", off: true, greedy: true),
+            GreedyScenario(homebrew: [], short: "2.1.0", off: false, greedy: true),
+            GreedyScenario(homebrew: nil, short: "2.1.0", off: false, greedy: true),
+            GreedyScenario(homebrew: ["antinote"], short: "2.1.3", off: true, greedy: true),
+            GreedyScenario(homebrew: ["antinote"], receipt: "2.1.3", short: "2.1.0", off: false, greedy: false),
+            GreedyScenario(homebrew: ["antinote"], receiptApp: "Renamed.app", short: "2.1.0", off: true, greedy: true),
+            GreedyScenario(homebrew: [], receiptApp: "Renamed.app", short: "2.1.0", off: false, greedy: false)
+        ]
+        for (index, scenario) in scenarios.enumerated() {
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            defer { try? FileManager.default.removeItem(at: root) }
+            let app = try makeInstallation(in: root, receiptVersion: scenario.receipt, receiptApp: scenario.receiptApp)
+            try setApplicationVersion(scenario.short, at: app)
+            let service = makeService(in: root, homebrewOutdated: scenario.homebrew)
+            await service.refresh()
+            await service.refreshHomebrewOutdated()
+            let (vm, _) = await makeSUT(casks: [makeAntinote()], categories: makeCategories(), localHomebrew: service)
+            let cask = try XCTUnwrap(vm.casks.first)
+            vm.selectedSidebar = .library(.updates)
+            for (greedy, expected) in [(false, scenario.off), (true, scenario.greedy)] {
+                service.setGreedyUpdates(greedy)
+                XCTAssertEqual(service.localState(for: cask).hasAvailableUpdate, expected, "scenario \(index) greedy \(greedy)")
+                XCTAssertEqual(vm.updatesCount, expected ? 1 : 0, "scenario \(index) greedy \(greedy)")
+            }
+        }
+    }
+
+    func test_homebrew_is_asked_only_by_an_explicit_outdated_refresh() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        try makeInstallation(in: root)
+        var queries = 0
+        let defaults = makeScratchDefaults("outdated-refresh-\(UUID().uuidString)")
+        defaults.set(root.path, forKey: HomebrewLocator.customPrefixKey)
+        let service = LocalHomebrewService(defaults: defaults) {
+            $0.applicationDirectories = [root.appendingPathComponent("Applications")]
+            $0.brewBinaryProvider = { nil }
+            $0.brewVersionProvider = { "test" }
+            $0.outdatedTokensProvider = {
+                queries += 1
+                return ["antinote"]
+            }
+        }
+        await service.refresh()
+        await service.refresh()
+        XCTAssertEqual(queries, 0)
+        XCTAssertNil(service.homebrewOutdatedTokens)
+        await service.refreshHomebrewOutdated()
+        XCTAssertEqual(queries, 1)
+        XCTAssertEqual(service.homebrewOutdatedTokens, ["antinote"])
+    }
+
     func test_ambiguous_identity_and_uncomparable_versions_keep_receipt_policy() async throws {
         let scenarios = ["wrong-id", "store", "duplicate", "missing-id", "multiple-apps", "build-only",
                          "beta", "beta-bundle", "manual-updates", "alias"]
@@ -190,7 +253,7 @@ final class HomebrewAppVersionTests: XCTestCase {
 
     @discardableResult
     private func makeInstallation(
-        in root: URL, token: String = "antinote", receiptVersion: String = "1.1.7"
+        in root: URL, token: String = "antinote", receiptVersion: String = "1.1.7", receiptApp: String = "Antinote.app"
     ) throws -> URL {
         let app = try makeApplicationBundle(
             in: root.appendingPathComponent("Applications"), named: "Antinote.app",
@@ -205,7 +268,7 @@ final class HomebrewAppVersionTests: XCTestCase {
         try FileManager.default.createDirectory(at: caskfile.deletingLastPathComponent(), withIntermediateDirectories: true)
         try FileManager.default.createSymbolicLink(at: version.appendingPathComponent("Antinote.app"), withDestinationURL: app)
         try Data("{}".utf8).write(to: caskfile)
-        try Data(#"{"uninstall_artifacts":[{"app":["Antinote.app"]}]}"#.utf8)
+        try Data(#"{"uninstall_artifacts":[{"app":["\#(receiptApp)"]}]}"#.utf8)
             .write(to: metadata.appendingPathComponent("INSTALL_RECEIPT.json"))
         return app
     }
@@ -217,13 +280,14 @@ final class HomebrewAppVersionTests: XCTestCase {
         try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: url)
     }
 
-    private func makeService(in root: URL) -> LocalHomebrewService {
+    private func makeService(in root: URL, homebrewOutdated: Set<String>? = nil) -> LocalHomebrewService {
         let defaults = makeScratchDefaults("app-version-\(UUID().uuidString)")
         defaults.set(root.path, forKey: HomebrewLocator.customPrefixKey)
         return LocalHomebrewService(defaults: defaults) {
             $0.applicationDirectories = [root.appendingPathComponent("Applications")]
             $0.brewBinaryProvider = { nil }
             $0.brewVersionProvider = { "test" }
+            $0.outdatedTokensProvider = { homebrewOutdated }
         }
     }
 

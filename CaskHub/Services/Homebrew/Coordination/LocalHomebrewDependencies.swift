@@ -99,6 +99,7 @@ struct LocalHomebrewDependencies {
             from: HomebrewLocator.brewBinaryURL()
         )
     }
+    var outdatedTokensProvider: (() async -> Set<String>?)?
 
     func resolvedCommandExecutor() -> any HomebrewCommandExecuting {
         commandExecutor

@@ -157,7 +157,7 @@ private struct GreedyButton: View {
                 .labelStyle(.titleAndIcon)
                 .padding(.horizontal, CHSpace.toolbarLabelInset)
         }
-        .help("Also list apps that update themselves (brew upgrade --greedy)")
+        .help("Also list self-updating apps Homebrew cannot verify")
         .accessibilityAddTraits(isOn ? .isSelected : [])
 
         if isOn {
