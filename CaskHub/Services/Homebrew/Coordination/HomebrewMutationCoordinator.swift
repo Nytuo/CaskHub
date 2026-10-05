@@ -7,33 +7,6 @@
 
 import Foundation
 
-enum HomebrewMutationRecoveryBehavior: Equatable {
-    case finishMutation
-    case continueSequence
-}
-
-struct HomebrewMutationStep {
-    let arguments: [String]
-    let environmentOverrides: [String: String]
-    let cancellable: Bool
-    let recoverIf: (() -> Bool)?
-    let recoveryBehavior: HomebrewMutationRecoveryBehavior
-}
-
-struct HomebrewMutationSequenceRequest {
-    let action: CaskAction
-    let token: String
-    let displayName: String
-    let origin: CaskActionOrigin
-    let steps: [HomebrewMutationStep]
-    let context: HomebrewMutationContext
-}
-
-struct HomebrewMutationCallbacks {
-    let refresh: () async -> Void
-    let strandedCopyExists: () -> Bool
-    let postconditionSatisfied: () -> Bool
-}
 @MainActor
 final class HomebrewMutationCoordinator {
     private let operationStore: CaskOperationStore
@@ -43,6 +16,8 @@ final class HomebrewMutationCoordinator {
     private let fileManager: FileManager
 
     private let outputAggregator: BrewOutputAggregator
+    private let lanes = HomebrewLaneLimiter.shared
+    private var heldLanes: [String: HomebrewLaneLimiter.Lane] = [:]
 
     init(
         operationStore: CaskOperationStore,
@@ -84,18 +59,16 @@ final class HomebrewMutationCoordinator {
             token: request.token,
             origin: request.origin
         )
-        defer { clearOperationResources(token: request.token) }
+        defer {
+            clearOperationResources(token: request.token)
+            releaseLane(token: request.token)
+        }
 
         for (index, step) in request.steps.enumerated() {
             if index > 0 { prepareNextStep(request: request) }
             let span = CrashReporter.span(name: step.arguments.first ?? "brew", operation: "brew")
             do {
-                try await executeStreaming(
-                    token: request.token,
-                    arguments: step.arguments,
-                    cancellable: step.cancellable,
-                    environmentOverrides: step.environmentOverrides
-                )
+                try await run(step, token: request.token)
                 span.finish()
             } catch {
                 let resolution = try await handleFailure(
@@ -122,6 +95,34 @@ final class HomebrewMutationCoordinator {
 }
 
 extension HomebrewMutationCoordinator {
+    /// A step keeps its lane until the next step asks for one, so the closing rescan stays inside it.
+    private func run(_ step: HomebrewMutationStep, token: String) async throws {
+        if operationStore.state(for: token)?.cancellationRequested == true { throw CancellationError() }
+        releaseLane(token: token)
+        let progress = operationStore.state(for: token)?.progress
+        let admitted = await lanes.acquire(step.lane, token: token) {
+            if var queued = progress {
+                queued.phase = .queued
+                operationStore.send(.updateProgress(queued), for: token)
+            }
+            operationStore.send(.setCancellable(step.cancellation != .never), for: token)
+        }
+        guard admitted else { throw CancellationError() }
+        heldLanes[token] = step.lane
+        if let progress { operationStore.send(.updateProgress(progress), for: token) }
+        operationStore.send(.setCancellable(false), for: token)
+        try await executeStreaming(
+            token: token,
+            arguments: step.arguments,
+            cancellable: step.cancellation == .untilPerforming,
+            environmentOverrides: step.environmentOverrides
+        )
+    }
+
+    private func releaseLane(token: String) {
+        if let lane = heldLanes.removeValue(forKey: token) { lanes.release(lane) }
+    }
+
     func executeStreaming(
         token: String,
         arguments: [String],
@@ -251,7 +252,7 @@ extension HomebrewMutationCoordinator {
 
     func applyParsedOutput(_ parsed: BrewOutputAggregator.Parsed, token: String) {
         guard var progress = operationStore.state(for: token)?.progress,
-              progress.phase != .canceling
+              progress.phase != .canceling, progress.phase != .queued
         else { return }
 
         let update = parsed.update
@@ -280,7 +281,7 @@ extension HomebrewMutationCoordinator {
 
     func cancel(token: String) {
         guard operationStore.state(for: token)?.canCancel == true,
-              commandExecutor.cancel(token: token)
+              lanes.cancelWaiting(token: token) || commandExecutor.cancel(token: token)
         else { return }
         operationStore.send(.requestCancellation, for: token)
     }
@@ -342,7 +343,7 @@ extension HomebrewMutationCoordinator {
         let step = request.steps[stepIndex]
         if error is CancellationError {
             span.finish()
-            await callbacks.refresh()
+            if step.lane == .exclusive { await callbacks.refresh() }
             operationStore.send(.clear, for: request.token)
             return .stopSequence
         }

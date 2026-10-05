@@ -252,26 +252,18 @@ final class HomebrewCommandExecutorTests: XCTestCase {
         XCTAssertNil(secondService.operationStore.state(for: "gimp"))
     }
 
-    func test_maintenance_probe_waits_for_running_mutation() async throws {
-        let processOverlap = expectation(description: "Homebrew processes overlap")
-        processOverlap.isInverted = true
+    func test_maintenance_probe_waits_for_running_mutation() async {
         let maintenanceFinished = expectation(description: "maintenance finished early")
         maintenanceFinished.isInverted = true
-        let runner = ControlledBrewProcessRunner(overlapExpectation: processOverlap)
-        let executor = SystemHomebrewCommandExecutor(processRunner: runner)
-        let mutation = Task {
-            try await executor.execute(
-                HomebrewCommandRequest(
-                    token: "firefox",
-                    executableURL: URL(fileURLWithPath: "/test/bin/brew"),
-                    arguments: ["install", "--cask", "firefox"],
-                    environment: [:]
-                ),
-                onStart: {},
-                onChunk: { _ in }
-            )
+        let executor = SuspendingHomebrewCommandExecutor()
+        let service = LocalHomebrewService(defaults: makeScratchDefaults("maintenance-waits")) {
+            $0.commandExecutor = executor
+            $0.softwareScanner = EmptyInstalledSoftwareScanner()
+            $0.brewBinaryProvider = { URL(fileURLWithPath: "/test/bin/brew") }
+            $0.brewVersionProvider = { "test" }
         }
-        await runner.waitForStarts(1)
+        let mutation = Task { try? await service.uninstall(token: "firefox") }
+        while executor.requests.count < 1 { await Task.yield() }
         let maintenance = Task {
             let result = await SystemMaintenanceProbe().run(
                 URL(fileURLWithPath: "/usr/bin/true"),
@@ -282,10 +274,10 @@ final class HomebrewCommandExecutorTests: XCTestCase {
             return result
         }
 
-        await fulfillment(of: [processOverlap, maintenanceFinished], timeout: 0.1)
-        runner.finishNext()
+        await fulfillment(of: [maintenanceFinished], timeout: 0.1)
+        executor.finish(BrewProcessResult(exitCode: 0, output: ""))
 
-        _ = try await mutation.value
+        await mutation.value
         let maintenanceResult = await maintenance.value
         XCTAssertEqual(maintenanceResult?.exitCode, 0)
     }

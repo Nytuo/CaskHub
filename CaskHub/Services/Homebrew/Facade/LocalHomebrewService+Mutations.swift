@@ -34,7 +34,8 @@ extension LocalHomebrewService {
                     HomebrewMutationStep(
                         arguments: args,
                         environmentOverrides: [:],
-                        cancellable: action == .installing,
+                        lane: .exclusive,
+                        cancellation: action == .installing ? .untilPerforming : .never,
                         recoverIf: nil,
                         recoveryBehavior: .finishMutation
                     )

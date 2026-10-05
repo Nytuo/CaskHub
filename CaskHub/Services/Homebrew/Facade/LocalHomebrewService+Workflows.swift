@@ -89,7 +89,8 @@ extension LocalHomebrewService {
         let updateStep = HomebrewMutationStep(
             arguments: ["update"],
             environmentOverrides: [:],
-            cancellable: false,
+            lane: .exclusive,
+            cancellation: .never,
             recoverIf: nil,
             recoveryBehavior: .continueSequence
         )
@@ -139,14 +140,16 @@ extension LocalHomebrewService {
                 HomebrewMutationStep(
                     arguments: ["fetch", "--cask", token],
                     environmentOverrides: [:],
-                    cancellable: false,
+                    lane: .exclusive,
+                    cancellation: .never,
                     recoverIf: nil,
                     recoveryBehavior: .finishMutation
                 ),
                 HomebrewMutationStep(
                     arguments: ["uninstall", "--cask", token, "--force"],
                     environmentOverrides: ["HOMEBREW_NO_AUTOREMOVE": "1"],
-                    cancellable: false,
+                    lane: .exclusive,
+                    cancellation: .never,
                     recoverIf: { [self] in
                         mutationCoordinator.removalSatisfied(
                             caskroomEntry: caskroomEntry,
@@ -159,7 +162,8 @@ extension LocalHomebrewService {
                 HomebrewMutationStep(
                     arguments: ["install", "--cask", token],
                     environmentOverrides: [:],
-                    cancellable: false,
+                    lane: .exclusive,
+                    cancellation: .never,
                     recoverIf: nil,
                     recoveryBehavior: .finishMutation
                 )
