@@ -3,37 +3,18 @@
     <channel>
         <title>CaskHub</title>
         <item>
-            <title>0.9.0</title>
-            <pubDate>Tue, 06 Oct 2026 14:13:52 +0000</pubDate>
-            <sparkle:version>819</sparkle:version>
-            <sparkle:shortVersionString>0.9.0</sparkle:shortVersionString>
+            <title>0.9.1</title>
+            <pubDate>Tue, 06 Oct 2026 15:34:36 +0000</pubDate>
+            <sparkle:version>825</sparkle:version>
+            <sparkle:shortVersionString>0.9.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.6</sparkle:minimumSystemVersion>
             <description sparkle:format="markdown"><![CDATA[
-### What's New
-
-- Added a Standard look with native macOS surfaces and Liquid Glass toolbar controls, next to Classic. Switch any time in Settings, Appearance
-- Added simultaneous downloads, up to three at a time, so Update All and Brewfile imports finish sooner
-- Added cancelling an install or update while it is queued or downloading
-- Added a welcome tour for new installs and a What's New card after each update
-- Added a separate section in Installed for apps managed outside Homebrew, with a switch in Settings, General
-- Added a Refresh button to the Updates toolbar
-
-### Improvements
-
-- Updates with Greedy off now match what Homebrew itself lists as outdated
-- Cask icons now share one size with a soft shadow, and no longer flash while scrolling
-- Status bar now shows how many apps are downloading and queued during Update All and Brewfile imports
-- Health and Shelf Setup buttons now match the size of catalog buttons
-
 ### Bug Fixes
 
-- Fixed updates being offered again and again for apps Homebrew already considers up to date
-- Fixed updates being offered for a version built for a different macOS version or processor
-- Fixed standalone Microsoft apps such as Teams and OneDrive being claimed by the Office suite
-- Fixed Excel and similar apps disappearing from Installed after updating themselves
+- Fixed the sort and time period menus in the toolbar showing only icons on macOS 27
 
 ]]></description>
-            <enclosure url="https://github.com/alielsokary/CaskHub/releases/download/0.9.0/CaskHub-0.9.0.zip" length="7625095" type="application/octet-stream" sparkle:edSignature="pr+iyKw22yqbR5SVQoTL0+qUMytJdScxUxQlxTbR7IXbVYghnyEc7Aea/VQSAeAsMpY4MJJ0KZv/DmwP/Uj+DQ=="/>
+            <enclosure url="https://github.com/alielsokary/CaskHub/releases/download/0.9.1/CaskHub-0.9.1.zip" length="7871041" type="application/octet-stream" sparkle:edSignature="gGpkIKtjFeckSkNsgj/ugUOT6xwnzX7+AF9zvT7A/wAZ81Tc2FphMEbOyryubna2fump4Crk6gwnuqsHYolUBw=="/>
         </item>
     </channel>
 </rss>
