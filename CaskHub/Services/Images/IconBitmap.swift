@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import SwiftUI
 
 nonisolated enum IconBitmap {
     private struct PixelBounds {
@@ -57,6 +58,7 @@ nonisolated enum IconBitmap {
         let crop = body.rect.flatMap {
             max($0.width, $0.height) >= 0.8 * max(visibleRect.width, visibleRect.height) ? $0 : nil
         } ?? visibleRect
+        if crop == body.rect { eraseSourceShadow(pixels, byteCount: height * context.bytesPerRow) }
         guard let raster = context.makeImage(), let cropped = raster.cropping(to: crop) else { return image }
         let scale = min(1, pixelCap / max(crop.width, crop.height))
         let size = CGSize(width: (crop.width * scale).rounded(), height: (crop.height * scale).rounded())
@@ -68,5 +70,55 @@ nonisolated enum IconBitmap {
         target.draw(cropped, in: CGRect(origin: .zero, size: size))
         guard let scaled = target.makeImage() else { return NSImage(cgImage: cropped, size: crop.size) }
         return NSImage(cgImage: scaled, size: size)
+    }
+
+    // Transparent margin around the icon body, as a fraction of its longest side.
+    static let shadowInset: CGFloat = 0.075
+
+    // The rectangular body crop leaves the source's own shadow in the corners.
+    private static func eraseSourceShadow(_ pixels: UnsafeMutablePointer<UInt8>, byteCount: Int) {
+        for offset in stride(from: 0, to: byteCount, by: 4) {
+            let alpha = pixels[offset + 3]
+            guard alpha <= 128, max(pixels[offset], pixels[offset + 1], pixels[offset + 2]) < alpha / 3 else { continue }
+            (pixels + offset).update(repeating: 0, count: 4)
+        }
+    }
+
+    static func shadowed(_ image: NSImage) -> NSImage {
+        guard let body = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return image }
+        let size = CGSize(width: body.width, height: body.height)
+        let side = max(size.width, size.height)
+        let margin = (side * shadowInset).rounded()
+        guard let canvas = CGContext(
+            data: nil, width: Int(size.width + margin * 2), height: Int(size.height + margin * 2),
+            bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return image }
+        let rect = CGRect(origin: CGPoint(x: margin, y: margin), size: size)
+        let corners = Path(
+            roundedRect: rect, cornerRadius: min(size.width, size.height) * 0.2, style: .continuous
+        ).cgPath
+        // Cast the shadow from an off-canvas copy so none of it sits under a translucent icon.
+        let offCanvas = CGFloat(canvas.width)
+        canvas.saveGState()
+        canvas.setShadow(
+            offset: CGSize(width: offCanvas, height: -side * 0.01), blur: side * 0.05,
+            color: CGColor(gray: 0, alpha: 0.16)
+        )
+        canvas.translateBy(x: -offCanvas, y: 0)
+        canvas.beginTransparencyLayer(auxiliaryInfo: nil)
+        canvas.addPath(corners)
+        canvas.clip()
+        for _ in 0..<3 { canvas.draw(body, in: rect) }
+        canvas.endTransparencyLayer()
+        canvas.restoreGState()
+        canvas.addPath(corners)
+        canvas.clip()
+        canvas.setBlendMode(.destinationOut)
+        for _ in 0..<3 { canvas.draw(body, in: rect) }
+        canvas.setBlendMode(.normal)
+        canvas.draw(body, in: rect)
+        guard let shadowed = canvas.makeImage() else { return image }
+        return NSImage(cgImage: shadowed, size: CGSize(width: shadowed.width, height: shadowed.height))
     }
 }

@@ -254,7 +254,7 @@ final class ImageCacheService {
     private nonisolated static func preparedImage(from data: Data) async -> NSImage? {
         await Task.detached(priority: .userInitiated) {
             guard let image = NSImage(data: data), image.isValid else { return nil }
-            return IconBitmap.normalized(image)
+            return IconBitmap.shadowed(IconBitmap.normalized(image))
         }.value
     }
 }
