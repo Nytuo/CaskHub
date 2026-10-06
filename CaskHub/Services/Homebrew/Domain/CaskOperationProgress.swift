@@ -190,37 +190,49 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
             return $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
         }
         guard !sortedOperations.isEmpty else { return nil }
-        if let batch { return make(batch: batch, operations: sortedOperations) }
+        if let batch, let status = make(batch: batch, operations: sortedOperations) { return status }
 
-        if sortedOperations.count == 1, let operation = sortedOperations.first {
-            let byteProgress = operation.phase.showsByteProgress ? operation.byteProgress : nil
-            var label = "\(operation.phase.label(for: operation.action)) \(operation.displayName)"
-            if byteProgress == nil { label += "…" }
-            return CaskOperationStatus(label: label, byteProgress: byteProgress)
-        }
+        if sortedOperations.count == 1, let operation = sortedOperations.first { return single(operation) }
 
         let summary = String(localized: "\(sortedOperations.count) operations in progress")
         return CaskOperationStatus(label: ([summary] + phaseCounts(sortedOperations)).joined(separator: " · "))
     }
 
-    private static func make(batch progress: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus {
+    private static func single(_ operation: CaskOperationProgress) -> CaskOperationStatus {
+        let byteProgress = operation.phase.showsByteProgress ? operation.byteProgress : nil
+        var label = "\(operation.phase.label(for: operation.action)) \(operation.displayName)"
+        if byteProgress == nil { label += "…" }
+        return CaskOperationStatus(label: label, byteProgress: byteProgress)
+    }
+
+    /// Counts only apps still in flight, so a finished, failed or cancelled app never raises a number.
+    private static func make(batch progress: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus? {
         let members = operations.filter { progress.tokens.contains($0.token) }
+        guard let first = members.first else { return nil }
+        let installing = members.first { $0.phase == .performing }
         let downloads = members.filter { ![.performing, .queued, .canceling].contains($0.phase) }
-        let batch = Batch(
-            installing: members.first { $0.phase == .performing },
+        var status = members.count == 1 ? single(first) : CaskOperationStatus(
+            label: batchLabel(installing: installing, downloads: downloads.count, members: members),
+            byteProgress: downloads.count == 1 && downloads[0].phase.showsByteProgress ? downloads[0].byteProgress : nil
+        )
+        status.batch = Batch(
+            installing: installing,
             isDownloading: !downloads.isEmpty,
             finishedCount: progress.finishedCount,
             total: progress.total
         )
-        let sentence = batch.sentence(bytes: nil) { "\($0.phase.label(for: $0.action)) \($0.displayName)…" }
-        let queued = phaseCounts(members.filter { $0.phase == .queued })
-        let onlyDownload = downloads.count == 1 ? downloads.first : nil
-        var status = CaskOperationStatus(
-            label: ([sentence] + queued).joined(separator: " · "),
-            byteProgress: onlyDownload?.phase.showsByteProgress == true ? onlyDownload?.byteProgress : nil
-        )
-        status.batch = batch
         return status
+    }
+
+    private static func batchLabel(installing: CaskOperationProgress?, downloads: Int, members: [CaskOperationProgress]) -> String {
+        var parts = installing.map { [single($0).label] } ?? []
+        if downloads > 0 {
+            let waiting = downloads + members.count(where: { $0.phase == .queued })
+            parts.append(String(localized: "Downloading \(downloads) of \(waiting)"))
+        } else {
+            parts += phaseCounts(members.filter { $0.phase != .performing })
+        }
+        return parts.joined(separator: " · ")
     }
 
     private static func phaseCounts(_ operations: [CaskOperationProgress]) -> [String] {
