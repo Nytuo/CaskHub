@@ -178,7 +178,7 @@ final class ConcurrentDownloadTests: XCTestCase {
 
         XCTAssertEqual(Set(executor.running("fetch")), ["a", "b", "c"])
         XCTAssertTrue(service.isUpdatingAll)
-        XCTAssertEqual(service.statusBarOperation?.message, "\(String(localized: "Downloading"))… \(String(localized: "(\(0) of \(3))"))")
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading \(3) of \(3)"))
 
         let deadline = Date().addingTimeInterval(10)
         while service.isUpdatingAll, Date() < deadline {
@@ -193,6 +193,29 @@ final class ConcurrentDownloadTests: XCTestCase {
         XCTAssertNil(service.operationStore.batch)
     }
 
+    func test_update_all_status_counts_downloads_out_of_what_is_left_and_shrinks_on_cancel() async {
+        let executor = ControlledHomebrewCommandExecutor()
+        let service = makeService(executor)
+        let tokens = (0 ..< 6).map { "cask\($0)" }
+        let batch = Task { await service.updateAll(tokens: tokens) }
+        await executor.waitForRequests(3)
+        await settle { service.operationStore.state(for: "cask5")?.progress?.phase == .queued }
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading \(3) of \(6)"))
+
+        service.cancelInstall(token: "cask5")
+        service.cancelInstall(token: "cask4")
+        await settle { service.operationStore.batch?.finishedCount == 2 }
+        XCTAssertEqual(service.operationStore.batch?.finishedCount, 2)
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading \(3) of \(4)"))
+
+        let deadline = Date().addingTimeInterval(10)
+        while service.isUpdatingAll, Date() < deadline {
+            if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }
+        }
+        await batch.value
+        XCTAssertNil(service.statusBarOperation)
+    }
+
     func test_install_all_downloads_together_and_counts_failures() async {
         let executor = ControlledHomebrewCommandExecutor()
         let service = makeService(executor)
@@ -204,7 +227,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         executor.finish("b", exitCode: 1)
         await settle { finishedCounts == [1] }
         XCTAssertEqual(finishedCounts, [1])
-        XCTAssertEqual(service.statusBarOperation?.message, "\(String(localized: "Downloading"))… \(String(localized: "(\(1) of \(3))"))")
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading \(2) of \(2)"))
         let deadline = Date().addingTimeInterval(10)
         while finishedCounts.count < 3, Date() < deadline {
             if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }
