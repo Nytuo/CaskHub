@@ -194,21 +194,45 @@ extension ArtifactIdentityTests {
         categories.applyData(try JSONDecoder().decode(CaskCategoryData.self, from: data))
         let api = MockBrewAPIClient()
         api.casks = [makeCask("optional", name: mode == "auxiliary-app" ? "Catalog Product" : "Optional",
-                              packageIdentifiers: ["org.example.*"])]
+                              packageIdentifiers: ["org.example.*"]),
+                     makeCask("suite", name: "Optional Suite", packageIdentifiers: ["org.example.*"],
+                              packageAppNames: ["Optional.app", "Other.app"])]
         let viewModel = makeViewModel(api: api, categories: categories, localHomebrew: local)
         await viewModel.fetchCasks()
         let enriched = try XCTUnwrap(viewModel.casks.first)
-        XCTAssertTrue(enriched.applicationBundleIdentifiers.isEmpty, mode)
-        XCTAssertTrue(enriched.catalogPackageAppNames.isEmpty, mode)
+        XCTAssertTrue(enriched.applicationBundleIdentifiers.isEmpty && enriched.catalogPackageAppNames.isEmpty, mode)
         let accepted = ["valid", "relative-location", "bundle-location"].contains(mode)
         let state = local.localState(for: enriched)
         XCTAssertEqual(state.installationSource == .packageInstaller, accepted, mode)
         XCTAssertEqual(state.isAdoptable, accepted, mode)
+        try assertSuiteDoesNotClaimComponent(viewModel, local: local, launcher: launcher, accepted: accepted, mode: mode)
         if accepted {
             XCTAssertTrue(state.canOpen, mode)
             local.open(enriched)
             XCTAssertEqual(launcher.lastOpenedURL?.standardizedFileURL, app.standardizedFileURL, mode)
         }
+    }
+
+    private func assertSuiteDoesNotClaimComponent(
+        _ viewModel: CaskCatalogViewModel, local: LocalHomebrewService,
+        launcher: RecordingApplicationLauncher, accepted: Bool, mode: String
+    ) throws {
+        // Mac App Store matching has its own policy; this regression exercises
+        // package-receipt ownership and must not change that separate behavior.
+        guard mode != "store" else { return }
+        let suite = try XCTUnwrap(viewModel.casks.first { $0.token == "suite" })
+        let state = local.localState(for: suite)
+        XCTAssertNil(state.installationSource, mode)
+        XCTAssertNil(state.externalVersion, mode)
+        XCTAssertFalse(state.canOpen, mode)
+        XCTAssertNil(state.adoptionPlan, mode)
+        viewModel.selectedSidebar = .library(.installed)
+        XCTAssertTrue(viewModel.filteredCasks.isEmpty, mode)
+        XCTAssertEqual(viewModel.filteredExternallyManagedCasks.map(\.token), accepted ? ["optional"] : [], mode)
+        viewModel.selectedSidebar = .library(.adopt)
+        XCTAssertEqual(viewModel.filteredCasks.map(\.token), accepted ? ["optional"] : [], mode)
+        local.open(suite)
+        XCTAssertNil(launcher.lastOpenedURL, mode)
     }
 
     private func conditionalReceiptReplies(mode: String, volume: URL) throws -> [String: String] {
@@ -251,12 +275,17 @@ extension ArtifactIdentityTests {
             bundleName: "Optional.app", bundleIdentifier: "org.example.optional",
             packageIdentifier: "org.example.component", installedPath: "/Applications/Optional.app"
         )
-        let signatures = ["optional", "optional-enterprise"].map { token in
+        let verifiedSignatures = ["optional", "optional-enterprise"].map { token in
             PackageCaskSignature(
                 token: token, displayName: "Optional", receiptPatterns: ["org.example.*"],
-                appNameCandidates: ["Optional.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: [identity]
+                appNameCandidates: ["Optional.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: [identity],
+                productIdentities: nil
             )
         }
+        let signatures = verifiedSignatures + [PackageCaskSignature(
+            token: "optional-suite", displayName: "Optional Suite", receiptPatterns: ["org.example.*"],
+            appNameCandidates: [identity.bundleName], verifiedBundleIdentifiersByName: [:], receiptCandidates: [], productIdentities: nil
+        )]
         let receipt = PackageReceiptResolver.Receipt(
             files: "Applications/Optional.app/Contents/Info.plist",
             location: .init(volume: URL(fileURLWithPath: "/"), installLocation: "/")
@@ -268,6 +297,36 @@ extension ArtifactIdentityTests {
                 availableAppNames: [identity.bundleName], applications: [application], homebrewInstalledTokens: installed
             )
             XCTAssertEqual(Set(result.keys), installed.count == 1 ? installed : [])
+        }
+    }
+
+    func test_homebrew_registration_precedes_a_standalone_component_identity() {
+        let identity = PackageApplicationIdentity(
+            bundleName: "Microsoft Teams.app", bundleIdentifier: "com.microsoft.teams2",
+            packageIdentifier: "com.microsoft.teams2", installedPath: "/Applications/Microsoft Teams.app"
+        )
+        let teams = PackageCaskSignature(
+            token: "microsoft-teams", displayName: "Microsoft Teams", receiptPatterns: [identity.packageIdentifier],
+            appNameCandidates: [identity.bundleName], verifiedBundleIdentifiersByName: [:], receiptCandidates: [identity],
+            productIdentities: nil
+        )
+        let suite = PackageCaskSignature(
+            token: "microsoft-office-businesspro", displayName: "Microsoft Office BusinessPro",
+            receiptPatterns: [identity.packageIdentifier], appNameCandidates: [identity.bundleName, "Microsoft Word.app"],
+            verifiedBundleIdentifiersByName: [:], receiptCandidates: [], productIdentities: nil
+        )
+        let receipt = PackageReceiptResolver.Receipt(
+            files: "Microsoft Teams.app/Contents/Info.plist",
+            location: .init(volume: URL(fileURLWithPath: "/"), installLocation: "Applications")
+        )
+        for installed: Set<String> in [[], [teams.token], [suite.token]] {
+            let result = PackageReceiptResolver().resolve(
+                signatures: [suite, teams], receipts: [identity.packageIdentifier: receipt],
+                availableAppNames: [identity.bundleName],
+                applications: [makeDetectedApplication(identity.bundleName, id: identity.bundleIdentifier)],
+                homebrewInstalledTokens: installed
+            )
+            XCTAssertEqual(Set(result.keys), installed.isEmpty ? [teams.token] : installed)
         }
     }
 }

@@ -1,0 +1,102 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "feature1.detail" : {
+      "comment" : "What's New card: description of feature row 1. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cleaner, native theme joins Classic. Switch between them any time in Settings, Appearance."
+          }
+        }
+      }
+    },
+    "feature1.title" : {
+      "comment" : "What's New card: title of feature row 1. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A New Standard Look"
+          }
+        }
+      }
+    },
+    "feature2.detail" : {
+      "comment" : "What's New card: description of feature row 2. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps now download in parallel, and any download can be canceled while it is in progress."
+          }
+        }
+      }
+    },
+    "feature2.title" : {
+      "comment" : "What's New card: title of feature row 2. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simultaneous Downloads"
+          }
+        }
+      }
+    },
+    "feature3.detail" : {
+      "comment" : "What's New card: description of feature row 3. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The list now matches what Homebrew will upgrade. Refresh it any time from the toolbar."
+          }
+        }
+      }
+    },
+    "feature3.title" : {
+      "comment" : "What's New card: title of feature row 3. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates You Can Trust"
+          }
+        }
+      }
+    },
+    "feature4.detail" : {
+      "comment" : "What's New card: description of feature row 4. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps managed outside Homebrew now appear in their own section. You can hide it in Settings, General."
+          }
+        }
+      }
+    },
+    "feature4.title" : {
+      "comment" : "What's New card: title of feature row 4. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Clearer Installed List"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

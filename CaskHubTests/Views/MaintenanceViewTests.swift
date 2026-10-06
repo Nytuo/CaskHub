@@ -11,6 +11,33 @@ import XCTest
 
 final class MaintenanceViewTests: XCTestCase {
     @MainActor
+    func test_health_and_shelf_pills_match_card_height_in_both_styles() {
+        let originalStyle = AppStyle.current
+        defer { AppStyle.current = originalStyle }
+        let probe = CGSize(width: 400, height: 100)
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let heights = [
+                NSHostingController(rootView: ActionCapsuleButton(action: .open) {})
+                    .sizeThatFits(in: probe).height,
+                NSHostingController(rootView: ActionCapsuleButton(action: .update, fullWidth: false) {})
+                    .sizeThatFits(in: probe).height,
+                NSHostingController(rootView: PillButton(
+                    title: "Sync now", background: .chActionInstallBg, border: .chActionInstallBorder,
+                    foreground: .chActionInstallFg
+                ) {}).sizeThatFits(in: probe).height,
+                NSHostingController(rootView: PillButton(
+                    title: "Clean", background: .chActionUpdateBg, border: .chActionUpdateBorder,
+                    foreground: .chActionUpdateFg
+                ) {}.frame(minWidth: 74)).sizeThatFits(in: probe).height,
+                NSHostingController(rootView: StatusPill(title: "Up to date")).sizeThatFits(in: probe).height,
+                NSHostingController(rootView: WorkingPill(title: "Working")).sizeThatFits(in: probe).height
+            ]
+            XCTAssertEqual(Set(heights), [CHSize.actionCapsuleHeight], "\(style) \(heights)")
+        }
+    }
+
+    @MainActor
     func test_page_renders_before_first_checkup() {
         render(MaintenanceView(model: makeMaintenanceModel()).environment(ImageCacheService()))
     }

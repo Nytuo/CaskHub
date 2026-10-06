@@ -26,6 +26,10 @@ extension CaskCatalogViewModel {
         installedCasks.count
     }
 
+    func installedCount(includingExternallyManaged: Bool) -> Int {
+        includingExternallyManaged ? installedCount : librarySnapshot.homebrewInstalledCasks.count
+    }
+
     var adoptableCasks: [Cask] {
         librarySnapshot.adoptableCasks
     }
@@ -177,7 +181,19 @@ extension CaskCatalogViewModel {
     }
 
     var filteredCasks: [Cask] {
-        let key = FilteredCatalogCacheKey(
+        filteredCache.value(for: filteredCacheKey) {
+            CatalogProjector.makeFiltered(from: filteredProjectionInput)
+        }
+    }
+
+    var filteredExternallyManagedCasks: [Cask] {
+        externallyManagedCache.value(for: filteredCacheKey) {
+            CatalogProjector.makeExternallyManaged(from: filteredProjectionInput)
+        }
+    }
+
+    private var filteredCacheKey: FilteredCatalogCacheKey {
+        FilteredCatalogCacheKey(
             library: libraryCacheKey,
             recentlyAddedRevision: recentlyAdded.catalogStateRevision,
             analyticsPeriod: analyticsPeriod,
@@ -186,23 +202,24 @@ extension CaskCatalogViewModel {
             searchText: appliedSearchText,
             sortOption: sortOption
         )
-        return filteredCache.value(for: key) {
-            CatalogProjector.makeFiltered(from: CatalogFilteredProjectionInput(
-                casks: casks,
-                library: librarySnapshot,
-                selectedSidebar: selectedSidebar,
-                searchText: appliedSearchText,
-                sortOption: sortOption,
-                downloadCounts: downloadCounts,
-                recentTokens: recentlyAdded.recentTokens(
-                    within: recentlyAddedWindow.rawValue
-                ),
-                addedDates: recentlyAdded.addedDates,
-                installedDates: localHomebrew.installationSnapshot.installedCasks
-                    .compactMapValues(\.installedAt),
-                searchKeys: appliedSearchText.isEmpty ? [:] : searchKeys,
-                nameRanks: sortUsesNameRanks ? nameRanks : [:]
-            ))
-        }
+    }
+
+    private var filteredProjectionInput: CatalogFilteredProjectionInput {
+        CatalogFilteredProjectionInput(
+            casks: casks,
+            library: librarySnapshot,
+            selectedSidebar: selectedSidebar,
+            searchText: appliedSearchText,
+            sortOption: sortOption,
+            downloadCounts: downloadCounts,
+            recentTokens: recentlyAdded.recentTokens(
+                within: recentlyAddedWindow.rawValue
+            ),
+            addedDates: recentlyAdded.addedDates,
+            installedDates: localHomebrew.installationSnapshot.installedCasks
+                .compactMapValues(\.installedAt),
+            searchKeys: appliedSearchText.isEmpty ? [:] : searchKeys,
+            nameRanks: sortUsesNameRanks ? nameRanks : [:]
+        )
     }
 }

@@ -71,6 +71,7 @@ struct CaskCardView: View {
                     .pointerStyle(.link)
                 }
             }
+            .padding(.top, CHSize.titleInsetBelowIcon * textScale)
 
             Spacer(minLength: 4)
 

@@ -127,9 +127,25 @@ extension Analytics {
         send("Settings.themeChanged", parameters: ["theme": theme])
     }
 
+    static func styleChanged(_ style: AppStyle) {
+        send("Settings.styleChanged", parameters: ["style": style.rawValue])
+    }
+
     /// Turning telemetry OFF sends nothing — the opt-out applies instantly.
     static func analyticsReEnabled() {
         send("Settings.analyticsEnabled")
+    }
+
+    // MARK: - Launch cards
+
+    static func launchCardShown(_ card: LaunchCard) {
+        send("LaunchCard.shown", parameters: ["kind": card.rawValue])
+    }
+
+    static func launchCardDismissed(_ card: LaunchCard, page: Int? = nil) {
+        var parameters = ["kind": card.rawValue]
+        parameters["page"] = page.map { "\($0)" }
+        send("LaunchCard.dismissed", parameters: parameters)
     }
 
     // MARK: - Parameter mapping

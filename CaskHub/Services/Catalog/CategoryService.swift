@@ -55,6 +55,7 @@ nonisolated struct CaskCategoryData: Decodable {
     // Optional for releases predating app identity metadata.
     var appIdentities: [String: [CaskAppIdentity]]?
     var packageAppCandidates: [String: [PackageApplicationIdentity]]?
+    var packageProductIdentities: [String: [PackageApplicationIdentity]]?
     var metadataUpdatedAt: String?
 }
 
@@ -69,6 +70,7 @@ final class CategoryService {
     private(set) var iconTokens: Set<String>?
     private(set) var appIdentities: [String: [CaskAppIdentity]] = [:]
     private(set) var packageAppCandidates: [String: [PackageApplicationIdentity]] = [:]
+    private(set) var packageProductIdentities: [String: [PackageApplicationIdentity]] = [:]
     private(set) var metadataUpdatedAt: String?
     private(set) var catalogStateRevision = 0
 
@@ -128,17 +130,25 @@ final class CategoryService {
             enriched.catalogBundleIdentifiers = identities.filter {
                 names.contains($0.bundleName)
             }.map(\.bundleIdentifier)
-            enriched.catalogPackageCandidates = (packageAppCandidates[cask.token] ?? []).filter { candidate in
-                let identity = CaskAppIdentity(
-                    bundleName: candidate.bundleName, bundleIdentifier: candidate.bundleIdentifier,
-                    packageIdentifier: candidate.packageIdentifier, installedPath: candidate.installedPath
-                )
-                return identity.verifiesPackageApp(for: cask)
-                    && candidate.bundleIdentifier.range(
-                        of: #"\A[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\z"#, options: .regularExpression
-                    ) != nil
-            }
+            enriched.catalogPackageCandidates = validPackageIdentities(packageAppCandidates[cask.token] ?? [], for: cask)
+            enriched.catalogPackageProducts = cask.hasPackageArtifact ? packageProductIdentities[cask.token].map {
+                // A reviewed product has one app. Invalid evidence must not reopen legacy fallback.
+                $0.count <= 1 ? validPackageIdentities($0, for: cask) : []
+            } : nil
             return enriched
+        }
+    }
+
+    private func validPackageIdentities(_ candidates: [PackageApplicationIdentity], for cask: Cask) -> [PackageApplicationIdentity] {
+        candidates.filter { candidate in
+            let identity = CaskAppIdentity(
+                bundleName: candidate.bundleName, bundleIdentifier: candidate.bundleIdentifier,
+                packageIdentifier: candidate.packageIdentifier, installedPath: candidate.installedPath
+            )
+            return identity.verifiesPackageApp(for: cask)
+                && candidate.bundleIdentifier.range(
+                    of: #"\A[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\z"#, options: .regularExpression
+                ) != nil
         }
     }
 
@@ -153,6 +163,7 @@ final class CategoryService {
         if let identities = catalog.appIdentities { appIdentities = identities }
         // Missing candidate metadata revokes prior conditional evidence.
         packageAppCandidates = catalog.packageAppCandidates ?? [:]
+        packageProductIdentities = catalog.packageProductIdentities ?? [:]
         if let updatedAt = catalog.metadataUpdatedAt { metadataUpdatedAt = updatedAt }
         catalogStateRevision &+= 1
     }

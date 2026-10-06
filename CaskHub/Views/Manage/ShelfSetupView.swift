@@ -25,6 +25,8 @@ struct ShelfSetupView: View {
             .padding(.horizontal, CHSpace.s5)
             .frame(maxWidth: .infinity)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .sheet(isPresented: $showsIgnorePicker) {
@@ -255,29 +257,6 @@ struct ShelfSetupView: View {
     }
 }
 
-// MARK: - Page Chrome
-
-struct UtilityTopBar: View {
-    let title: String
-    var summary: String?
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(CHType.topBarTitle)
-                .foregroundStyle(Color.chTextTitle)
-            Spacer(minLength: 10)
-            if let summary {
-                Text(summary)
-                    .font(CHType.countMeta)
-                    .foregroundStyle(Color.chTextMuted)
-            }
-        }
-        .padding(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
-        .glassPanel(radius: 999, surface: .chSurfaceToolbar)
-    }
-}
-
 // MARK: - Picker Sheet
 
 struct AdoptIgnorePickerSheet: View {
@@ -332,7 +311,7 @@ struct AdoptIgnorePickerSheet: View {
 
     private func adoptableRow(_ cask: Cask) -> some View {
         HStack(spacing: 10) {
-            CaskIconView(cask: cask, size: 28)
+            CaskIconView(cask: cask, size: 28, alignment: .center)
             Text(cask.displayName)
                 .font(CHType.cardTitle)
                 .foregroundStyle(Color.chTextTitle)
@@ -349,30 +328,6 @@ struct AdoptIgnorePickerSheet: View {
         }
         .padding(.vertical, 8)
         .overlay(alignment: .top) { Color.chHairline.frame(height: 1) }
-    }
-}
-
-// MARK: - Shared Bits
-
-struct PillButton: View {
-    let title: String
-    let background: Color
-    let border: Color
-    let foreground: Color
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(CHType.button)
-                .foregroundStyle(foreground)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 13)
-                .background(Capsule().fill(background))
-                .overlay(Capsule().strokeBorder(border, lineWidth: 1))
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 }
 

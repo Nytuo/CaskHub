@@ -318,7 +318,7 @@ final class ApplicationIdentityCollisionTests: XCTestCase {
         )
         XCTAssertTrue(InstallationIndexBuilder().resolveMacAppStoreApplications(
             signatures: [MacAppStoreCaskSignature(
-                token: "motion", bundleNames: ["Motion.app"], hasPackageArtifact: false,
+                token: "motion", bundleNames: ["Motion.app"], hasPackageArtifact: false, isReviewedProduct: false,
                 applicationBundleIdentifiers: [expectedIdentifier], packageIdentifiers: []
             )],
             applications: [storeApp], installedCasks: [:]

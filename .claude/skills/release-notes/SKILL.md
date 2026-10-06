@@ -38,6 +38,14 @@ Each release adds one entry at the top of `CHANGELOG.md`:
   mismatch, so forgetting to add the new entry fails loudly.
 - Omit any section that would be empty. A patch release may be Bug Fixes only.
 - Never rewrite past entries; only add the new one on top.
+- When the new entry has a `### What's New` section, update the launch card.
+  Patch releases leave it alone.
+  - `CaskHub/Resources/WhatsNew.xcstrings` holds one `featureN.title` and
+    `featureN.detail` pair per row, up to four rows. Rewrite the whole file
+    with the new English text and no other locales. The keys are reused, so
+    a translation left behind would show the previous release's text.
+  - In `WhatsNewRelease.latest` (`CaskHub/Models/LaunchCard.swift`) set the
+    version and each row's SF Symbol, and match the row count to the file.
 
 ## Writing the bullets
 

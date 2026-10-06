@@ -33,12 +33,14 @@ enum CaskHubMain {
 
 struct CaskHubApp: App {
     @AppStorage("appTheme") private var selectedTheme: String = AppTheme.system.rawValue
+    @AppStorage(AppStyle.storageKey) private var selectedStyle: AppStyle = .classic
     @NSApplicationDelegateAdaptor(ApplicationTerminationCoordinator.self)
     private var terminationCoordinator
 
     @State private var updaterService = UpdaterService()
     @State private var helpTopic: HelpTopic = .gettingStarted
     @State private var settingsSection: SettingsSection = .general
+    @State private var launchCard: LaunchCard?
 
     @State private var categoryService: CategoryService
     @State private var recentlyAdded: RecentlyAddedService
@@ -50,6 +52,15 @@ struct CaskHubApp: App {
     init() {
         // Tooltip delay in ms; registered (not set) so it never persists to prefs.
         UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 500])
+        // Must run before anything persists prefs or caches, or a new install reads as an upgrade.
+        let hadPriorInstall = AppStyle.hasPriorInstall()
+        AppStyle.current = AppStyle.resolveStored(in: .standard) { hadPriorInstall }
+        _launchCard = State(initialValue: CrashReporter.isRunningTests ? nil : LaunchCardGate.resolve(
+            in: .standard,
+            currentVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
+            hasPriorInstall: hadPriorInstall,
+            latestVersion: WhatsNewRelease.latest.version
+        ))
         BrandFonts.register()
         CrashReporter.start()
         Analytics.start()
@@ -105,6 +116,12 @@ struct CaskHubApp: App {
                     .onChange(of: selectedTheme, initial: true) { _, newValue in
                         AppTheme.apply(newValue)
                     }
+                    .onChange(of: selectedStyle) { _, newValue in
+                        AppStyle.current = newValue
+                    }
+                    .sheet(item: $launchCard) { card in
+                        LaunchCardView(card: card)
+                    }
                     .environment(categoryService)
                     .environment(recentlyAdded)
                     .environment(localHomebrew)
@@ -112,7 +129,7 @@ struct CaskHubApp: App {
                     .environment(maintenance)
             }
             .defaultSize(width: 1360, height: 880)
-            .windowStyle(.hiddenTitleBar)
+            .windowToolbarStyle(.unified(showsTitle: false))
             .commandsRemoved()
             .commands {
                 CommandGroup(replacing: .newItem) {}
@@ -140,7 +157,7 @@ struct CaskHubApp: App {
         }
         .commands {
             CaskHubApplicationCommands(updater: updaterService)
-            CaskHubHelpCommands(selection: $helpTopic)
+            CaskHubHelpCommands(selection: $helpTopic, launchCard: $launchCard)
         }
     }
 }

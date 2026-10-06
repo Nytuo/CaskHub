@@ -153,7 +153,7 @@ final class CaskCatalogSortTests: XCTestCase {
         )
 
         let now = Date()
-        let local = LocalHomebrewService(defaults: makeScratchDefaults("library-sort-defaults"))
+        let local = await makePlatformResolvedHomebrew(defaults: makeScratchDefaults("library-sort-defaults"))
         updateInstallationSnapshot(of: local) {
             $0.installedCasks = [
                 "alpha": LocalCaskInstallation(
@@ -188,7 +188,8 @@ final class CaskCatalogSortTests: XCTestCase {
 
         vm.selectedSidebar = .library(.installed)
         XCTAssertEqual(vm.sortOption, .recentlyInstalled)
-        XCTAssertEqual(vm.filteredCasks.map(\.token), ["zulu", "alpha", "able", "bravo"])
+        XCTAssertEqual(vm.filteredCasks.map(\.token), ["zulu", "alpha"])
+        XCTAssertEqual(vm.filteredExternallyManagedCasks.map(\.token), ["able", "bravo"])
 
         vm.selectedSidebar = .library(.updates)
         XCTAssertEqual(vm.sortOption, .nameAZ)
@@ -283,7 +284,7 @@ final class CaskCatalogSortTests: XCTestCase {
 
     @MainActor
     func test_cached_projections_invalidate_for_each_catalog_dependency() async {
-        let local = LocalHomebrewService(
+        let local = await makePlatformResolvedHomebrew(
             defaults: makeScratchDefaults("projection-invalidation")
         )
         let categories = CategoryService()

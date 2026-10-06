@@ -158,7 +158,7 @@ final class AdoptionSurfaceTests: XCTestCase {
     @MainActor
     func test_mutations_use_injected_runner_and_map_nonzero_exit() async {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(exitCode: 7, output: "simulated failure")]
+        runner.queuedResults = [.success, BrewProcessResult(exitCode: 7, output: "simulated failure")]
         let service = makeMutationService(runner: runner)
 
         do {
@@ -175,7 +175,7 @@ final class AdoptionSurfaceTests: XCTestCase {
             XCTFail("unexpected error: \(error)")
         }
 
-        XCTAssertEqual(runner.requests.map(\.arguments), [["install", "--cask", "firefox"]])
+        XCTAssertEqual(runner.requests.map(\.arguments), [["fetch", "--cask", "firefox"], ["install", "--cask", "firefox"]])
         let askpassPath = try? XCTUnwrap(runner.requests.first?.environment["SUDO_ASKPASS"])
         XCTAssertNotNil(runner.requests.first?.askpassContents)
         XCTAssertFalse(askpassPath.map(FileManager.default.fileExists(atPath:)) ?? true)
@@ -221,7 +221,7 @@ final class AdoptionSurfaceTests: XCTestCase {
 
         XCTAssertEqual(
             runner.requests.map(\.arguments),
-            [["install", "--cask", "zen-privacy"]]
+            [["fetch", "--cask", "zen-privacy"], ["install", "--cask", "zen-privacy"]]
         )
     }
 

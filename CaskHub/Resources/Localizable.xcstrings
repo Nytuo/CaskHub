@@ -80,34 +80,6 @@
         }
       }
     },
-    "%@ theme" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема: %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 主题"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 主題"
-          }
-        }
-      }
-    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -229,6 +201,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 天"
+          }
+        }
+      }
+    },
+    "(%lld of %lld)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%1$lld из %2$lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%1$lld із %2$lld)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "（%1$lld/%2$lld）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "（%1$lld/%2$lld）"
           }
         }
       }
@@ -1365,30 +1365,30 @@
         }
       }
     },
-    "Also list apps that update themselves (brew upgrade --greedy)" : {
+    "Also list self-updating apps Homebrew cannot verify" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Также показывать приложения, которые обновляются сами (brew upgrade --greedy)"
+            "state" : "needs_review",
+            "value" : "Также показывать самообновляющиеся приложения, которые Homebrew не может проверить"
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Також перелічіть програми, які оновлюються самостійно (brew upgrade --greedy)"
+            "state" : "needs_review",
+            "value" : "Також показувати програми із самооновленням, які Homebrew не може перевірити"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "同时列出会自我更新的应用（brew upgrade --greedy）"
+            "state" : "needs_review",
+            "value" : "同时列出 Homebrew 无法验证的自动更新应用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "同時列出會自我更新的 App（brew upgrade --greedy）"
+            "state" : "needs_review",
+            "value" : "同時列出 Homebrew 無法驗證的自動更新 App"
           }
         }
       }
@@ -1449,34 +1449,6 @@
         }
       }
     },
-    "App Theme" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема оформления"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема програми"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "应用主题"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App 主題"
-          }
-        }
-      }
-    },
     "Appearance" : {
       "localizations" : {
         "ru" : {
@@ -1501,6 +1473,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "外觀"
+          }
+        }
+      }
+    },
+    "appearance.style.standard" : {
+      "comment" : "Appearance style name for the system-like Liquid Glass look",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стандартная"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стандартна"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标准"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準"
           }
         }
       }
@@ -3083,6 +3091,34 @@
         }
       }
     },
+    "Classic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Классическая"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Класична"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "经典"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "經典"
+          }
+        }
+      }
+    },
     "Clean Up" : {
       "localizations" : {
         "ru" : {
@@ -3165,34 +3201,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除已快取的 App 圖示"
-          }
-        }
-      }
-    },
-    "Clear search" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Очистить поиск"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Очистити пошук"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除搜索"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除搜尋"
           }
         }
       }
@@ -4822,25 +4830,25 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable Greedy to include casks that normally update themselves. Leave it off when you prefer each app's built-in updater."
+            "value" : "Updates lists what Homebrew reports as outdated. Enable Greedy to also include self-updating apps Homebrew cannot verify."
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Включите режим --greedy, чтобы учитывать пакеты Cask, которые обычно обновляются сами. Оставьте его выключенным, если предпочитаете встроенный механизм обновления каждого приложения."
+            "state" : "needs_review",
+            "value" : "В разделе «Обновления» показано то, что Homebrew считает устаревшим. Включите режим --greedy, чтобы также учитывать самообновляющиеся приложения, которые Homebrew не может проверить."
           }
         },
         "uk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Увімкніть Greedy, щоб додати пакети Cask, які зазвичай оновлюються самостійно. Не вмикайте, якщо надаєте перевагу вбудованому засобу оновлення кожної програми."
+            "state" : "needs_review",
+            "value" : "У розділі «Оновлення» показано те, що Homebrew вважає застарілим. Увімкніть Greedy, щоб також додати програми із самооновленням, які Homebrew не може перевірити."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "啟用 Greedy 可納入通常會自行更新的 Cask。如果你偏好使用各 App 內建的更新程式，請保持關閉。"
+            "state" : "needs_review",
+            "value" : "「更新」會列出 Homebrew 回報為過期的項目。啟用 Greedy 可同時納入 Homebrew 無法驗證的自動更新 App。"
           }
         }
       }
@@ -5505,6 +5513,36 @@
         }
       }
     },
+    "Installed" : {
+      "comment" : "A section in the settings that displays the list of apps installed on the user's machine.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Установленные"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Встановлено"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已安装"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已安裝"
+          }
+        }
+      }
+    },
     "Installed (%@)" : {
       "localizations" : {
         "ru" : {
@@ -5869,6 +5907,318 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登入時啟動 CaskHub"
+          }
+        }
+      }
+    },
+    "launchCard.button.back" : {
+      "comment" : "Welcome tour button that returns to the previous page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
+    "launchCard.button.continue" : {
+      "comment" : "What's New card button that closes the card",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "launchCard.button.getStarted" : {
+      "comment" : "Welcome tour button on the last page that closes the tour",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "launchCard.button.next" : {
+      "comment" : "Welcome tour button that advances to the next page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        }
+      }
+    },
+    "launchCard.button.skip" : {
+      "comment" : "Welcome tour button that closes the tour early",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.adopt.detail" : {
+      "comment" : "Welcome tour, Adopt Apps page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed apps by hand? Adopt them so Homebrew keeps them up to date."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.adopt.title" : {
+      "comment" : "Welcome tour, Adopt Apps page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adopt Your Existing Apps"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.categories.detail" : {
+      "comment" : "Welcome tour, categories page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thousands of casks sorted into categories, each with its real app icon, so finding a design tool or a database client takes seconds."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.categories.title" : {
+      "comment" : "Welcome tour, categories page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse by Category"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.intro.detail" : {
+      "comment" : "Welcome tour, first page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A native home for every Homebrew cask. Browse, install, update, and tidy up without opening Terminal."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.intro.title" : {
+      "comment" : "Welcome tour, first page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to CaskHub"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.look.detail" : {
+      "comment" : "Welcome tour, appearance style page description. Standard and Classic are the two style names",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard feels native to macOS. Classic is warm and playful. Change it any time in Settings."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.look.title" : {
+      "comment" : "Welcome tour, appearance style page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick Your Look"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.manage.detail" : {
+      "comment" : "Welcome tour, installed apps and updates page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See every installed app, check what is outdated, and update all of them with one click."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.manage.title" : {
+      "comment" : "Welcome tour, installed apps and updates page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything in One Place"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.pageIndicator" : {
+      "comment" : "Welcome tour, VoiceOver label for the page dots: current page, total pages",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Page %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.privacy.detail" : {
+      "comment" : "Welcome tour, privacy page description shown above the analytics and crash report toggles",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anonymous usage and crash data help improve CaskHub. Nothing personal is collected, and you can turn either off."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.privacy.title" : {
+      "comment" : "Welcome tour, privacy page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Privacy"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.ready.detail" : {
+      "comment" : "Welcome tour, last page description shown above a list of keyboard shortcuts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A few shortcuts to get around faster."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.ready.title" : {
+      "comment" : "Welcome tour, last page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're All Set"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.recentlyAdded.detail" : {
+      "comment" : "Welcome tour, Recently Added page description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recently Added tracks new casks as they arrive in Homebrew."
+          }
+        }
+      }
+    },
+    "launchCard.welcome.recentlyAdded.title" : {
+      "comment" : "Welcome tour, Recently Added page title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See What Just Landed"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.search" : {
+      "comment" : "Welcome tour, label next to the Command-F keycap",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search the catalog"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.settings" : {
+      "comment" : "Welcome tour, label next to the Command-comma keycap",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "launchCard.welcome.shortcut.viewMode" : {
+      "comment" : "Welcome tour, label next to the Command-1 and Command-2 keycaps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between grid and list"
+          }
+        }
+      }
+    },
+    "launchCard.whatsNew.title" : {
+      "comment" : "Title of the What's New card and of its Help menu item",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's New in CaskHub"
           }
         }
       }
@@ -8868,6 +9218,63 @@
         }
       }
     },
+    "Managed Outside Homebrew" : {
+      "comment" : "Section heading for installed apps managed by the App Store or installed manually.",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не управляются Homebrew"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не керуються Homebrew"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非 Homebrew 管理"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非 Homebrew 管理"
+          }
+        }
+      }
+    },
+    "Match system appearance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Следовать системному оформлению"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповідати оформленню системи"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟随系统外观"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟隨系統外觀"
+          }
+        }
+      }
+    },
     "More actions" : {
       "localizations" : {
         "ru" : {
@@ -9808,6 +10215,34 @@
         }
       }
     },
+    "Refresh Updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Обновить список обновлений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Оновити список оновлень"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "刷新更新列表"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新整理更新列表"
+          }
+        }
+      }
+    },
     "Repair or Replace" : {
       "localizations" : {
         "ru" : {
@@ -10408,31 +10843,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export…"
+            "value" : "Export"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Экспортировать…"
+            "value" : "Экспортировать"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Експорт…"
+            "value" : "Експорт"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导出…"
+            "value" : "导出"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "匯出…"
+            "value" : "匯出"
           }
         }
       }
@@ -10588,31 +11023,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose file…"
+            "value" : "Choose file"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выбрать файл…"
+            "value" : "Выбрать файл"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Виберіть файл…"
+            "value" : "Виберіть файл"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择文件…"
+            "value" : "选择文件"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選擇檔案…"
+            "value" : "選擇檔案"
           }
         }
       }
@@ -10906,37 +11341,37 @@
       }
     },
     "shelfSetup.brewfile.sheet.pouring" : {
-      "comment" : "Import progress: cask name, current index, total",
+      "comment" : "Import progress: name of the cask being installed",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pouring %1$@… (%2$lld of %3$lld)"
+            "value" : "Pouring %@…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Установка %1$@… (%2$lld из %3$lld)"
+            "value" : "Установка %@…"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Встановлення %1$@… (%2$lld із %3$lld)"
+            "value" : "Встановлення %@…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在装入 %1$@…（%2$lld/%3$lld）"
+            "value" : "正在装入 %@…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在裝入 %1$@…（%2$lld/%3$lld）"
+            "value" : "正在裝入 %@…"
           }
         }
       }
@@ -11128,31 +11563,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Ignore an app…"
+            "value" : "Ignore an app"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Исключить приложение…"
+            "value" : "Исключить приложение"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ Ігнорувати програму…"
+            "value" : "Ігнорувати програму"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ 忽略应用…"
+            "value" : "忽略应用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "+ 忽略 App…"
+            "value" : "忽略 App"
           }
         }
       }
@@ -11495,6 +11930,35 @@
         }
       }
     },
+    "Show apps managed outside Homebrew" : {
+      "comment" : "Switch in General settings controlling the external apps section on the Installed page.",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать приложения, не управляемые Homebrew"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показати програми, якими не керує Homebrew"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示非 Homebrew 管理的应用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示非 Homebrew 管理的 App"
+          }
+        }
+      }
+    },
     "Show Available Updates" : {
       "localizations" : {
         "ru" : {
@@ -11513,6 +11977,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示可用更新"
+          }
+        }
+      }
+    },
+    "Show installed apps available in Homebrew but managed elsewhere." : {
+      "comment" : "Description of the setting that shows externally managed installed apps on the Installed page.",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать установленные приложения, доступные в Homebrew, но не управляемые им."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показувати встановлені програми, доступні в Homebrew, якими він не керує."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示可通过 Homebrew 获取但不由其管理的已安装应用。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示可透過 Homebrew 取得但不由其管理的已安裝 App。"
           }
         }
       }
@@ -11961,6 +12454,34 @@
         }
       }
     },
+    "Switch between the light and dark halves with macOS" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключаться между светлой и тёмной половинами вместе с macOS"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перемикатися між світлою і темною половинами разом із macOS"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "随 macOS 在浅色与深色之间切换"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隨 macOS 在淺色與深色之間切換"
+          }
+        }
+      }
+    },
     "System" : {
       "localizations" : {
         "ru" : {
@@ -11985,6 +12506,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "跟隨系統"
+          }
+        }
+      }
+    },
+    "System (Currently %@)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системная (Сейчас %@)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системна (Зараз %@)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟随系统（当前为%@）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟隨系統（目前為%@）"
           }
         }
       }
@@ -12126,6 +12675,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」 的安裝程式需要你的登入密碼。"
+          }
+        }
+      }
+    },
+    "Theme" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主题"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主題"
           }
         }
       }
@@ -12634,34 +13211,6 @@
         }
       }
     },
-    "Updating %lld of %lld" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обновление %lld из %lld"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Оновлення %lld із %lld"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在更新 %lld/%lld"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在更新 %lld/%lld"
-          }
-        }
-      }
-    },
     "Updating Homebrew…" : {
       "localizations" : {
         "ru" : {
@@ -12875,6 +13424,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "檢視"
+          }
+        }
+      }
+    },
+    "View Mode" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режим просмотра"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режим перегляду"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示方式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示方式"
           }
         }
       }

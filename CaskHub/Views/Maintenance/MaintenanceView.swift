@@ -29,6 +29,8 @@ struct MaintenanceView: View {
             .animation(.easeOut(duration: 0.25), value: model.checks)
             .animation(.easeOut(duration: 0.2), value: model.advisoriesExpanded)
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .task { await model.refreshDisk() }
@@ -81,21 +83,19 @@ struct MaintenanceView: View {
         Button {
             Task { await model.runCheckup() }
         } label: {
-            HStack(spacing: 7) {
-                if model.doctorRunning {
-                    ProgressView()
-                        .controlSize(.mini)
+            ActionCapsule(
+                background: .chActionInstallBg, border: .chActionInstallBorder, foreground: .chActionInstallFg
+            ) {
+                HStack(spacing: 5) {
+                    if model.doctorRunning {
+                        ProgressView()
+                            .controlSize(.mini)
+                    }
+                    Text(String(localized: model.doctorRunning
+                        ? .maintenanceHealthRunning
+                        : .maintenanceHealthRun))
                 }
-                Text(String(localized: model.doctorRunning
-                    ? .maintenanceHealthRunning
-                    : .maintenanceHealthRun))
-                    .font(CHType.button)
             }
-            .foregroundStyle(Color.chActionInstallFg)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 16)
-            .background(Capsule().fill(Color.chActionInstallBg))
-            .overlay(Capsule().strokeBorder(Color.chActionInstallBorder, lineWidth: 1))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -309,17 +309,13 @@ struct WorkingPill: View {
     let title: String
 
     var body: some View {
-        HStack(spacing: 6) {
-            ProgressView()
-                .controlSize(.mini)
-            Text(title)
-                .font(CHType.button)
+        ActionCapsule(background: .chSurfaceField, border: .chHairlineStrong, foreground: .chTextMuted) {
+            HStack(spacing: 5) {
+                ProgressView()
+                    .controlSize(.mini)
+                Text(title)
+            }
         }
-        .foregroundStyle(Color.chTextMuted)
-        .padding(.vertical, 4)
-        .padding(.horizontal, 13)
-        .background(Capsule().fill(Color.chSurfaceField))
-        .overlay(Capsule().strokeBorder(Color.chHairlineStrong, lineWidth: 1))
     }
 }
 
@@ -327,13 +323,9 @@ struct StatusPill: View {
     let title: String
 
     var body: some View {
-        Text(title)
-            .font(CHType.button)
-            .foregroundStyle(Color.chActionDoneFg)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 13)
-            .background(Capsule().fill(Color.chActionDoneBg))
-            .overlay(Capsule().strokeBorder(Color.chActionDoneBorder, lineWidth: 1))
+        ActionCapsule(background: .chActionDoneBg, border: .chActionDoneBorder, foreground: .chActionDoneFg) {
+            Text(title)
+        }
     }
 }
 

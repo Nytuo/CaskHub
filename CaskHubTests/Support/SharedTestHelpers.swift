@@ -7,6 +7,7 @@
 
 @testable import CaskHub
 import Foundation
+import Sentry
 import XCTest
 
 // MARK: - Mock API
@@ -481,4 +482,54 @@ func makeIdentityCategoryService() throws -> CategoryService {
     let service = CategoryService()
     service.applyData(try JSONDecoder().decode(CaskCategoryData.self, from: data))
     return service
+}
+
+final class SpyAnalyticsProvider: AnalyticsProvider, SentryMetricsApiProtocol {
+    var startedWith: [Bool] = []
+    var enabledChanges: [Bool] = []
+    var signals: [(name: String, parameters: [String: String])] = []
+    var metricKeys: [String] = []
+    var metricValues: [UInt] = []
+    var metricAttributes: [[String: SentryAttributeContent]] = []
+
+    func start(enabled: Bool) { startedWith.append(enabled) }
+    func setEnabled(_ enabled: Bool) { enabledChanges.append(enabled) }
+
+    func count(
+        key: String,
+        value: UInt,
+        attributes: [String: SentryAttributeValue]
+    ) {
+        let attributes = attributes.mapValues { $0.asSentryAttributeContent }
+        metricKeys.append(key)
+        metricValues.append(value)
+        metricAttributes.append(attributes)
+
+        guard case let .string(name)? = attributes["event.name"] else { return }
+        let parameters = attributes.reduce(into: [String: String]()) { result, attribute in
+            guard attribute.key.hasPrefix("event."), attribute.key != "event.name",
+                  case let .string(value) = attribute.value
+            else { return }
+            result[String(attribute.key.dropFirst("event.".count))] = value
+        }
+        signals.append((name, parameters))
+    }
+
+    func distribution(
+        key _: String,
+        value _: Double,
+        unit _: SentryUnit?,
+        attributes _: [String: SentryAttributeValue]
+    ) {}
+
+    func gauge(
+        key _: String,
+        value _: Double,
+        unit _: SentryUnit?,
+        attributes _: [String: SentryAttributeValue]
+    ) {}
+}
+
+extension BrewProcessResult {
+    static let success = BrewProcessResult(exitCode: 0, output: "")
 }

@@ -47,3 +47,34 @@ nonisolated struct HomebrewVersionLoader: Sendable {
         return firstLine.split(separator: " ").last.map(String.init)
     }
 }
+
+nonisolated struct HomebrewOutdatedLoader: Sendable {
+    /// What `brew outdated` lists, or nil when Homebrew cannot answer.
+    @concurrent
+    func load(from brewURL: URL?) async -> HomebrewOutdatedReport? {
+        // ponytail: no auto-update, so the list is as fresh as Homebrew's last update. Allow it if staleness shows up.
+        guard let brewURL,
+              let result = ProcessCapture.capture(
+                  brewURL,
+                  arguments: ["outdated", "--cask", "--json=v2"],
+                  environment: ["HOMEBREW_NO_AUTO_UPDATE": "1"]
+              )
+        else { return nil }
+        return Self.report(in: result.output ?? "")
+    }
+
+    static func report(in output: String) -> HomebrewOutdatedReport? {
+        guard let decoded = try? JSONDecoder().decode(OutdatedOutput.self, from: Data(output.utf8)) else { return nil }
+        let pinned = Set(decoded.casks.filter { $0.pinned == true }.map(\.name))
+        return HomebrewOutdatedReport(upgradable: Set(decoded.casks.map(\.name)).subtracting(pinned), pinned: pinned)
+    }
+}
+
+private nonisolated struct OutdatedOutput: Decodable {
+    struct Cask: Decodable {
+        let name: String
+        let pinned: Bool?
+    }
+
+    let casks: [Cask]
+}

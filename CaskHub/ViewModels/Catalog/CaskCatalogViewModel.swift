@@ -85,6 +85,8 @@ final class CaskCatalogViewModel {
         BoundedMemoizedValues<CatalogLibraryCacheKey, CatalogLibrarySnapshot>(capacity: 1)
     @ObservationIgnored let filteredCache =
         BoundedMemoizedValues<FilteredCatalogCacheKey, [Cask]>(capacity: 16)
+    @ObservationIgnored let externallyManagedCache =
+        BoundedMemoizedValues<FilteredCatalogCacheKey, [Cask]>(capacity: 1)
     @ObservationIgnored let browseCache =
         BoundedMemoizedValues<BrowseCatalogCacheKey, [BrowseSection]>(capacity: 1)
     @ObservationIgnored let searchKeysCache = BoundedMemoizedValues<Int, [String: String]>(capacity: 1)
@@ -165,9 +167,10 @@ final class CaskCatalogViewModel {
         lastLoadedAt = .now
         async let catalog: Void = fetchCasks()
         async let local: Void = localHomebrew.refresh()
+        async let homebrewOutdated: Void = localHomebrew.refreshHomebrewOutdated()
         async let categories: Void = categoryService.refreshFromRemote()
         async let addedDates: Void = recentlyAdded.refreshFromRemote()
-        _ = await (catalog, local, categories, addedDates)
+        _ = await (catalog, local, homebrewOutdated, categories, addedDates)
         let enriched = categoryService.addingAppIdentities(to: casks)
         if enriched != casks {
             casks = enriched

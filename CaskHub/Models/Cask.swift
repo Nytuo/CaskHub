@@ -209,6 +209,8 @@ nonisolated struct Cask: Decodable, Identifiable, Hashable, Sendable {
     let deprecated: Bool
     let disabled: Bool
     let autoUpdates: Bool?
+    let variations: [String: CaskUpdateVariation]?
+    let supportedPlatforms: Set<String>?
     let conflictsWith: CaskConflicts?
     var artifacts: [ArtifactStanza]?
     /// Verified identities supplied by CaskFlow, scoped to this cask's app artifacts.
@@ -217,6 +219,16 @@ nonisolated struct Cask: Decodable, Identifiable, Hashable, Sendable {
     var catalogPackageAppIdentifiers: [String: [String]]?
     /// Conditional payloads, used only by the installed-package receipt scanner.
     var catalogPackageCandidates: [PackageApplicationIdentity]?
+    /// Reviewed product association: nil is unreviewed; empty requires Homebrew registration.
+    var catalogPackageProducts: [PackageApplicationIdentity]?
+
+    var storeAppNames: [String] {
+        catalogPackageProducts?.map(\.bundleName) ?? (appArtifactNames + packageAppNameCandidates)
+    }
+
+    var storeBundleIdentifiers: [String] {
+        catalogPackageProducts?.map(\.bundleIdentifier) ?? applicationBundleIdentifiers
+    }
 
     var catalogPackageAppNames: [String] {
         catalogPackageAppIdentifiers?.keys.sorted() ?? []
@@ -334,6 +346,8 @@ nonisolated struct Cask: Decodable, Identifiable, Hashable, Sendable {
                 deprecated: deprecated,
                 disabled: disabled,
                 autoUpdates: autoUpdates,
+                variations: nil,
+                supportedPlatforms: nil,
                 conflictsWith: conflictingCaskTokens.isEmpty
                     ? nil
                     : CaskConflicts(cask: conflictingCaskTokens)

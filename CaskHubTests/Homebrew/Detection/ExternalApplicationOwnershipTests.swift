@@ -35,6 +35,7 @@ final class ExternalApplicationOwnershipTests: XCTestCase {
             token: token,
             bundleNames: [bundleName],
             hasPackageArtifact: hasPackage,
+            isReviewedProduct: false,
             applicationBundleIdentifiers: applicationIdentifiers,
             packageIdentifiers: packageIdentifiers
         )
