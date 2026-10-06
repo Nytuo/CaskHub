@@ -205,30 +205,30 @@
         }
       }
     },
-    "%@… (%lld of %lld)" : {
+    "(%lld of %lld)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@… (%2$lld из %3$lld)"
+            "value" : "(%1$lld из %2$lld)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@… (%2$lld із %3$lld)"
+            "value" : "(%1$lld із %2$lld)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@…（%2$lld/%3$lld）"
+            "value" : "（%1$lld/%2$lld）"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@…（%2$lld/%3$lld）"
+            "value" : "（%1$lld/%2$lld）"
           }
         }
       }
@@ -3613,34 +3613,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在下載"
-          }
-        }
-      }
-    },
-    "Downloading… (%lld of %lld)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Загрузка… (%1$lld из %2$lld)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завантаження… (%1$lld із %2$lld)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在下载…（%1$lld/%2$lld）"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在下載…（%1$lld/%2$lld）"
           }
         }
       }
@@ -11441,37 +11413,37 @@
       }
     },
     "shelfSetup.brewfile.sheet.pouring" : {
-      "comment" : "Import progress: cask name, current index, total",
+      "comment" : "Import progress: name of the cask being installed",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pouring %1$@… (%2$lld of %3$lld)"
+            "value" : "Pouring %@…"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Установка %1$@… (%2$lld из %3$lld)"
+            "value" : "Установка %@…"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Встановлення %1$@… (%2$lld із %3$lld)"
+            "value" : "Встановлення %@…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在装入 %1$@…（%2$lld/%3$lld）"
+            "value" : "正在装入 %@…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在裝入 %1$@…（%2$lld/%3$lld）"
+            "value" : "正在裝入 %@…"
           }
         }
       }

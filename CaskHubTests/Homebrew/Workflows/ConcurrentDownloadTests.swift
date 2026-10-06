@@ -178,7 +178,7 @@ final class ConcurrentDownloadTests: XCTestCase {
 
         XCTAssertEqual(Set(executor.running("fetch")), ["a", "b", "c"])
         XCTAssertTrue(service.isUpdatingAll)
-        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading… (\(0) of \(3))"))
+        XCTAssertEqual(service.statusBarOperation?.message, "\(String(localized: "Downloading"))… \(String(localized: "(\(0) of \(3))"))")
 
         let deadline = Date().addingTimeInterval(10)
         while service.isUpdatingAll, Date() < deadline {
@@ -204,7 +204,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         executor.finish("b", exitCode: 1)
         await settle { finishedCounts == [1] }
         XCTAssertEqual(finishedCounts, [1])
-        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading… (\(1) of \(3))"))
+        XCTAssertEqual(service.statusBarOperation?.message, "\(String(localized: "Downloading"))… \(String(localized: "(\(1) of \(3))"))")
         let deadline = Date().addingTimeInterval(10)
         while finishedCounts.count < 3, Date() < deadline {
             if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }

@@ -153,16 +153,24 @@ nonisolated struct CaskBatchProgress: Equatable, Sendable {
 }
 
 nonisolated struct CaskOperationStatus: Equatable, Sendable {
-    struct BatchStep: Equatable, Sendable {
-        let displayName: String
-        let position: Int
+    struct Batch: Equatable, Sendable {
+        let installing: CaskOperationProgress?
+        let isDownloading: Bool
+        let finishedCount: Int
         let total: Int
+
+        func sentence(installingLabel: (CaskOperationProgress) -> String) -> String {
+            var parts = installing.map { [installingLabel($0)] } ?? []
+            if isDownloading || parts.isEmpty {
+                parts.append("\(CaskOperationPhase.downloading.label(for: .installing))…")
+            }
+            return parts.joined(separator: " · ") + " " + String(localized: "(\(finishedCount) of \(total))")
+        }
     }
 
     let label: String
     let byteProgress: CaskByteProgress?
-    private(set) var batchStep: BatchStep?
-    private(set) var details: [String] = []
+    private(set) var batch: Batch?
 
     init(label: String, byteProgress: CaskByteProgress? = nil) {
         self.label = label
@@ -193,19 +201,23 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
         return CaskOperationStatus(label: ([summary] + phaseCounts(sortedOperations)).joined(separator: " · "))
     }
 
-    private static func make(batch: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus {
-        guard let current = operations.first(where: { $0.phase == .performing && batch.tokens.contains($0.token) }) else {
-            let lead = String(localized: "Downloading… (\(batch.finishedCount) of \(batch.total))")
-            let details = phaseCounts(operations.filter { $0.phase == .queued })
-            return CaskOperationStatus(label: ([lead] + details).joined(separator: " · "))
-        }
-        let step = BatchStep(displayName: current.displayName, position: batch.finishedCount + 1, total: batch.total)
-        let name = "\(current.phase.label(for: current.action)) \(current.displayName)"
-        let lead = String(localized: "\(name)… (\(step.position) of \(step.total))")
-        let details = phaseCounts(operations.filter { $0.token != current.token })
-        var status = CaskOperationStatus(label: ([lead] + details).joined(separator: " · "))
-        status.batchStep = step
-        status.details = details
+    private static func make(batch progress: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus {
+        let members = operations.filter { progress.tokens.contains($0.token) }
+        let downloads = members.filter { ![.performing, .queued, .canceling].contains($0.phase) }
+        let batch = Batch(
+            installing: members.first { $0.phase == .performing },
+            isDownloading: !downloads.isEmpty,
+            finishedCount: progress.finishedCount,
+            total: progress.total
+        )
+        let sentence = batch.sentence { "\($0.phase.label(for: $0.action)) \($0.displayName)…" }
+        let queued = phaseCounts(members.filter { $0.phase == .queued })
+        let onlyDownload = downloads.count == 1 ? downloads.first : nil
+        var status = CaskOperationStatus(
+            label: ([sentence] + queued).joined(separator: " · "),
+            byteProgress: onlyDownload?.phase.showsByteProgress == true ? onlyDownload?.byteProgress : nil
+        )
+        status.batch = batch
         return status
     }
 

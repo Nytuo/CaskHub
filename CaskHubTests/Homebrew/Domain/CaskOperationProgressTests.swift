@@ -248,37 +248,53 @@ final class CaskOperationProgressTests: XCTestCase {
         )
     }
 
-    func test_batch_status_names_the_app_being_installed_and_counts_the_rest() {
-        let phases: [CaskOperationPhase] = [.downloading, .performing, .queued, .downloading]
+    func test_batch_status_keeps_one_sentence_while_an_app_installs_and_others_download() {
+        let phases: [CaskOperationPhase] = [.downloading, .performing, .queued, .verifying]
         let operations = phases.enumerated().map {
             CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .installing, phase: $0.element)
         }
         let batch = CaskBatchProgress(tokens: Set((0 ..< 8).map { "t\($0)" }), finishedCount: 1)
         let status = CaskOperationStatus.make(operations: operations, batch: batch)
-        let lead = "\(CaskOperationPhase.performing.label(for: .installing)) App 1"
-        let downloading = CaskOperationPhase.downloading.label(for: .installing).lowercased()
+        let installing = CaskOperationPhase.performing.label(for: .installing)
         let queued = CaskOperationPhase.queued.label(for: .installing).lowercased()
 
-        XCTAssertEqual(status?.batchStep, .init(displayName: "App 1", position: 2, total: 8))
-        XCTAssertEqual(status?.details, ["2 \(downloading)", "1 \(queued)"])
+        XCTAssertEqual(status?.message, "\(installing) App 1… · \(downloading)… \(count(1, of: 8)) · 1 \(queued)")
         XCTAssertEqual(
-            status?.message,
-            String(localized: "\(lead)… (\(2) of \(8))") + " · 2 \(downloading) · 1 \(queued)"
+            status?.batch?.sentence { "Pouring \($0.displayName)…" },
+            "Pouring App 1… · \(downloading)… \(count(1, of: 8))"
         )
     }
 
-    func test_batch_status_reads_downloading_until_one_of_its_apps_is_installed() {
-        let phases: [CaskOperationPhase] = [.downloading, .preparing, .verifying, .queued]
-        var operations = phases.enumerated().map {
-            CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .updating, phase: $0.element)
-        }
-        operations.append(CaskOperationProgress(token: "other", displayName: "Other", action: .uninstalling, phase: .performing))
-        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 1)
+    func test_batch_status_shows_bytes_for_a_single_download_and_ignores_outside_apps() {
+        let operations = [
+            CaskOperationProgress(
+                token: "t0", displayName: "App 0", action: .updating, phase: .downloading,
+                completedBytes: 12_000_000, totalBytes: 34_000_000
+            ),
+            CaskOperationProgress(token: "other", displayName: "Other", action: .uninstalling, phase: .performing)
+        ]
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 3)
         let status = CaskOperationStatus.make(operations: operations, batch: batch)
-        let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
 
-        XCTAssertNil(status?.batchStep)
-        XCTAssertEqual(status?.message, String(localized: "Downloading… (\(1) of \(5))") + " · 1 \(queued)")
+        XCTAssertNil(status?.batch?.installing)
+        XCTAssertEqual(status?.message, "\(downloading)… \(count(3, of: 5)) · 12 / 34 MB")
+    }
+
+    func test_batch_status_drops_downloading_when_only_an_install_is_left() {
+        let operations = [CaskOperationProgress(token: "t4", displayName: "App 4", action: .updating, phase: .performing)]
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 4)
+        let updating = CaskOperationPhase.performing.label(for: .updating)
+
+        XCTAssertEqual(
+            CaskOperationStatus.make(operations: operations, batch: batch)?.message,
+            "\(updating) App 4… \(count(4, of: 5))"
+        )
+    }
+
+    private var downloading: String { CaskOperationPhase.downloading.label(for: .installing) }
+
+    private func count(_ finished: Int, of total: Int) -> String {
+        String(localized: "(\(finished) of \(total))")
     }
 
     @MainActor
