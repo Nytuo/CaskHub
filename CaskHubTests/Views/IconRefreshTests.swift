@@ -117,11 +117,11 @@ final class IconRefreshTests: XCTestCase {
             let (loaded, concurrent) = await (first, second)
             let image = try XCTUnwrap(loaded)
             XCTAssertTrue(concurrent === image)
-            XCTAssertEqual(image.size, NSSize(width: 40, height: 20))
+            XCTAssertEqual(image.size, NSSize(width: 46, height: 26))
             let raster = try XCTUnwrap(image.cgImage(forProposedRect: nil, context: nil, hints: nil))
             let result = NSBitmapImageRep(cgImage: raster)
-            XCTAssertEqual(result.colorAt(x: 0, y: 0)?.alphaComponent, 1)
-            XCTAssertEqual(result.colorAt(x: 39, y: 19)?.alphaComponent, 1)
+            XCTAssertEqual(result.colorAt(x: 3, y: 13)?.alphaComponent, 1)
+            XCTAssertEqual(result.colorAt(x: 42, y: 13)?.alphaComponent, 1)
             let cached = await images.image(for: Cask.preview(token: "antinote"))
             XCTAssertTrue(cached === image)
             let stored = await disk.loadData(token: "antinote")
@@ -138,11 +138,16 @@ final class IconRefreshTests: XCTestCase {
             )!
             solid.bitmapData!.initialize(repeating: alpha, count: solid.bytesPerRow * solid.pixelsHigh)
             let image = NSImage(cgImage: try XCTUnwrap(solid.cgImage), size: NSSize(width: 10, height: 10))
-            XCTAssertEqual(ImageCacheService.normalizedIcon(image).size, image.size)
+            XCTAssertEqual(IconBitmap.normalized(image).size, image.size)
         }
     }
 
     private func icon(side: Int, fills: [(range: Range<Int>, alpha: UInt8)]) throws -> NSImage {
+        let bitmap = bitmap(side: side, fills: fills)
+        return NSImage(cgImage: try XCTUnwrap(bitmap.cgImage), size: NSSize(width: side, height: side))
+    }
+
+    private func bitmap(side: Int, fills: [(range: Range<Int>, alpha: UInt8)]) -> NSBitmapImageRep {
         let bitmap = NSBitmapImageRep(
             bitmapDataPlanes: nil, pixelsWide: side, pixelsHigh: side,
             bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
@@ -158,19 +163,19 @@ final class IconRefreshTests: XCTestCase {
                 }
             }
         }
-        return NSImage(cgImage: try XCTUnwrap(bitmap.cgImage), size: NSSize(width: side, height: side))
+        return bitmap
     }
 
     func test_normalization_crops_to_solid_body_ignoring_soft_shadow() throws {
         let shadowed = try icon(side: 100, fills: [(10..<90, 60), (16..<84, 255)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(shadowed).size, NSSize(width: 68, height: 68))
+        XCTAssertEqual(IconBitmap.normalized(shadowed).size, NSSize(width: 68, height: 68))
     }
 
     func test_normalization_keeps_full_bounds_of_translucent_icons() throws {
         let glass = try icon(side: 100, fills: [(10..<90, 100), (45..<55, 255)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(glass).size, NSSize(width: 80, height: 80))
+        XCTAssertEqual(IconBitmap.normalized(glass).size, NSSize(width: 80, height: 80))
         let faint = try icon(side: 100, fills: [(10..<90, 100)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(faint).size, NSSize(width: 80, height: 80))
+        XCTAssertEqual(IconBitmap.normalized(faint).size, NSSize(width: 80, height: 80))
     }
 
     func test_large_icons_downsample_to_display_cap() throws {
@@ -181,11 +186,50 @@ final class IconRefreshTests: XCTestCase {
         )!
         solid.bitmapData!.initialize(repeating: 255, count: solid.bytesPerRow * solid.pixelsHigh)
         let image = NSImage(cgImage: try XCTUnwrap(solid.cgImage), size: NSSize(width: 256, height: 256))
-        let normalized = ImageCacheService.normalizedIcon(image)
+        let normalized = IconBitmap.normalized(image)
         let raster = try XCTUnwrap(normalized.cgImage(forProposedRect: nil, context: nil, hints: nil))
         XCTAssertEqual(raster.width, 160)
         XCTAssertEqual(raster.height, 160)
         XCTAssertEqual(NSBitmapImageRep(cgImage: raster).colorAt(x: 80, y: 80)?.alphaComponent, 1)
+    }
+
+    func test_normalization_erases_source_shadow_left_in_body_corners() throws {
+        let bitmap = bitmap(side: 100, fills: [(16..<84, 255), (16..<20, 100)])
+        for row in 16..<18 {
+            for column in 16..<20 {
+                (bitmap.bitmapData! + row * bitmap.bytesPerRow + column * 4).update(from: [0, 0, 0, 40], count: 4)
+            }
+        }
+        let image = NSImage(cgImage: try XCTUnwrap(bitmap.cgImage), size: NSSize(width: 100, height: 100))
+        let normalized = IconBitmap.normalized(image)
+        XCTAssertEqual(normalized.size, NSSize(width: 68, height: 68))
+        let raster = try XCTUnwrap(normalized.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        let result = NSBitmapImageRep(cgImage: raster)
+        XCTAssertEqual(result.colorAt(x: 0, y: 0)?.alphaComponent, 0)
+        XCTAssertEqual(try XCTUnwrap(result.colorAt(x: 0, y: 3)?.alphaComponent), 100 / 255, accuracy: 0.01)
+        XCTAssertEqual(result.colorAt(x: 30, y: 30)?.alphaComponent, 1)
+    }
+
+    func test_shadow_does_not_darken_a_translucent_icon() throws {
+        let shadowed = IconBitmap.shadowed(try icon(side: 80, fills: [(0..<80, 140)]))
+        let raster = try XCTUnwrap(shadowed.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        let center = try XCTUnwrap(NSBitmapImageRep(cgImage: raster).colorAt(x: 46, y: 46))
+        XCTAssertEqual(center.alphaComponent, 140 / 255, accuracy: 0.02)
+        XCTAssertEqual(center.redComponent, 1, accuracy: 0.02)
+    }
+
+    func test_shadow_is_baked_into_a_margin_around_the_icon_body() throws {
+        let shadowed = IconBitmap.shadowed(try icon(side: 80, fills: [(0..<80, 255)]))
+        XCTAssertEqual(shadowed.size, NSSize(width: 92, height: 92))
+        let raster = try XCTUnwrap(shadowed.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        let result = NSBitmapImageRep(cgImage: raster)
+        XCTAssertEqual(result.colorAt(x: 46, y: 46)?.alphaComponent, 1)
+        XCTAssertEqual(result.colorAt(x: 6, y: 46)?.alphaComponent, 1)
+        XCTAssertEqual(result.colorAt(x: 6, y: 6)?.alphaComponent, 0)
+        let below = try XCTUnwrap(result.colorAt(x: 46, y: 87)?.alphaComponent)
+        XCTAssertGreaterThan(below, 0)
+        XCTAssertLessThan(below, 0.3)
+        XCTAssertEqual(result.colorAt(x: 46, y: 0)?.alphaComponent, 0)
     }
 
     func test_cached_image_is_synchronously_available_only_after_load() async throws {

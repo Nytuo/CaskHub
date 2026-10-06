@@ -16,6 +16,8 @@ struct CaskIconView: View {
     @State private var loadedImage: NSImage?
     @State private var didResolve = false
 
+    private var shadowInset: CGFloat { size * IconBitmap.shadowInset }
+
     private var wellShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
     }
@@ -27,8 +29,8 @@ struct CaskIconView: View {
                     .resizable()
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .clipShape(IconCorners())
-                    .frame(width: size, height: size, alignment: alignment)
+                    .frame(width: size + shadowInset * 2, height: size + shadowInset * 2, alignment: alignment)
+                    .padding(-shadowInset)
                     .transition(.opacity)
             } else if cask.isCLI {
                 cliTile
@@ -68,12 +70,6 @@ struct CaskIconView: View {
             .fill(fill)
             .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
             .frame(width: size, height: size)
-    }
-}
-
-private nonisolated struct IconCorners: Shape {
-    func path(in rect: CGRect) -> Path {
-        Path(roundedRect: rect, cornerRadius: min(rect.width, rect.height) * 0.2, style: .continuous)
     }
 }
 
