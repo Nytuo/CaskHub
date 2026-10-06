@@ -336,13 +336,17 @@ final class CaskHubTests: XCTestCase {
 
     @MainActor
     func test_activation_notification_refreshes_and_resumes_pending_adoption() async {
+        XCTAssertIdentical(LocalHomebrewDependencies().notificationCenter, NotificationCenter.default)
         let scanner = MutableInstalledSoftwareScanner()
+        let center = NotificationCenter()
         let service = LocalHomebrewService(
             defaults: makeScratchDefaults("activation-adoption")
         ) {
             $0.softwareScanner = scanner
             $0.brewBinaryProvider = { URL(fileURLWithPath: "/test/bin/brew") }
             $0.brewVersionProvider = { "test" }
+            $0.caskPlatformProvider = { nil }
+            $0.notificationCenter = center
         }
         let cask = makeCask("activation-adoption", appNames: ["Activation.app"])
         seedExternalInstallation(of: cask, version: cask.displayVersion, in: service)
@@ -361,7 +365,7 @@ final class CaskHubTests: XCTestCase {
         } onChange: {
             resumed.fulfill()
         }
-        NotificationCenter.default.post(
+        center.post(
             name: NSApplication.didBecomeActiveNotification,
             object: nil
         )

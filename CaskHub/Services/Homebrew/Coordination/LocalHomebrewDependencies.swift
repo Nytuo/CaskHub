@@ -84,6 +84,7 @@ enum HomebrewIssuePolicy {
 struct LocalHomebrewDependencies {
     var caskPlatformProvider: (() async -> CaskPlatform?)?
     var fileManager: FileManager = .default
+    var notificationCenter: NotificationCenter = .default
     var applicationDirectories: [URL]?
     var processRunner: (any BrewProcessRunning)?
     var commandExecutor: (any HomebrewCommandExecuting)?
