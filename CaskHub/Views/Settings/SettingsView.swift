@@ -174,6 +174,7 @@ struct GeneralSettingsView: View {
     @Environment(LocalHomebrewService.self) private var localHomebrew
     @State private var settingsModel = GeneralSettingsModel()
     @AppStorage(SidebarView.showAdoptKey) private var showAdoptApps = true
+    @AppStorage(ContentView.showExternallyManagedAppsKey) private var showExternallyManagedApps = true
 
     var body: some View {
         Form {
@@ -189,6 +190,13 @@ struct GeneralSettingsView: View {
             Section("Sidebar") {
                 Toggle("Show Adopt Apps", isOn: $showAdoptApps)
                 Text("Adopt Apps lists installed apps that Homebrew can start managing for you.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Installed") {
+                Toggle("Show apps managed outside Homebrew", isOn: $showExternallyManagedApps)
+                    .toggleStyle(.switch)
+                Text("Show installed apps available in Homebrew but managed elsewhere.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -399,46 +407,6 @@ private struct HomebrewSettingsContent: View {
         let response = CrashReporter.withHangTrackingPaused { panel.runModal() }
         guard response == .OK, let url = panel.url else { return }
         Task { await locationModel.applySelection(url) }
-    }
-}
-
-struct PrivacySettingsView: View {
-    @AppStorage(Analytics.enabledKey) private var analyticsEnabled = true
-    @AppStorage(CrashReporter.enabledKey) private var crashReportingEnabled = true
-
-    var body: some View {
-        Form {
-            Section("Usage Analytics") {
-                Toggle(
-                    "Share anonymous usage analytics",
-                    isOn: $analyticsEnabled
-                )
-
-                Text(.settingsPrivacyUsageAnalytics)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            }
-
-            Section("Crash Reports") {
-                Toggle(
-                    "Share crash reports",
-                    isOn: $crashReportingEnabled
-                )
-
-                Text(.settingsPrivacyCrashReports)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
-        .padding()
-        .onChange(of: analyticsEnabled) { _, isOn in
-            Analytics.refresh()
-            if isOn { Analytics.analyticsReEnabled() }
-        }
-        .onChange(of: crashReportingEnabled) { _, _ in
-            CrashReporter.refresh()
-        }
     }
 }
 

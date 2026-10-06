@@ -116,42 +116,30 @@ final class CaskOperationStoreTests: XCTestCase {
         XCTAssertEqual(store.status?.message, "\(updatingLabel) Firefox…")
     }
 
-    func test_update_all_lifecycle_has_one_owner_and_clears_progress_atomically() {
+    func test_update_all_lifecycle_has_one_owner() {
         let store = CaskOperationStore()
-        let progress = CaskUpdateAllProgress(
-            currentIndex: 1,
-            totalCount: 2,
-            currentToken: "firefox",
-            currentDisplayName: "Firefox"
-        )
 
         XCTAssertTrue(store.beginUpdateAll())
         XCTAssertFalse(store.beginUpdateAll())
-        XCTAssertTrue(store.hasActiveOperations)
-
-        store.setUpdateAllProgress(progress)
         XCTAssertTrue(store.isUpdatingAll)
-        XCTAssertEqual(store.updateAllProgress, progress)
+        XCTAssertTrue(store.hasActiveOperations)
 
         store.finishUpdateAll()
         XCTAssertFalse(store.isUpdatingAll)
-        XCTAssertNil(store.updateAllProgress)
         XCTAssertFalse(store.hasActiveOperations)
     }
 
-    func test_update_all_progress_is_ignored_outside_an_active_batch() {
+    func test_batch_progress_has_one_owner_and_needs_more_than_one_app() {
         let store = CaskOperationStore()
-        let progress = CaskUpdateAllProgress(
-            currentIndex: 1,
-            totalCount: 1,
-            currentToken: "firefox",
-            currentDisplayName: "Firefox"
-        )
 
-        store.setUpdateAllProgress(progress)
+        XCTAssertFalse(store.beginBatch(tokens: ["a"]))
+        XCTAssertTrue(store.beginBatch(tokens: ["a", "b", "c"]))
+        XCTAssertFalse(store.beginBatch(tokens: ["d", "e"]))
+        store.advanceBatch()
+        XCTAssertEqual(store.batch, CaskBatchProgress(tokens: ["a", "b", "c"], finishedCount: 1))
 
-        XCTAssertNil(store.updateAllProgress)
-        XCTAssertFalse(store.isUpdatingAll)
+        store.endBatch()
+        XCTAssertNil(store.batch)
     }
 
     private func adoptionRequest() -> CaskAdoptionRequest {

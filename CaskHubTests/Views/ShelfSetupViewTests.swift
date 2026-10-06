@@ -160,7 +160,7 @@ final class ShelfSetupViewTests: XCTestCase {
             ]
         )
         let phases: [BrewfileImportPhase] = [
-            .preview, .running(index: 0), .done(failedCount: 0), .done(failedCount: 1)
+            .preview, .running(completedCount: 1), .done(failedCount: 0), .done(failedCount: 1)
         ]
         for phase in phases {
             render(BrewfileImportSheet(plan: plan, phase: phase)
@@ -232,9 +232,37 @@ final class ShelfSetupViewTests: XCTestCase {
 
     @MainActor
     func test_page_chrome_renders() {
-        render(UtilityTopBar(title: "Shelf Setup", summary: "3 ignored"), width: 1100, height: 600)
-        render(UtilityTopBar(title: "Health"), width: 1100, height: 600)
         render(CountBadge(count: 2), width: 1100, height: 600)
+    }
+
+    @MainActor
+    func test_health_and_shelf_buttons_fit_compact_pages_in_both_styles() async {
+        let originalStyle = AppStyle.current
+        defer { AppStyle.current = originalStyle }
+        let homebrew = makeHomebrew(defaults: makeScratchDefaults("utility-buttons"), externalApps: ["slack": "Slack.app"])
+        let (vm, _) = await makeSUT(
+            casks: [makeCask("slack", appNames: ["Slack.app"])], localHomebrew: homebrew
+        )
+        homebrew.setAdoptIgnored("slack", true)
+        let probe = RecordingMaintenanceProbe()
+        probe.directorySizes = ["Homebrew": 1_000, "icons": 2_000]
+        let model = makeMaintenanceModel(probe: probe)
+        await model.refreshDisk()
+        let imageCache = ImageCacheService()
+        for style in AppStyle.allCases {
+            AppStyle.current = style
+            let pages = [
+                AnyView(ShelfSetupView(viewModel: vm).environment(homebrew).environment(imageCache)),
+                AnyView(MaintenanceView(model: model).environment(imageCache))
+            ]
+            for (index, page) in pages.enumerated() {
+                for width: CGFloat in [754, 1100] {
+                    let host = NSHostingController(rootView: page)
+                    let size = host.sizeThatFits(in: CGSize(width: width, height: 700))
+                    XCTAssertLessThanOrEqual(size.width, width, "\(style) page \(index) at \(width)")
+                }
+            }
+        }
     }
 
     @MainActor

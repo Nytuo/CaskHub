@@ -14,6 +14,8 @@ extension ContentView {
         ScrollView {
             catalogContent
         }
+        .contentMargins(.top, CHSpace.belowToolbar, for: .scrollContent)
+        .toolbarScrollEdge()
         .contentMargins(.bottom, 44, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .modifier(ResetScrollOnChange(trigger: selectedSidebar))
@@ -27,6 +29,14 @@ extension ContentView {
         case .list:
             listContent
         }
+    }
+
+    private var externallyManagedSection: some View {
+        catalogSectionView(
+            String(localized: "Managed Outside Homebrew"),
+            casks: viewModel.filteredExternallyManagedCasks,
+            destination: nil
+        )
     }
 
     var gridContent: some View {
@@ -45,6 +55,9 @@ extension ContentView {
                 }
             } else {
                 caskGrid(viewModel.displayedCasks, showsReveal: true)
+                if showsExternallyManagedSection {
+                    externallyManagedSection
+                }
             }
         }
         .frame(maxWidth: catalogWidth, alignment: .leading)
@@ -83,6 +96,10 @@ extension ContentView {
                 caskList(viewModel.displayedCasks)
                 if viewModel.hasMoreToReveal {
                     RevealSentinel { viewModel.revealMore() }
+                }
+                if showsExternallyManagedSection {
+                    externallyManagedSection
+                        .padding(.top, CHSpace.s4)
                 }
             }
             .frame(maxWidth: catalogWidth)
@@ -125,32 +142,48 @@ extension ContentView {
     }
 
     func browseSectionView(_ section: BrowseSection) -> some View {
+        catalogSectionView(section.title, casks: section.casks, destination: section.destination)
+    }
+
+    private func catalogSectionView(
+        _ title: String,
+        casks: [Cask],
+        destination: SidebarSelection?
+    ) -> some View {
         VStack(alignment: .leading, spacing: CHSpace.s3) {
             HStack(alignment: .firstTextBaseline) {
-                Text(section.title)
+                Text(title)
                     .font(CHType.section)
                     .foregroundStyle(Color.chTextTitle)
                 Spacer()
-                Button {
-                    Analytics.viewAllTapped(to: section.destination)
-                    viewModel.selectedSidebar = section.destination
-                } label: {
-                    Text("View All")
-                        .font(CHType.button)
-                        .foregroundStyle(Color.chTextBrand)
+                if let destination {
+                    Button {
+                        Analytics.viewAllTapped(to: destination)
+                        viewModel.selectedSidebar = destination
+                    } label: {
+                        Text("View All")
+                            .font(CHType.button)
+                            .foregroundStyle(Color.chTextBrand)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             switch viewMode {
             case .grid:
-                caskGrid(section.casks)
+                caskGrid(casks)
             case .list:
                 LazyVStack(spacing: 0) {
-                    caskList(section.casks)
+                    caskList(casks)
                 }
             }
         }
         .padding(.top, CHSpace.s3)
+    }
+
+    var showsExternallyManagedSection: Bool {
+        selectedSidebar == .library(.installed)
+            && showExternallyManagedApps
+            && !viewModel.filteredExternallyManagedCasks.isEmpty
     }
 
     // MARK: - Error View

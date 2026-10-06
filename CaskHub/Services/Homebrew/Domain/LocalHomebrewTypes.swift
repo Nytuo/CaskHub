@@ -87,6 +87,7 @@ nonisolated struct MacAppStoreCaskSignature: Sendable {
     let token: String
     let bundleNames: Set<String>
     let hasPackageArtifact: Bool
+    let isReviewedProduct: Bool
     let applicationBundleIdentifiers: [String]
     let packageIdentifiers: [String]
 }
@@ -155,8 +156,8 @@ nonisolated struct CaskInstallationIndex: Sendable {
     )
 }
 
-/// A payload identity whose installation depends on package choices. It cannot
-/// establish ownership until the matching installed receipt and file path agree.
+/// An app-to-component association, verified locally against its installed receipt and path.
+/// Extracted candidates also need declared-name validation; reviewed products do not.
 nonisolated struct PackageApplicationIdentity: Decodable, Hashable, Sendable {
     let bundleName: String
     let bundleIdentifier: String
@@ -171,6 +172,11 @@ nonisolated struct PackageCaskSignature: Sendable {
     let appNameCandidates: [String]
     let verifiedBundleIdentifiersByName: [String: [String]]
     let receiptCandidates: [PackageApplicationIdentity]
+    let productIdentities: [PackageApplicationIdentity]?
+
+    var receiptIdentities: [PackageApplicationIdentity] {
+        productIdentities ?? receiptCandidates
+    }
 }
 
 nonisolated struct PackageInstallationCandidate {
@@ -213,6 +219,11 @@ nonisolated enum CaskUninstallAvailability: Equatable, Sendable {
         guard case let .unavailable(reason) = self else { return nil }
         return reason
     }
+}
+
+nonisolated struct HomebrewOutdatedReport: Equatable, Sendable {
+    let upgradable: Set<String>
+    let pinned: Set<String>
 }
 
 nonisolated struct CaskLocalState: Equatable, Sendable {

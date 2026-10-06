@@ -8,9 +8,9 @@
 import SwiftUI
 
 enum CHRadius {
-    static let hero: CGFloat = 20
-    static let card: CGFloat = 18
-    static let iconLg: CGFloat = 26 // hero app icon well
+    static var hero: CGFloat { CHType.isNative ? 18 : 20 }
+    static var card: CGFloat { CHType.isNative ? 14 : 18 }
+    static var iconLg: CGFloat { CHType.isNative ? 24 : 26 } // hero app icon well
     static let keycap: CGFloat = 5
     // fields, pills and buttons are capsules
 }
@@ -29,6 +29,7 @@ enum CHSize {
     }
 
     static let cardHeight: CGFloat = 176
+    static let titleInsetBelowIcon: CGFloat = 3.5
     static let heroHeight: CGFloat = 180
     static let actionCapsuleHeight: CGFloat = 28
     static let listActionWidth: CGFloat = 110
@@ -39,4 +40,6 @@ enum CHSpace {
     static let s4: CGFloat = 16
     static let s5: CGFloat = 24
     static let gridGap: CGFloat = 14 // cask card grid gap
+    static let belowToolbar: CGFloat = 10 // plus the toolbar inset
+    static let toolbarLabelInset: CGFloat = 5 // matches the segmented picker's inset
 }

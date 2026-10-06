@@ -10,10 +10,13 @@ import SwiftUI
 struct CaskIconView: View {
     let cask: Cask
     var size: CGFloat = 44
+    var alignment: Alignment = .top
 
     @Environment(ImageCacheService.self) private var imageCache
     @State private var loadedImage: NSImage?
     @State private var didResolve = false
+
+    private var shadowInset: CGFloat { size * IconBitmap.shadowInset }
 
     private var wellShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
@@ -21,25 +24,18 @@ struct CaskIconView: View {
 
     var body: some View {
         ZStack {
-            if let loadedImage {
-                wellShape
-                    .fill(Color.chSurfaceField)
-                    .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
-                    .frame(width: size, height: size)
-                Image(nsImage: loadedImage)
+            if let image = imageCache.cachedImage(for: cask.token) ?? loadedImage {
+                Image(nsImage: image)
                     .resizable()
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: size * 0.9, height: size * 0.9)
-                    .clipShape(RoundedRectangle(cornerRadius: size * 0.18, style: .continuous))
+                    .frame(width: size + shadowInset * 2, height: size + shadowInset * 2, alignment: alignment)
+                    .padding(-shadowInset)
                     .transition(.opacity)
             } else if cask.isCLI {
                 cliTile
             } else {
-                wellShape
-                    .fill(Color.chSurfaceField)
-                    .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
-                    .frame(width: size, height: size)
+                well(.chSurfaceWell)
                 if didResolve {
                     Image(systemName: "macwindow")
                         .font(.system(size: size * 0.4))
@@ -61,14 +57,18 @@ struct CaskIconView: View {
     }
 
     private var cliTile: some View {
-        wellShape
-            .fill(Color.chInk)
-            .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
+        well(.chSurfaceTerminal)
             .overlay(
                 Text(">_")
                     .font(Font.custom(CHType.monoFamily, size: size * 0.34).weight(.bold))
                     .foregroundStyle(Color.chCream)
             )
+    }
+
+    private func well(_ fill: Color) -> some View {
+        wellShape
+            .fill(fill)
+            .overlay(wellShape.strokeBorder(Color.chHairline, lineWidth: 0.5))
             .frame(width: size, height: size)
     }
 }

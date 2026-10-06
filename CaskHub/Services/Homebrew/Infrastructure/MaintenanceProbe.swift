@@ -75,16 +75,21 @@ nonisolated struct SystemMaintenanceProbe: MaintenanceProbing {
         arguments: [String],
         environment: [String: String]?
     ) async -> BrewProbeResult? {
-        await SystemHomebrewCommandExecutor.acquireGlobalTurn()
+        await Self.acquireExclusiveLane()
         let result = ProcessCapture.capture(
             executable,
             arguments: arguments,
             environment: environment,
             mergeStderr: true
         )
-        await SystemHomebrewCommandExecutor.releaseGlobalTurn()
+        await MainActor.run { HomebrewLaneLimiter.shared.release(.exclusive) }
         guard let result else { return nil }
         return BrewProbeResult(exitCode: result.status, output: result.output ?? "")
+    }
+
+    @MainActor
+    private static func acquireExclusiveLane() async {
+        _ = await HomebrewLaneLimiter.shared.acquire(.exclusive, token: nil) {}
     }
 
     @concurrent

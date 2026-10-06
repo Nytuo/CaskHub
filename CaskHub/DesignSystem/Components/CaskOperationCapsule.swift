@@ -27,19 +27,22 @@ struct CaskOperationCapsule: View {
             }
 
             if let byteProgress = downloadByteProgress {
-                Text(progress?.phase.label(for: action) ?? "Downloading")
-                    .font(CHType.downloadLabel)
-                    .foregroundStyle(Color.chTextBody)
-                    .lineLimit(1)
-                    .fixedSize()
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 0) {
+                        downloadPhaseLabel
+                            .fixedSize()
 
-                Spacer(minLength: 6)
+                        Spacer(minLength: 6)
 
-                Text(byteProgress.text)
-                    .font(CHType.downloadProgress)
-                    .monospacedDigit()
-                    .foregroundStyle(Color.chTextBody)
-                    .lineLimit(1)
+                        Text(byteProgress.text)
+                            .font(CHType.downloadProgress)
+                            .monospacedDigit()
+                            .foregroundStyle(Color.chTextBody)
+                            .lineLimit(1)
+                    }
+                    downloadPhaseLabel
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             } else {
                 Text(label)
                     .font(CHType.bodySm)
@@ -85,6 +88,13 @@ struct CaskOperationCapsule: View {
         }
         .overlay(Capsule().strokeBorder(Color.chHairline, lineWidth: 1))
         .accessibilityLabel(label.replacingOccurrences(of: " · ", with: ", "))
+    }
+
+    private var downloadPhaseLabel: some View {
+        Text(progress?.phase.label(for: action) ?? "Downloading")
+            .font(CHType.downloadLabel)
+            .foregroundStyle(Color.chTextBody)
+            .lineLimit(1)
     }
 
     private var downloadByteProgress: CaskByteProgress? {

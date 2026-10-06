@@ -12,6 +12,8 @@ enum ViewMode: String {
 }
 
 struct ContentView: View {
+    static let showExternallyManagedAppsKey = "showExternallyManagedApps"
+
     @Bindable var viewModel: CaskCatalogViewModel
     @Environment(ImageCacheService.self) private var imageCache
     @Environment(CategoryService.self) private var categoryService
@@ -19,10 +21,13 @@ struct ContentView: View {
     @Environment(MaintenanceViewModel.self) private var maintenance
     @AppStorage("catalogTextSize") private var catalogTextSize: CatalogTextSize = .standard
     @AppStorage("viewMode") var viewMode: ViewMode = .grid
+    @AppStorage(Self.showExternallyManagedAppsKey) var showExternallyManagedApps = true
     @FocusState private var searchFocused: Bool
     @State private var sidebarVisibility: NavigationSplitViewVisibility = .all
     @State private var showsResultsHeader = false
     @State private var searchSignalTask: Task<Void, Never>?
+    @State private var isScrolledUnderToolbar = false
+    @State private var isRefreshingUpdates = false
 
     @State private var detailWidth: CGFloat = CHSize.contentWidth + 2 * CHSize.catalogInset
 
@@ -44,25 +49,13 @@ struct ContentView: View {
                 ),
                 categoryService: categoryService,
                 updatesCount: viewModel.updatesCount,
-                installedCount: viewModel.installedCount,
+                installedCount: viewModel.installedCount(includingExternallyManaged: showExternallyManagedApps),
                 adoptableCount: viewModel.adoptableCasks.count,
                 categoryCounts: viewModel.categoryCounts
             )
             .navigationSplitViewColumnWidth(min: 245, ideal: 245, max: 300)
         } detail: {
             VStack(spacing: 0) {
-                Group {
-                    if isUtilityPage {
-                        utilityTopBar
-                    } else {
-                        catalogTopBar
-                    }
-                }
-                .frame(maxWidth: isUtilityPage ? CHSize.contentWidth : catalogWidth)
-                .padding(.horizontal, isUtilityPage ? CHSpace.s5 : CHSize.catalogInset)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, CHSpace.s4)
-
                 if showsResultsHeader {
                     Text("Results for “\(viewModel.searchText)”")
                         .font(CHType.section)
@@ -70,7 +63,7 @@ struct ContentView: View {
                         .frame(maxWidth: catalogWidth, alignment: .leading)
                         .padding(.horizontal, CHSize.catalogInset)
                         .frame(maxWidth: .infinity)
-                        .padding(.bottom, CHSpace.s4)
+                        .padding(.vertical, CHSpace.s4)
                 }
 
                 detailContent
@@ -79,7 +72,26 @@ struct ContentView: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { detailWidth = $0 }
-            .ignoresSafeArea(.container, edges: .top)
+            .onPreferenceChange(ScrolledUnderToolbarKey.self) { scrolled in
+                isScrolledUnderToolbar = scrolled
+            }
+            // Hiding the backing outright also drops the scroll edge effect, so toggle it.
+            .toolbarBackgroundVisibility(isScrolledUnderToolbar ? .visible : .hidden, for: .windowToolbar)
+            .toolbar {
+                TopBarTitle(title: sectionName, summary: topBarSummary)
+                if !isUtilityPage {
+                    catalogToolbar
+                }
+            }
+            .modifier(CatalogSearch(
+                isEnabled: !isUtilityPage,
+                text: $viewModel.searchText,
+                isFocused: $searchFocused,
+                onSubmit: {
+                    searchFocused = false
+                    showsResultsHeader = !viewModel.searchText.isEmpty
+                }
+            ))
         }
         .overlay {
             Button("") { searchFocused = true }
@@ -101,7 +113,7 @@ struct ContentView: View {
         .focusedSceneValue(\.catalogViewMode, $viewMode)
         .focusedSceneValue(\.sidebarVisibility, $sidebarVisibility)
         .windowToolbarFullScreenVisibility(.onHover)
-        .tint(Color.chTerracotta)
+        .tint(Color.chAccent)
         .task {
             async let icons: Void = imageCache.refreshIconManifest()
             await viewModel.load()
@@ -141,8 +153,10 @@ struct ContentView: View {
                 showsResultsHeader = false
             }
         }
-        .onAppear {
-            DispatchQueue.main.async { searchFocused = false }
+        .task {
+            // The toolbar search field is the window's first key view.
+            try? await Task.sleep(for: .milliseconds(300))
+            searchFocused = false
         }
         .modifier(ResignFocusOnOutsideClick(
             isFocused: { searchFocused },
@@ -152,15 +166,11 @@ struct ContentView: View {
 
     // MARK: - Top Bar
 
-    private var catalogTopBar: some View {
-        TopBarView(
-            title: sectionName,
-            caskCount: viewModel.filteredCasks.count,
+    private var catalogToolbar: CatalogToolbar {
+        CatalogToolbar(
             sortOption: $viewModel.sortOption,
             sortOptions: sortOptions,
             viewMode: $viewMode,
-            searchText: $viewModel.searchText,
-            searchFocus: $searchFocused,
             analyticsPeriod: selectedSidebar == .discover(.topCharts) ? viewModel.analyticsPeriod : nil,
             onSelectPeriod: { period in
                 Analytics.topChartsPeriodChanged(period)
@@ -181,24 +191,20 @@ struct ContentView: View {
             updateAllCount: viewModel.updatesCount,
             isUpdatingAll: localHomebrew.isUpdatingAll,
             isUpdatingHomebrew: localHomebrew.isUpdatingHomebrew,
+            onRefreshUpdates: selectedSidebar == .library(.updates) ? { refreshUpdates() } : nil,
+            isRefreshingUpdates: isRefreshingUpdates,
             greedyUpdates: selectedSidebar == .library(.updates) ? localHomebrew.greedyUpdates : nil,
             onToggleGreedy: { enabled in
                 Analytics.greedyUpdatesChanged(enabled)
                 localHomebrew.setGreedyUpdates(enabled)
             },
-            showsSort: selectedSidebar != .discover(.featured) && !showsBrowseSections,
-            onSubmitSearch: {
-                searchFocused = false
-                showsResultsHeader = !viewModel.searchText.isEmpty
-            }
+            showsSort: selectedSidebar != .discover(.featured) && !showsBrowseSections
         )
     }
 
-    private var utilityTopBar: some View {
-        UtilityTopBar(
-            title: sectionName,
-            summary: utilitySummary
-        )
+    private var topBarSummary: String? {
+        let externalCount = showsExternallyManagedSection ? viewModel.filteredExternallyManagedCasks.count : 0
+        return isUtilityPage ? utilitySummary : String(localized: "\(viewModel.filteredCasks.count + externalCount) casks")
     }
 
     private var utilitySummary: String? {
@@ -277,6 +283,36 @@ struct ContentView: View {
 
     func categoryInfo(for cask: Cask) -> CaskCategoryPresentation? {
         viewModel.categoryPresentation(for: cask)
+    }
+}
+
+private extension ContentView {
+    func refreshUpdates() {
+        isRefreshingUpdates = true
+        Task {
+            await viewModel.load()
+            isRefreshingUpdates = false
+        }
+    }
+}
+
+// MARK: - Search
+
+private struct CatalogSearch: ViewModifier {
+    let isEnabled: Bool
+    @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding
+    let onSubmit: () -> Void
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content
+                .searchable(text: $text, placement: .toolbar, prompt: Text("Search apps…"))
+                .searchFocused(isFocused)
+                .onSubmit(of: .search, onSubmit)
+        } else {
+            content
+        }
     }
 }
 

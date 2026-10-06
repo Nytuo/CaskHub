@@ -100,6 +100,8 @@ struct CaskInfoPopover: View {
             deprecated: false,
             disabled: false,
             autoUpdates: true,
+            variations: nil,
+            supportedPlatforms: nil,
             conflictsWith: nil
         ),
         category: CaskCategoryPresentation(

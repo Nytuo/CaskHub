@@ -33,10 +33,13 @@ extension LocalHomebrewService {
     }
 
     func install(token: String) async throws {
-        try await runMutation(
+        try await runMutationSequence(
             .installing,
             token: token,
-            args: ["install", "--cask", token],
+            steps: [
+                .fetch(token: token, cancellation: .untilPerforming),
+                .exclusive(["install", "--cask", token], cancellation: .untilPerforming)
+            ],
             origin: .individual
         )
     }
@@ -89,7 +92,8 @@ extension LocalHomebrewService {
         let updateStep = HomebrewMutationStep(
             arguments: ["update"],
             environmentOverrides: [:],
-            cancellable: false,
+            lane: .exclusive,
+            cancellation: .never,
             recoverIf: nil,
             recoveryBehavior: .continueSequence
         )
@@ -136,17 +140,12 @@ extension LocalHomebrewService {
             action,
             token: token,
             steps: [
-                HomebrewMutationStep(
-                    arguments: ["fetch", "--cask", token],
-                    environmentOverrides: [:],
-                    cancellable: false,
-                    recoverIf: nil,
-                    recoveryBehavior: .finishMutation
-                ),
+                .fetch(token: token, cancellation: .never),
                 HomebrewMutationStep(
                     arguments: ["uninstall", "--cask", token, "--force"],
                     environmentOverrides: ["HOMEBREW_NO_AUTOREMOVE": "1"],
-                    cancellable: false,
+                    lane: .exclusive,
+                    cancellation: .never,
                     recoverIf: { [self] in
                         mutationCoordinator.removalSatisfied(
                             caskroomEntry: caskroomEntry,
@@ -156,13 +155,7 @@ extension LocalHomebrewService {
                     },
                     recoveryBehavior: .continueSequence
                 ),
-                HomebrewMutationStep(
-                    arguments: ["install", "--cask", token],
-                    environmentOverrides: [:],
-                    cancellable: false,
-                    recoverIf: nil,
-                    recoveryBehavior: .finishMutation
-                )
+                .exclusive(["install", "--cask", token], cancellation: .never)
             ],
             origin: origin,
             context: context
@@ -175,10 +168,13 @@ extension LocalHomebrewService {
     ) async throws {
         let args = ["upgrade", "--cask", token]
             + (greedyUpdates ? ["--greedy"] : [])
-        try await runMutation(
+        try await runMutationSequence(
             .updating,
             token: token,
-            args: args,
+            steps: [
+                .fetch(token: token, cancellation: .untilPerforming),
+                .exclusive(args, cancellation: .whileQueued)
+            ],
             origin: origin
         )
     }
@@ -192,14 +188,34 @@ extension LocalHomebrewService {
         ) {
             operationStore.send(.enqueue(.updating), for: token)
         }
-        for (index, token) in tokens.enumerated() {
-            operationStore.setUpdateAllProgress(CaskUpdateAllProgress(
-                currentIndex: index + 1,
-                totalCount: tokens.count,
-                currentToken: token,
-                currentDisplayName: displayName(for: token)
-            ))
-            try? await upgrade(token: token, origin: .updateAll)
+        _ = await runBatch(tokens, onFinished: { _ in }, operation: { try await self.upgrade(token: $0, origin: .updateAll) })
+    }
+
+    /// Returns how many installs failed.
+    func installAll(tokens: [String], onFinished: (Int) -> Void) async -> Int {
+        await runBatch(tokens, onFinished: onFinished) { try await self.install(token: $0) }
+    }
+
+    private func runBatch(
+        _ tokens: [String],
+        onFinished: (Int) -> Void,
+        operation: @escaping @MainActor (String) async throws -> Void
+    ) async -> Int {
+        let reportsProgress = operationStore.beginBatch(tokens: Set(tokens))
+        defer { if reportsProgress { operationStore.endBatch() } }
+        return await withTaskGroup(of: Bool.self) { group in
+            for token in tokens {
+                group.addTask { await (try? operation(token)) != nil }
+            }
+            var finishedCount = 0
+            var failedCount = 0
+            for await succeeded in group {
+                finishedCount += 1
+                if !succeeded { failedCount += 1 }
+                if reportsProgress { operationStore.advanceBatch() }
+                onFinished(finishedCount)
+            }
+            return failedCount
         }
     }
 

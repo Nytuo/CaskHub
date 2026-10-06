@@ -245,7 +245,7 @@ final class MutationRecoveryTests: XCTestCase {
         await fulfillment(of: [versionReloaded], timeout: 1)
 
         XCTAssertEqual(runner.requests.map(\.arguments), [
-            ["install", "--cask", "gimp"],
+            ["fetch", "--cask", "gimp"],
             ["update"],
             ["update"]
         ])
@@ -297,7 +297,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_sudo_decline_is_suppressed_only_with_the_helper_cancel_marker() async {
         let unmarkedRunner = StubBrewProcessRunner()
-        unmarkedRunner.queuedResults = [BrewProcessResult(
+        unmarkedRunner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "sudo: no password was provided"
         )]
@@ -311,7 +311,7 @@ final class MutationRecoveryTests: XCTestCase {
         }
 
         let markedRunner = StubBrewProcessRunner()
-        markedRunner.queuedResults = [BrewProcessResult(
+        markedRunner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "sudo: no password was provided"
         )]
@@ -333,7 +333,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_askpass_cancel_marker_does_not_depend_on_sudo_output() async {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(exitCode: 1, output: "")]
+        runner.queuedResults = [.success, BrewProcessResult(exitCode: 1, output: "")]
         runner.onRequest = { request in
             let script = try XCTUnwrap(request.environment["SUDO_ASKPASS"])
             try Data().write(to: AskpassScriptManager.cancellationMarker(
@@ -374,7 +374,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_failed_upgrade_for_uninstalled_cask_refreshes_stale_local_state() async {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(
+        runner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "Error: Cask 'thorium' is not installed."
         )]
@@ -396,7 +396,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_nonzero_upgrade_is_recovered_only_when_refresh_proves_changed_receipt() async throws {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(
+        runner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "🍺  zed was successfully upgraded!"
         )]
@@ -428,7 +428,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_nonzero_upgrade_still_fails_when_refresh_does_not_prove_change() async {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(
+        runner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "🍺  zed was successfully upgraded!"
         )]
@@ -451,7 +451,7 @@ final class MutationRecoveryTests: XCTestCase {
 
     func test_nonzero_upgrade_does_not_treat_a_zombie_receipt_as_success() async {
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(
+        runner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "🍺  zed was successfully upgraded!"
         )]
@@ -484,7 +484,7 @@ final class MutationRecoveryTests: XCTestCase {
     func test_brew_error_diagnostics_keep_error_before_long_cleanup_tail() async {
         let runner = StubBrewProcessRunner()
         let cleanupTail = (1...30).map { "formula-\($0)" }.joined(separator: "\n")
-        runner.queuedResults = [BrewProcessResult(
+        runner.queuedResults = [.success, BrewProcessResult(
             exitCode: 1,
             output: "Error: the meaningful failure\n" + cleanupTail
         )]
@@ -577,7 +577,7 @@ extension MutationRecoveryTests {
             CrashReporter.isRunningTests = originalTestState
         }
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(exitCode: 1, output:
+        runner.queuedResults = [.success, BrewProcessResult(exitCode: 1, output:
             "Error: You have not agreed to the Xcode license. Please resolve this by running:\n"
                 + "  sudo xcodebuild -license accept"
         )]
@@ -588,7 +588,7 @@ extension MutationRecoveryTests {
         XCTAssertEqual(crashSpy.capturedErrors.count, 1)
         XCTAssertEqual(crashSpy.capturedErrorTags.last?["brew.action"], "updating")
         XCTAssertNotNil(crashSpy.spans.last?.span.finishedError)
-        XCTAssertEqual(runner.requests.map(\.arguments), [["upgrade", "--cask", "gimp"]])
+        XCTAssertEqual(runner.requests.map(\.arguments), [["fetch", "--cask", "gimp"], ["upgrade", "--cask", "gimp"]])
         let failure = service.operationStore.state(for: "gimp")?.failure
         XCTAssertTrue(failure?.message.contains("review and accept") == true)
         XCTAssertEqual(failure?.recoveries, [])

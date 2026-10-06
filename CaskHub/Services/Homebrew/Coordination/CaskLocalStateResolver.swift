@@ -11,6 +11,8 @@ struct CaskLocalStateResolver {
     let snapshot: InstallationSnapshot
     let hasRegisteredApplicationCatalog: Bool
     let greedyUpdates: Bool
+    let homebrewOutdated: HomebrewOutdatedReport?
+    let platform: CaskPlatform?
     let applicationDirectories: [URL]
     let fileManager: FileManager
 
@@ -53,9 +55,7 @@ struct CaskLocalStateResolver {
         }
         if macAppStoreApplication(for: cask) != nil { return true }
 
-        let matchingNames = Set(
-            cask.appArtifactNames + cask.packageAppNameCandidates
-        )
+        let matchingNames = Set(cask.storeAppNames)
         .intersection(snapshot.macAppStoreAppNames)
         guard !matchingNames.isEmpty else { return false }
 
@@ -113,7 +113,8 @@ struct CaskLocalStateResolver {
     func localState(for cask: Cask) -> CaskLocalState {
         let source = installationSource(for: cask)
         let externalVersion = externalApplication(for: cask)?.version
-        let outdated = isOutdated(token: cask.token, remoteVersion: cask.version, autoUpdates: cask.autoUpdates)
+        let target = cask.updateTarget(for: platform)
+        let outdated = target.map { isOutdated(token: cask.token, remoteVersion: $0.version, autoUpdates: $0.autoUpdates) } ?? false
         return CaskLocalState(
             installationSource: source,
             externalVersion: externalVersion,
@@ -130,7 +131,9 @@ struct CaskLocalStateResolver {
                 ? externalCLIPath(cask)
                 : nil,
             uninstallAvailability: uninstallAvailability(for: cask),
-            hasAvailableUpdate: (greedyUpdates || cask.autoUpdates != true) && outdated,
+            hasAvailableUpdate: outdated
+                && homebrewOutdated?.pinned.contains(cask.token) != true
+                && (greedyUpdates || target?.autoUpdates != true || isListedByHomebrew(cask.token)),
             isOutdated: outdated,
             isZombie: isZombie(cask),
             canOpen: canOpen(cask)
@@ -139,14 +142,20 @@ struct CaskLocalStateResolver {
 
     func isOutdated(token: String, remoteVersion: String, autoUpdates: Bool?) -> Bool {
         guard let installation = snapshot.installedCasks[token],
-              !installation.isZombie
+              // brew upgrade does nothing once the receipt matches the tap.
+              installation.installedVersion != remoteVersion
         else { return false }
-        // Self-updaters can advance the app without updating Homebrew's receipt.
+        // Self-updaters can advance the app without updating Homebrew's receipt or its last answer.
         if autoUpdates == true,
            let application = snapshot.installationIndex.homebrewApplications[token],
-           let comparison = Self.compareApplicationVersion(application, to: remoteVersion) {
-            return comparison == .orderedAscending
+           let outdated = Self.isBundleOutdated(application, tapVersion: remoteVersion) {
+            return outdated
         }
+        if isListedByHomebrew(token),
+           !snapshot.installationIndex.verifiedZombieTokens.contains(token) {
+            return true
+        }
+        guard !installation.isZombie else { return false }
         return Self.comparableVersion(installation.installedVersion)
             != Self.comparableVersion(remoteVersion)
     }
@@ -184,13 +193,12 @@ struct CaskLocalStateResolver {
     }
 
     func launchURL(for cask: Cask) -> URL? {
-        existingBundleURL(named: launchableBundleNames(for: cask))
+        guard isInstalled(token: cask.token) else { return externalLaunchURL(for: cask) }
+        return existingBundleURL(named: launchableBundleNames(for: cask))
     }
 
     func externalLaunchURL(for cask: Cask) -> URL? {
-        macAppStoreApplication(for: cask)?.url
-            ?? snapshot.externalApplicationOwners[cask.token]?.url
-            ?? existingBundleURL(named: externalBundleNameCandidates(for: cask))
+        externalApplication(for: cask)?.url
     }
 
     func externalAppVersion(for cask: Cask) -> String? {
@@ -222,6 +230,10 @@ struct CaskLocalStateResolver {
         }
     }
 
+    private func isListedByHomebrew(_ token: String) -> Bool {
+        homebrewOutdated?.upgradable.contains(token) == true
+    }
+
     private static func comparableVersion(_ version: String) -> Substring {
         version.prefix { $0 != "," && $0 != "_" }
     }
@@ -250,7 +262,7 @@ struct CaskLocalStateResolver {
         if snapshot.installationIndex.catalogTokens.contains(cask.token) {
             return snapshot.installationIndex.macAppStoreApplications[cask.token]
         }
-        return (cask.appArtifactNames + cask.packageAppNameCandidates).lazy
+        return cask.storeAppNames.lazy
             .flatMap { snapshot.detectedApplicationsByBundleName[$0] ?? [] }
             .first { application in
                 guard application.isMacAppStore else { return false }
@@ -265,13 +277,13 @@ struct CaskLocalStateResolver {
         _ identifier: String,
         matches cask: Cask
     ) -> Bool {
-        if !cask.applicationBundleIdentifiers.isEmpty {
+        if !cask.storeBundleIdentifiers.isEmpty {
             return ApplicationIdentityMatcher.applicationBundleIdentifier(
                 identifier,
-                matchesAny: cask.applicationBundleIdentifiers
+                matchesAny: cask.storeBundleIdentifiers
             )
         }
-        return cask.hasPackageArtifact && ApplicationIdentityMatcher.bundleIdentifier(
+        return cask.hasPackageArtifact && cask.catalogPackageProducts == nil && ApplicationIdentityMatcher.bundleIdentifier(
             identifier,
             matchesPackageIdentifiers: cask.packageIdentifiers
         )
@@ -279,19 +291,18 @@ struct CaskLocalStateResolver {
 }
 
 private extension CaskLocalStateResolver {
-    static func compareApplicationVersion(
-        _ application: DetectedApplication, to remoteVersion: String
-    ) -> ComparisonResult? {
-        let parts = remoteVersion.split(separator: ",", omittingEmptySubsequences: false).map(String.init)
-        // Only numeric release or release,build formats have a known bundle mapping.
-        guard (1 ... 2).contains(parts.count),
-              parts.allSatisfy({ numericComparison($0, $0) != nil }),
-              let release = application.shortVersion,
-              let comparison = numericComparison(release, parts[0])
+    static func isBundleOutdated(_ application: DetectedApplication, tapVersion: String) -> Bool? {
+        let parts = tapVersion.split(separator: ",", omittingEmptySubsequences: false).map(String.init)
+        guard let short = application.shortVersion,
+              let release = numericComparison(short, parts[0])
         else { return nil }
-        guard comparison == .orderedSame, parts.count == 2 else { return comparison }
-        guard let build = application.buildVersion else { return nil }
-        return numericComparison(build, parts[1])
+        // The second part is only a build number when it is shaped like the bundle's.
+        guard release == .orderedSame, parts.count == 2,
+              let build = application.buildVersion,
+              build.split(separator: ".").count == parts[1].split(separator: ".").count,
+              let buildOrder = numericComparison(build, parts[1])
+        else { return release == .orderedAscending }
+        return buildOrder == .orderedAscending
     }
 
     static func numericComparison(_ lhs: String, _ rhs: String) -> ComparisonResult? {

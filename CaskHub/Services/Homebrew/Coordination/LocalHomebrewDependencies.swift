@@ -82,7 +82,9 @@ enum HomebrewIssuePolicy {
 
 @MainActor
 struct LocalHomebrewDependencies {
+    var caskPlatformProvider: (() async -> CaskPlatform?)?
     var fileManager: FileManager = .default
+    var notificationCenter: NotificationCenter = .default
     var applicationDirectories: [URL]?
     var processRunner: (any BrewProcessRunning)?
     var commandExecutor: (any HomebrewCommandExecuting)?
@@ -99,6 +101,8 @@ struct LocalHomebrewDependencies {
             from: HomebrewLocator.brewBinaryURL()
         )
     }
+    var homebrewOutdatedProvider: (() async -> HomebrewOutdatedReport?)?
+    var laneLimiter: HomebrewLaneLimiter?
 
     func resolvedCommandExecutor() -> any HomebrewCommandExecuting {
         commandExecutor

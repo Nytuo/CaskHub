@@ -10,52 +10,6 @@ import Sentry
 import TelemetryDeck
 import XCTest
 
-private final class SpyAnalyticsProvider: AnalyticsProvider, SentryMetricsApiProtocol {
-    var startedWith: [Bool] = []
-    var enabledChanges: [Bool] = []
-    var signals: [(name: String, parameters: [String: String])] = []
-    var metricKeys: [String] = []
-    var metricValues: [UInt] = []
-    var metricAttributes: [[String: SentryAttributeContent]] = []
-
-    func start(enabled: Bool) { startedWith.append(enabled) }
-    func setEnabled(_ enabled: Bool) { enabledChanges.append(enabled) }
-
-    func count(
-        key: String,
-        value: UInt,
-        attributes: [String: SentryAttributeValue]
-    ) {
-        let attributes = attributes.mapValues { $0.asSentryAttributeContent }
-        metricKeys.append(key)
-        metricValues.append(value)
-        metricAttributes.append(attributes)
-
-        guard case let .string(name)? = attributes["event.name"] else { return }
-        let parameters = attributes.reduce(into: [String: String]()) { result, attribute in
-            guard attribute.key.hasPrefix("event."), attribute.key != "event.name",
-                  case let .string(value) = attribute.value
-            else { return }
-            result[String(attribute.key.dropFirst("event.".count))] = value
-        }
-        signals.append((name, parameters))
-    }
-
-    func distribution(
-        key _: String,
-        value _: Double,
-        unit _: SentryUnit?,
-        attributes _: [String: SentryAttributeValue]
-    ) {}
-
-    func gauge(
-        key _: String,
-        value _: Double,
-        unit _: SentryUnit?,
-        attributes _: [String: SentryAttributeValue]
-    ) {}
-}
-
 final class AnalyticsTests: XCTestCase {
     private var spy: SpyAnalyticsProvider!
     private var originalProvider: AnalyticsProvider!
@@ -339,6 +293,7 @@ final class AnalyticsTests: XCTestCase {
         Analytics.recentWindowChanged(.days30)
         Analytics.viewModeChanged(.list)
         Analytics.themeChanged("Dark")
+        Analytics.styleChanged(.native)
         Analytics.analyticsReEnabled()
 
         XCTAssertEqual(spy.signals.map(\.name), [
@@ -346,7 +301,7 @@ final class AnalyticsTests: XCTestCase {
             "Filter.periodChanged",
             "Filter.windowChanged",
             "View.modeChanged",
-            "Settings.themeChanged",
+            "Settings.themeChanged", "Settings.styleChanged",
             "Settings.analyticsEnabled"
         ])
         XCTAssertEqual(spy.signals.map(\.parameters), [
@@ -355,8 +310,41 @@ final class AnalyticsTests: XCTestCase {
             ["window": "30d"],
             ["mode": "list"],
             ["theme": "Dark"],
+            ["style": "native"],
             [:]
         ])
+    }
+
+    // MARK: - Launch cards
+
+    func test_launch_card_event_names_and_parameters() {
+        Analytics.launchCardShown(.welcome)
+        Analytics.welcomeLookConfirmed(.classic)
+        Analytics.launchCardDismissed(.welcome, page: 3, style: .classic)
+        Analytics.launchCardShown(.whatsNew)
+        Analytics.launchCardDismissed(.whatsNew, style: .native)
+
+        XCTAssertEqual(spy.signals.map(\.name), [
+            "LaunchCard.shown", "LaunchCard.lookConfirmed", "LaunchCard.dismissed",
+            "LaunchCard.shown", "LaunchCard.dismissed"
+        ])
+        XCTAssertEqual(spy.signals.map(\.parameters), [
+            ["kind": "welcome"],
+            ["style": "classic"],
+            ["kind": "welcome", "page": "3", "style": "classic"],
+            ["kind": "whatsNew"],
+            ["kind": "whatsNew", "style": "native"]
+        ])
+    }
+
+    func test_welcome_look_confirmation_sends_once_per_distinct_style() {
+        var confirmation = WelcomeLookConfirmation()
+        confirmation.confirm(.native)
+        confirmation.confirm(.native)
+        confirmation.confirm(.classic)
+
+        XCTAssertEqual(spy.signals.map(\.name), ["LaunchCard.lookConfirmed", "LaunchCard.lookConfirmed"])
+        XCTAssertEqual(spy.signals.map(\.parameters), [["style": "native"], ["style": "classic"]])
     }
 
     // MARK: - Crash-report breadcrumbs
@@ -556,7 +544,8 @@ extension AnalyticsTests {
         CrashReporter.captureCounts = [:]
 
         let runner = StubBrewProcessRunner()
-        runner.queuedResults = [BrewProcessResult(exitCode: 1, output: output)]
+        let failure = BrewProcessResult(exitCode: 1, output: output)
+        runner.queuedResults = operation == .updatingHomebrew || operation == .adopting ? [failure] : [.success, failure]
         let askpass = FileManager.default.temporaryDirectory
             .appendingPathComponent("caskhub-analytics-\(UUID().uuidString)")
         if markAskpassCancelled {

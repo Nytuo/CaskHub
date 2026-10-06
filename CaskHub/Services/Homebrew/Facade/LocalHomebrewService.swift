@@ -34,6 +34,7 @@ final class LocalHomebrewService {
         = { AppManagementPermission.assess(target: $0) }
 
     @ObservationIgnored private var activationObserver: (any NSObjectProtocol)?
+    @ObservationIgnored private let notificationCenter: NotificationCenter
 
     @ObservationIgnored let operationStore: CaskOperationStore
 
@@ -43,7 +44,9 @@ final class LocalHomebrewService {
     @ObservationIgnored let mutationCoordinator: HomebrewMutationCoordinator
     @ObservationIgnored let softwareScanner: any InstalledSoftwareScanning
     @ObservationIgnored let brewBinaryProvider: () -> URL?
+    @ObservationIgnored private let caskPlatformProvider: () async -> CaskPlatform?
     @ObservationIgnored private let brewVersionProvider: () async -> String?
+    @ObservationIgnored private let homebrewOutdatedProvider: () async -> HomebrewOutdatedReport?
 
     var isUpdatingAll: Bool {
         operationStore.isUpdatingAll
@@ -61,7 +64,17 @@ final class LocalHomebrewService {
 
     private(set) var customBrewPrefix: String?
 
-    /// Include self-updating casks (`auto_updates: true`) in updates, via `brew upgrade --greedy`.
+    /// Homebrew's platform tag, cached between refreshes; nil when detection fails.
+    private(set) var caskPlatform: CaskPlatform? {
+        didSet { if caskPlatform != oldValue { catalogStateRevision &+= 1 } }
+    }
+
+    /// What `brew outdated` lists; nil until Homebrew answers.
+    private(set) var homebrewOutdated: HomebrewOutdatedReport? {
+        didSet { if homebrewOutdated != oldValue { catalogStateRevision &+= 1 } }
+    }
+
+    /// Also offer self-updating casks Homebrew does not list; upgrades then pass `--greedy`.
     private(set) var greedyUpdates: Bool {
         didSet { catalogStateRevision &+= 1 }
     }
@@ -90,6 +103,7 @@ final class LocalHomebrewService {
         let operationStore = CaskOperationStore()
 
         fileManager = dependencies.fileManager
+        notificationCenter = dependencies.notificationCenter
         self.defaults = defaults
         applicationDirectories = dependencies.applicationDirectories
             ?? ApplicationDiscovery.defaultDirectories(
@@ -103,12 +117,18 @@ final class LocalHomebrewService {
             commandExecutor: dependencies.resolvedCommandExecutor(),
             brewBinaryProvider: dependencies.brewBinaryProvider,
             askpassProvider: dependencies.askpassProvider,
-            fileManager: dependencies.fileManager
+            fileManager: dependencies.fileManager,
+            lanes: dependencies.laneLimiter ?? .shared
         )
         softwareScanner = dependencies.softwareScanner
             ?? HomebrewInstallationScanner()
         brewBinaryProvider = dependencies.brewBinaryProvider
         brewVersionProvider = dependencies.brewVersionProvider
+        let brewBinary = dependencies.brewBinaryProvider
+        caskPlatformProvider = dependencies.caskPlatformProvider
+            ?? { await HomebrewPlatformLoader().load(from: brewBinary()) }
+        homebrewOutdatedProvider = dependencies.homebrewOutdatedProvider
+            ?? { await HomebrewOutdatedLoader().load(from: brewBinary()) }
         zapOnUninstall = defaults.bool(forKey: Self.zapOnUninstallKey)
         greedyUpdates = defaults.bool(forKey: Self.greedyKey)
         adoptIgnoredDates = defaults.dictionary(forKey: Self.adoptIgnoredKey) as? [String: Date] ?? [:]
@@ -119,7 +139,7 @@ final class LocalHomebrewService {
     private func observeApplicationActivation() {
         // The permission-request alert tells the user to grant App Management and
         // come back — returning to the app is the cue to finish those adoptions.
-        activationObserver = NotificationCenter.default.addObserver(
+        activationObserver = notificationCenter.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
@@ -136,7 +156,7 @@ final class LocalHomebrewService {
 
     deinit {
         if let activationObserver {
-            NotificationCenter.default.removeObserver(activationObserver)
+            notificationCenter.removeObserver(activationObserver)
         }
     }
 
@@ -170,17 +190,26 @@ final class LocalHomebrewService {
         } else {
             defaults.removeObject(forKey: HomebrewLocator.customPrefixKey)
         }
-        brewVersion = nil
+        invalidateBrewVersion()
         await refresh()
     }
 
     func invalidateBrewVersion() {
         brewVersion = nil
+        caskPlatform = nil
+    }
+
+    func refreshHomebrewOutdated() async {
+        homebrewOutdated = await homebrewOutdatedProvider()
     }
 
     // MARK: - Detection
 
     func refresh() async {
+        let prefix = customBrewPrefix
+        let platform = await caskPlatformProvider()
+        guard prefix == customBrewPrefix else { return }
+        caskPlatform = platform
         if brewVersion == nil {
             brewVersion = await brewVersionProvider()
         }

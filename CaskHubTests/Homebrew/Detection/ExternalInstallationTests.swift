@@ -64,7 +64,10 @@ final class ExternalInstallationTests: XCTestCase {
             $0.applicationDirectories = [apps]
             $0.applicationLauncher = launcher
         }
+        let application = try XCTUnwrap(ApplicationDiscovery().scan(fileManager: .default, directories: [apps]).applications.first)
         updateInstallationSnapshot(of: service) {
+            $0.detectedApplications = [application]
+            $0.externalPackageApplicationOwners = ["zoom": application]
             $0.externalPackageInstallations = [
                 "zoom": ExternalPackageInstallation(
                     appBundleNames: ["zoom.us.app"]
@@ -280,8 +283,10 @@ final class ExternalInstallationTests: XCTestCase {
         }
 
         vm.selectedSidebar = .library(.installed)
-        XCTAssertEqual(Set(vm.filteredCasks.map(\.token)), [store.token, package.token])
+        XCTAssertTrue(vm.filteredCasks.isEmpty)
+        XCTAssertEqual(Set(vm.filteredExternallyManagedCasks.map(\.token)), [store.token, package.token])
         XCTAssertEqual(vm.installedCount, 2)
+        XCTAssertEqual(vm.installedCount(includingExternallyManaged: false), 0)
 
         vm.selectedSidebar = .library(.adopt)
         XCTAssertEqual(vm.filteredCasks.map(\.token), [package.token])
@@ -349,7 +354,7 @@ final class ExternalInstallationTests: XCTestCase {
             token: "sf-symbols",
             displayName: "SF Symbols",
             receiptPatterns: ["com.apple.pkg.SFSymbols"],
-            appNameCandidates: ["SF Symbols.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: []
+            appNameCandidates: ["SF Symbols.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: [], productIdentities: nil
         )
 
         let result = PackageReceiptResolver().resolve(
@@ -368,13 +373,15 @@ final class ExternalInstallationTests: XCTestCase {
                 token: "zoom",
                 displayName: "Zoom",
                 receiptPatterns: [receipt],
-                appNameCandidates: ["Zoom.app", "zoom.us.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: []
+                appNameCandidates: ["Zoom.app", "zoom.us.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: [],
+                productIdentities: nil
             ),
             PackageCaskSignature(
                 token: "zoom-for-it-admins",
                 displayName: "Zoom for IT Admins",
                 receiptPatterns: [receipt],
-                appNameCandidates: ["Zoom for IT Admins.app", "zoom.us.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: []
+                appNameCandidates: ["Zoom for IT Admins.app", "zoom.us.app"], verifiedBundleIdentifiersByName: [:], receiptCandidates: [],
+                productIdentities: nil
             )
         ]
 
