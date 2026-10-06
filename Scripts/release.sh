@@ -16,6 +16,7 @@ WORK="$REPO_ROOT/.build/release"
 NOTARY_PROFILE="caskhub-notary"
 TEAM_ID="USYCM7BRK3"
 SPARKLE_VERSION="2.9.4"
+NOTES_HISTORY=5
 DOWNLOAD_URL_PREFIX="https://github.com/alielsokary/CaskHub/releases/download/$VERSION/"
 
 cd "$REPO_ROOT"
@@ -122,11 +123,12 @@ if [[ -z "$GENERATE_APPCAST" ]]; then
 fi
 
 echo "==> Generating appcast"
-# Top changelog entry, sans its version header: becomes the Sparkle dialog
-# notes (embedded markdown) and the GitHub release body.
+# Top changelog entry, sans its version header: the GitHub release body.
 NOTES="$WORK/release-notes.md"
 awk '/^## /{n++} n==1' "$CHANGELOG" | tail -n +2 > "$NOTES"
-cp "$NOTES" "$WORK/updates/CaskHub-$VERSION.md"
+# Sparkle dialog notes: recent entries, so users who skipped releases see them.
+awk -v max="$NOTES_HISTORY" '/^## /{n++} n>=1 && n<=max' "$CHANGELOG" \
+    | sed -E 's/^(## [0-9.]+) .*/\1/' > "$WORK/updates/CaskHub-$VERSION.md"
 APPCAST_ARGS=(--download-url-prefix "$DOWNLOAD_URL_PREFIX" --embed-release-notes)
 if [[ -n "${SPARKLE_ED_KEY_FILE:-}" ]]; then
     APPCAST_ARGS+=(--ed-key-file "$SPARKLE_ED_KEY_FILE")
