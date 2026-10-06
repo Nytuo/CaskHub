@@ -343,7 +343,6 @@ final class CaskHubTests: XCTestCase {
             $0.softwareScanner = scanner
             $0.brewBinaryProvider = { URL(fileURLWithPath: "/test/bin/brew") }
             $0.brewVersionProvider = { "test" }
-            $0.caskPlatformProvider = { nil }
         }
         let cask = makeCask("activation-adoption", appNames: ["Activation.app"])
         seedExternalInstallation(of: cask, version: cask.displayVersion, in: service)
@@ -367,8 +366,7 @@ final class CaskHubTests: XCTestCase {
             object: nil
         )
 
-        // The app host's own brew calls can hold the concurrent pool for seconds on CI.
-        await fulfillment(of: [resumed], timeout: 10)
+        await fulfillment(of: [resumed], timeout: 1)
         XCTAssertNotNil(service.operationStore.state(for: cask.token)?.adoptionRequest)
         XCTAssertTrue(service.operationStore.pendingPermissions.isEmpty)
     }
