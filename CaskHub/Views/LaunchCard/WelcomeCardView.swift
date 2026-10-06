@@ -49,6 +49,7 @@ struct WelcomeCardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var page: WelcomePage
+    @State private var confirmedStyle: AppStyle?
 
     init(page: WelcomePage = .intro) {
         _page = State(initialValue: page)
@@ -74,7 +75,9 @@ struct WelcomeCardView: View {
             footer
         }
         .frame(width: 600, height: 480)
-        .onDisappear { Analytics.launchCardDismissed(.welcome, page: page.rawValue + 1) }
+        .onDisappear {
+            Analytics.launchCardDismissed(.welcome, page: page.rawValue + 1, style: AppStyle.current)
+        }
     }
 
     private var footer: some View {
@@ -100,6 +103,7 @@ struct WelcomeCardView: View {
                 if isLastPage {
                     dismiss()
                 } else {
+                    if page == .look { confirmLook() }
                     move(by: 1)
                 }
             }
@@ -129,6 +133,13 @@ struct WelcomeCardView: View {
         .animation(reduceMotion ? nil : .spring(duration: 0.45, bounce: 0.3), value: page)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(.launchCardWelcomePageIndicator(page.rawValue + 1, WelcomePage.allCases.count)))
+    }
+
+    private func confirmLook() {
+        let style = AppStyle.current
+        guard style != confirmedStyle else { return }
+        confirmedStyle = style
+        Analytics.welcomeLookConfirmed(style)
     }
 
     private func move(by offset: Int) {
