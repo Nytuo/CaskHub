@@ -88,6 +88,7 @@
 		A12000000000000000000003 /* LocalHomebrewService+Adoption.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12000000000000000000003 /* LocalHomebrewService+Adoption.swift */; };
 		A12000000000000000000004 /* ZombieDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12000000000000000000004 /* ZombieDetectionTests.swift */; };
 		A1C0D0023A00000100000001 /* IconDiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0D0013A00000100000001 /* IconDiskCache.swift */; };
+		A1C0D0043A00000100000001 /* IconBitmap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0D0033A00000100000001 /* IconBitmap.swift */; };
 		A26000000000000000000002 /* UpdateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26000000000000000000001 /* UpdateSettingsView.swift */; };
 		C1A000000000000000000006 /* PrivacySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A000000000000000000005 /* PrivacySettingsView.swift */; };
 		A26000000000000000000004 /* UpdateSettingsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26000000000000000000003 /* UpdateSettingsViewTests.swift */; };
@@ -256,6 +257,7 @@
 		5317A6659E48459EB3FFB7EB /* BrewOutputCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewOutputCollector.swift; sourceTree = "<group>"; };
 		8BB79639B5E04DEBBDB54898 /* AdoptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoptionTests.swift; sourceTree = "<group>"; };
 		A1C0D0013A00000100000001 /* IconDiskCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconDiskCache.swift; sourceTree = "<group>"; };
+		A1C0D0033A00000100000001 /* IconBitmap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconBitmap.swift; sourceTree = "<group>"; };
 		A26000000000000000000001 /* UpdateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsView.swift; sourceTree = "<group>"; };
 		C1A000000000000000000005 /* PrivacySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacySettingsView.swift; sourceTree = "<group>"; };
 		A26000000000000000000003 /* UpdateSettingsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsViewTests.swift; sourceTree = "<group>"; };
@@ -655,6 +657,7 @@
 			isa = PBXGroup;
 			children = (
 				A1C0D0013A00000100000001 /* IconDiskCache.swift */,
+				A1C0D0033A00000100000001 /* IconBitmap.swift */,
 				41DFD47030028F7D00608C7A /* ImageCacheService.swift */,
 			);
 			path = Images;
@@ -1126,6 +1129,7 @@
 				41DFD4A030028F7D00608C7A /* CaskFlowReleases.swift in Sources */,
 				41DFD4A130028F7D00608C7A /* CategoryService.swift in Sources */,
 				A1C0D0023A00000100000001 /* IconDiskCache.swift in Sources */,
+				A1C0D0043A00000100000001 /* IconBitmap.swift in Sources */,
 				41DFD4A230028F7D00608C7A /* ImageCacheService.swift in Sources */,
 				41DFD4A330028F7D00608C7A /* InstallReceipt.swift in Sources */,
 				7FFA89946C514C00BF5496DB /* BrewOutputCollector.swift in Sources */,

@@ -138,7 +138,7 @@ final class IconRefreshTests: XCTestCase {
             )!
             solid.bitmapData!.initialize(repeating: alpha, count: solid.bytesPerRow * solid.pixelsHigh)
             let image = NSImage(cgImage: try XCTUnwrap(solid.cgImage), size: NSSize(width: 10, height: 10))
-            XCTAssertEqual(ImageCacheService.normalizedIcon(image).size, image.size)
+            XCTAssertEqual(IconBitmap.normalized(image).size, image.size)
         }
     }
 
@@ -163,14 +163,14 @@ final class IconRefreshTests: XCTestCase {
 
     func test_normalization_crops_to_solid_body_ignoring_soft_shadow() throws {
         let shadowed = try icon(side: 100, fills: [(10..<90, 60), (16..<84, 255)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(shadowed).size, NSSize(width: 68, height: 68))
+        XCTAssertEqual(IconBitmap.normalized(shadowed).size, NSSize(width: 68, height: 68))
     }
 
     func test_normalization_keeps_full_bounds_of_translucent_icons() throws {
         let glass = try icon(side: 100, fills: [(10..<90, 100), (45..<55, 255)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(glass).size, NSSize(width: 80, height: 80))
+        XCTAssertEqual(IconBitmap.normalized(glass).size, NSSize(width: 80, height: 80))
         let faint = try icon(side: 100, fills: [(10..<90, 100)])
-        XCTAssertEqual(ImageCacheService.normalizedIcon(faint).size, NSSize(width: 80, height: 80))
+        XCTAssertEqual(IconBitmap.normalized(faint).size, NSSize(width: 80, height: 80))
     }
 
     func test_large_icons_downsample_to_display_cap() throws {
@@ -181,7 +181,7 @@ final class IconRefreshTests: XCTestCase {
         )!
         solid.bitmapData!.initialize(repeating: 255, count: solid.bytesPerRow * solid.pixelsHigh)
         let image = NSImage(cgImage: try XCTUnwrap(solid.cgImage), size: NSSize(width: 256, height: 256))
-        let normalized = ImageCacheService.normalizedIcon(image)
+        let normalized = IconBitmap.normalized(image)
         let raster = try XCTUnwrap(normalized.cgImage(forProposedRect: nil, context: nil, hints: nil))
         XCTAssertEqual(raster.width, 160)
         XCTAssertEqual(raster.height, 160)
