@@ -23,7 +23,10 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-26
+    # SDK 27 required: macOS 27 drops toolbar menu titles for builds linked against older SDKs.
+    runs-on: ${{ vars.MACOS_RUNNER || 'xcode-27' }}
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_${{ vars.XCODE_VERSION || '27.0' }}.app/Contents/Developer
     steps:
       - name: Preflight
         env:
