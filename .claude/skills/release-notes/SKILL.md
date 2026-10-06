@@ -8,9 +8,10 @@ description: Use when cutting a CaskHub release, adding a CHANGELOG.md entry, or
 ## Overview
 
 `CHANGELOG.md` at the repo root (Keep a Changelog style: cumulative, newest
-first) is the single source. `Scripts/release.sh` extracts the TOP entry and
-uses it as both the GitHub release body and the Sparkle update dialog notes
-(embedded into `appcast.xml`, rendered as markdown). Feature-PR descriptions are
+first) is the single source. `Scripts/release.sh` uses the TOP entry as the
+GitHub release body, and the five most recent entries (`NOTES_HISTORY`) as the
+Sparkle update dialog notes (embedded into `appcast.xml`, rendered as markdown),
+so users who skipped releases still see what changed. Feature-PR descriptions are
 not covered by this standard — keep them as detailed as you like. The release PR
 is the exception (see Release PR description below).
 
