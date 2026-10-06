@@ -337,6 +337,16 @@ final class AnalyticsTests: XCTestCase {
         ])
     }
 
+    func test_welcome_look_confirmation_sends_once_per_distinct_style() {
+        var confirmation = WelcomeLookConfirmation()
+        confirmation.confirm(.native)
+        confirmation.confirm(.native)
+        confirmation.confirm(.classic)
+
+        XCTAssertEqual(spy.signals.map(\.name), ["LaunchCard.lookConfirmed", "LaunchCard.lookConfirmed"])
+        XCTAssertEqual(spy.signals.map(\.parameters), [["style": "native"], ["style": "classic"]])
+    }
+
     // MARK: - Crash-report breadcrumbs
 
     func test_send_records_breadcrumb_regardless_of_analytics_consent() {
