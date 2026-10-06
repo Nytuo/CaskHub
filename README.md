@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img width="850" height="250" alt="caskhub-banner-dark" src="https://github.com/user-attachments/assets/24326700-e485-4714-993f-648c2a36c25b" />
+  <img width="850" height="250" alt="CaskHub Banner-dark" src="https://github.com/user-attachments/assets/dd99656f-8b3a-4939-9277-8f6d6783fd1f" />
 </p>
 
 **A native macOS app store for Homebrew casks.** Browse, search, install, update, and uninstall thousands of Mac apps distributed through [Homebrew](https://brew.sh) - with original app icons extracted from the source, categories, popularity charts, and one-click actions, all in a clean SwiftUI interface.
