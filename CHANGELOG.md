@@ -4,6 +4,31 @@ User-facing changes to CaskHub, newest first. The top entry becomes the GitHub
 release body and the Sparkle update dialog notes (see `.claude/skills/release-notes`).
 Releases before 0.6.4 are on the [releases page](https://github.com/alielsokary/CaskHub/releases).
 
+## 0.9.0 — 2026-10-06
+
+### What's New
+
+- Added a Standard look with native macOS surfaces and Liquid Glass toolbar controls, next to Classic. Switch any time in Settings, Appearance
+- Added simultaneous downloads, up to three at a time, so Update All and Brewfile imports finish sooner
+- Added cancelling an install or update while it is queued or downloading
+- Added a welcome tour for new installs and a What's New card after each update
+- Added a separate section in Installed for apps managed outside Homebrew, with a switch in Settings, General
+- Added a Refresh button to the Updates toolbar
+
+### Improvements
+
+- Updates with Greedy off now match what Homebrew itself lists as outdated
+- Cask icons now share one size with a soft shadow, and no longer flash while scrolling
+- Status bar now shows how many apps are downloading and queued during Update All and Brewfile imports
+- Health and Shelf Setup buttons now match the size of catalog buttons
+
+### Bug Fixes
+
+- Fixed updates being offered again and again for apps Homebrew already considers up to date
+- Fixed updates being offered for a version built for a different macOS version or processor
+- Fixed standalone Microsoft apps such as Teams and OneDrive being claimed by the Office suite
+- Fixed Excel and similar apps disappearing from Installed after updating themselves
+
 ## 0.8.3 — 2026-09-20
 
 ### What's New
