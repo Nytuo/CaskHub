@@ -196,11 +196,19 @@ struct BrewfileImportSheet: View {
             .background(Capsule().fill(Color.chSurfaceField))
             .overlay(Capsule().strokeBorder(Color.chHairline, lineWidth: 1))
             .animation(.linear(duration: 0.15), value: completedCount)
-            Text(verbatim: localHomebrew.statusBarOperation?.message ?? " ")
+            Text(verbatim: progressText)
                 .font(CHType.statusMono)
                 .foregroundStyle(Color.chTextMuted)
+                .lineLimit(1)
         }
         .padding(.vertical, 8)
+    }
+
+    private var progressText: String {
+        guard let status = localHomebrew.statusBarOperation else { return " " }
+        guard let step = status.batchStep else { return status.message }
+        let pouring = String(localized: .shelfSetupBrewfileSheetPouring(step.displayName, step.position, step.total))
+        return ([pouring] + status.details).joined(separator: " · ")
     }
 
     @ViewBuilder private func summary(failedCount: Int) -> some View {

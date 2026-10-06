@@ -19,6 +19,7 @@ final class CaskOperationBox {
 final class CaskOperationStore {
     private(set) var boxes: [String: CaskOperationBox] = [:]
     private(set) var isUpdatingAll = false
+    private(set) var batch: CaskBatchProgress?
 
     func state(for token: String) -> CaskOperationState? {
         boxes[token]?.state
@@ -47,6 +48,21 @@ final class CaskOperationStore {
         isUpdatingAll = false
     }
 
+    /// Only one batch reports progress at a time.
+    func beginBatch(total: Int) -> Bool {
+        guard batch == nil, total > 1 else { return false }
+        batch = CaskBatchProgress(total: total)
+        return true
+    }
+
+    func advanceBatch() {
+        batch?.finishedCount += 1
+    }
+
+    func endBatch() {
+        batch = nil
+    }
+
     func canBeginOperation(_ action: CaskAction, for token: String) -> Bool {
         if action == .updatingHomebrew {
             return !hasActiveOperations
@@ -73,6 +89,6 @@ final class CaskOperationStore {
     }
 
     var status: CaskOperationStatus? {
-        CaskOperationStatus.make(operations: boxes.values.compactMap(\.state?.progress))
+        CaskOperationStatus.make(operations: boxes.values.compactMap(\.state?.progress), batch: batch)
     }
 }

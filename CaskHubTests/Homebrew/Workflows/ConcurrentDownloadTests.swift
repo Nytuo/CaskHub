@@ -178,7 +178,7 @@ final class ConcurrentDownloadTests: XCTestCase {
 
         XCTAssertEqual(Set(executor.running("fetch")), ["a", "b", "c"])
         XCTAssertTrue(service.isUpdatingAll)
-        XCTAssertEqual(service.statusBarOperation?.message.hasPrefix(String(localized: "\(3) operations in progress")), true)
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading… (\(0) of \(3))"))
 
         let deadline = Date().addingTimeInterval(10)
         while service.isUpdatingAll, Date() < deadline {
@@ -190,6 +190,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         XCTAssertEqual(executor.maxActive["upgrade"], 1)
         XCTAssertEqual(Set(executor.requests.filter { $0.arguments.first == "upgrade" }.map(\.token)), ["a", "b", "c"])
         XCTAssertNil(service.statusBarOperation)
+        XCTAssertNil(service.operationStore.batch)
     }
 
     func test_install_all_downloads_together_and_counts_failures() async {
@@ -203,6 +204,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         executor.finish("b", exitCode: 1)
         await settle { finishedCounts == [1] }
         XCTAssertEqual(finishedCounts, [1])
+        XCTAssertEqual(service.statusBarOperation?.message, String(localized: "Downloading… (\(1) of \(3))"))
         let deadline = Date().addingTimeInterval(10)
         while finishedCounts.count < 3, Date() < deadline {
             if !executor.finishAny() { try? await Task.sleep(nanoseconds: 1_000_000) }
@@ -213,6 +215,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         XCTAssertEqual(executor.maxActive["fetch"], 3)
         XCTAssertEqual(executor.maxActive["install"], 1)
         XCTAssertEqual(Set(executor.requests.filter { $0.arguments.first == "install" }.map(\.token)), ["a", "c"])
+        XCTAssertNil(service.operationStore.batch)
     }
 
     func test_maintenance_probe_does_not_wait_for_a_running_download() async {

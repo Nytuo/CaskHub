@@ -145,9 +145,22 @@ nonisolated struct CaskByteProgress: Equatable, Sendable {
     }
 }
 
+nonisolated struct CaskBatchProgress: Equatable, Sendable {
+    let total: Int
+    var finishedCount = 0
+}
+
 nonisolated struct CaskOperationStatus: Equatable, Sendable {
+    struct BatchStep: Equatable, Sendable {
+        let displayName: String
+        let position: Int
+        let total: Int
+    }
+
     let label: String
     let byteProgress: CaskByteProgress?
+    private(set) var batchStep: BatchStep?
+    private(set) var details: [String] = []
 
     init(label: String, byteProgress: CaskByteProgress? = nil) {
         self.label = label
@@ -159,12 +172,13 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
         return "\(label) · \(byteProgress.text)"
     }
 
-    static func make(operations: [CaskOperationProgress]) -> CaskOperationStatus? {
+    static func make(operations: [CaskOperationProgress], batch: CaskBatchProgress?) -> CaskOperationStatus? {
         let sortedOperations = operations.sorted {
             if $0.displayName == $1.displayName { return $0.token < $1.token }
             return $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
         }
         guard !sortedOperations.isEmpty else { return nil }
+        if let batch { return make(batch: batch, operations: sortedOperations) }
 
         if sortedOperations.count == 1, let operation = sortedOperations.first {
             let byteProgress = operation.phase.showsByteProgress ? operation.byteProgress : nil
@@ -173,8 +187,29 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
             return CaskOperationStatus(label: label, byteProgress: byteProgress)
         }
 
+        let summary = String(localized: "\(sortedOperations.count) operations in progress")
+        return CaskOperationStatus(label: ([summary] + phaseCounts(sortedOperations)).joined(separator: " · "))
+    }
+
+    private static func make(batch: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus {
+        guard let current = operations.first(where: { $0.phase == .performing }) else {
+            let lead = String(localized: "Downloading… (\(batch.finishedCount) of \(batch.total))")
+            let details = phaseCounts(operations.filter { $0.phase == .queued })
+            return CaskOperationStatus(label: ([lead] + details).joined(separator: " · "))
+        }
+        let step = BatchStep(displayName: current.displayName, position: batch.finishedCount + 1, total: batch.total)
+        let name = "\(current.phase.label(for: current.action)) \(current.displayName)"
+        let lead = String(localized: "\(name)… (\(step.position) of \(step.total))")
+        let details = phaseCounts(operations.filter { $0.token != current.token })
+        var status = CaskOperationStatus(label: ([lead] + details).joined(separator: " · "))
+        status.batchStep = step
+        status.details = details
+        return status
+    }
+
+    private static func phaseCounts(_ operations: [CaskOperationProgress]) -> [String] {
         var counts: [String: (count: Int, label: String)] = [:]
-        for operation in sortedOperations {
+        for operation in operations {
             let identifier = operation.phase.identifier(for: operation.action)
             let label = operation.phase.label(for: operation.action).lowercased()
             counts[identifier, default: (count: 0, label: label)].count += 1
@@ -184,12 +219,10 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
             "updating", "updating-homebrew", "adopting", "uninstalling", "repairing", "preparing",
             "canceling", "queued"
         ]
-        let details = phaseOrder.compactMap { identifier -> String? in
+        return phaseOrder.compactMap { identifier -> String? in
             guard let entry = counts[identifier], entry.count > 0 else { return nil }
             return "\(entry.count) \(entry.label)"
         }
-        let summary = String(localized: "\(sortedOperations.count) operations in progress")
-        return CaskOperationStatus(label: ([summary] + details).joined(separator: " · "))
     }
 }
 

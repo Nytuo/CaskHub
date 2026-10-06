@@ -188,23 +188,31 @@ extension LocalHomebrewService {
         ) {
             operationStore.send(.enqueue(.updating), for: token)
         }
-        let updates = tokens.map { token in
-            Task { try? await upgrade(token: token, origin: .updateAll) }
-        }
-        for update in updates { await update.value }
+        _ = await runBatch(tokens, onFinished: { _ in }, operation: { try await self.upgrade(token: $0, origin: .updateAll) })
     }
 
     /// Returns how many installs failed.
     func installAll(tokens: [String], onFinished: (Int) -> Void) async -> Int {
-        await withTaskGroup(of: Bool.self) { group in
+        await runBatch(tokens, onFinished: onFinished) { try await self.install(token: $0) }
+    }
+
+    private func runBatch(
+        _ tokens: [String],
+        onFinished: (Int) -> Void,
+        operation: @escaping @MainActor (String) async throws -> Void
+    ) async -> Int {
+        let reportsProgress = operationStore.beginBatch(total: tokens.count)
+        defer { if reportsProgress { operationStore.endBatch() } }
+        return await withTaskGroup(of: Bool.self) { group in
             for token in tokens {
-                group.addTask { await (try? self.install(token: token)) != nil }
+                group.addTask { await (try? operation(token)) != nil }
             }
             var finishedCount = 0
             var failedCount = 0
             for await succeeded in group {
                 finishedCount += 1
                 if !succeeded { failedCount += 1 }
+                if reportsProgress { operationStore.advanceBatch() }
                 onFinished(finishedCount)
             }
             return failedCount

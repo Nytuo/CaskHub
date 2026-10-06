@@ -229,7 +229,7 @@ final class CaskOperationProgressTests: XCTestCase {
             .label(for: .updatingHomebrew)
             .lowercased()
         XCTAssertEqual(
-            CaskOperationStatus.make(operations: operations)?.message,
+            CaskOperationStatus.make(operations: operations, batch: nil)?.message,
             "\(summary) · 1 \(downloading) · 1 \(updating) · 1 \(updatingHomebrew)"
         )
     }
@@ -243,9 +243,41 @@ final class CaskOperationProgressTests: XCTestCase {
         let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
 
         XCTAssertEqual(
-            CaskOperationStatus.make(operations: operations)?.message,
+            CaskOperationStatus.make(operations: operations, batch: nil)?.message,
             "\(summary) · 1 \(downloading) · 2 \(queued)"
         )
+    }
+
+    func test_batch_status_names_the_app_being_installed_and_counts_the_rest() {
+        let phases: [CaskOperationPhase] = [.downloading, .performing, .queued, .downloading]
+        let operations = phases.enumerated().map {
+            CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .installing, phase: $0.element)
+        }
+        let batch = CaskBatchProgress(total: 8, finishedCount: 1)
+        let status = CaskOperationStatus.make(operations: operations, batch: batch)
+        let lead = "\(CaskOperationPhase.performing.label(for: .installing)) App 1"
+        let downloading = CaskOperationPhase.downloading.label(for: .installing).lowercased()
+        let queued = CaskOperationPhase.queued.label(for: .installing).lowercased()
+
+        XCTAssertEqual(status?.batchStep, .init(displayName: "App 1", position: 2, total: 8))
+        XCTAssertEqual(status?.details, ["2 \(downloading)", "1 \(queued)"])
+        XCTAssertEqual(
+            status?.message,
+            String(localized: "\(lead)… (\(2) of \(8))") + " · 2 \(downloading) · 1 \(queued)"
+        )
+    }
+
+    func test_batch_status_reads_downloading_until_an_install_starts() {
+        let phases: [CaskOperationPhase] = [.downloading, .preparing, .verifying, .queued]
+        let operations = phases.enumerated().map {
+            CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .updating, phase: $0.element)
+        }
+        let batch = CaskBatchProgress(total: 5, finishedCount: 1)
+        let status = CaskOperationStatus.make(operations: operations, batch: batch)
+        let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
+
+        XCTAssertNil(status?.batchStep)
+        XCTAssertEqual(status?.message, String(localized: "Downloading… (\(1) of \(5))") + " · 1 \(queued)")
     }
 
     @MainActor
