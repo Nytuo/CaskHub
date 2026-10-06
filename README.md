@@ -14,14 +14,14 @@
 </p>
 
 <p align="center">
-  <img width="850" height="250" alt="caskhub-banner-dark" src="https://github.com/user-attachments/assets/24326700-e485-4714-993f-648c2a36c25b" />
+  <img width="850" height="250" alt="CaskHub Banner-dark" src="https://github.com/user-attachments/assets/dd99656f-8b3a-4939-9277-8f6d6783fd1f" />
 </p>
 
 **A native macOS app store for Homebrew casks.** Browse, search, install, update, and uninstall thousands of Mac apps distributed through [Homebrew](https://brew.sh) - with original app icons extracted from the source, categories, popularity charts, and one-click actions, all in a clean SwiftUI interface.
 
 CaskHub is 100% free and open source, no subscription, no premium tier, no ads, nothing.
 
-<img width="1492" height="962" alt="caskhub-dark" src="https://github.com/user-attachments/assets/d7899924-6ade-43cc-a3f9-dcabeac9229b" />
+<img width="1476" height="998" alt="caskhub-dark" src="https://github.com/user-attachments/assets/75577218-85dc-42b7-886b-0d6e26587212" />
 
 ## Install
 
