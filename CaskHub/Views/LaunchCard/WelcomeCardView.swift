@@ -45,10 +45,21 @@ enum WelcomePage: Int, CaseIterable {
     }
 }
 
+struct WelcomeLookConfirmation {
+    private var confirmedStyle: AppStyle?
+
+    mutating func confirm(_ style: AppStyle) {
+        guard style != confirmedStyle else { return }
+        confirmedStyle = style
+        Analytics.welcomeLookConfirmed(style)
+    }
+}
+
 struct WelcomeCardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var page: WelcomePage
+    @State private var lookConfirmation = WelcomeLookConfirmation()
 
     init(page: WelcomePage = .intro) {
         _page = State(initialValue: page)
@@ -74,7 +85,7 @@ struct WelcomeCardView: View {
             footer
         }
         .frame(width: 600, height: 480)
-        .onDisappear { Analytics.launchCardDismissed(.welcome, page: page.rawValue + 1) }
+        .onDisappear { Analytics.launchCardDismissed(.welcome, page: page.rawValue + 1, style: AppStyle.current) }
     }
 
     private var footer: some View {
@@ -100,6 +111,7 @@ struct WelcomeCardView: View {
                 if isLastPage {
                     dismiss()
                 } else {
+                    if page == .look { lookConfirmation.confirm(AppStyle.current) }
                     move(by: 1)
                 }
             }
