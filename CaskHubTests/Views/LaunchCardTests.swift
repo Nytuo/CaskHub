@@ -88,6 +88,16 @@ final class LaunchCardTests: XCTestCase {
         XCTAssertNil(lastSeen(defaults))
     }
 
+    func test_whats_new_rows_read_their_text_from_the_whats_new_table() {
+        XCTAssertFalse(WhatsNewRelease.latest.features.isEmpty)
+        for feature in WhatsNewRelease.latest.features {
+            for resource in [feature.title, feature.detail] {
+                XCTAssertEqual(resource.table, "WhatsNew")
+                XCTAssertNotEqual(String(localized: resource), resource.key)
+            }
+        }
+    }
+
     func test_cards_render_in_both_styles() {
         let style = AppStyle.current
         defer { AppStyle.current = style }
