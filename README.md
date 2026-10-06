@@ -21,7 +21,7 @@
 
 CaskHub is 100% free and open source, no subscription, no premium tier, no ads, nothing.
 
-<img width="1492" height="962" alt="caskhub-dark" src="https://github.com/user-attachments/assets/d7899924-6ade-43cc-a3f9-dcabeac9229b" />
+<img width="1476" height="998" alt="caskhub-dark" src="https://github.com/user-attachments/assets/75577218-85dc-42b7-886b-0d6e26587212" />
 
 ## Install
 
