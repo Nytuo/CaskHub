@@ -34,6 +34,7 @@ final class LocalHomebrewService {
         = { AppManagementPermission.assess(target: $0) }
 
     @ObservationIgnored private var activationObserver: (any NSObjectProtocol)?
+    @ObservationIgnored private let notificationCenter: NotificationCenter
 
     @ObservationIgnored let operationStore: CaskOperationStore
 
@@ -102,6 +103,7 @@ final class LocalHomebrewService {
         let operationStore = CaskOperationStore()
 
         fileManager = dependencies.fileManager
+        notificationCenter = dependencies.notificationCenter
         self.defaults = defaults
         applicationDirectories = dependencies.applicationDirectories
             ?? ApplicationDiscovery.defaultDirectories(
@@ -137,7 +139,7 @@ final class LocalHomebrewService {
     private func observeApplicationActivation() {
         // The permission-request alert tells the user to grant App Management and
         // come back — returning to the app is the cue to finish those adoptions.
-        activationObserver = NotificationCenter.default.addObserver(
+        activationObserver = notificationCenter.addObserver(
             forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
@@ -154,7 +156,7 @@ final class LocalHomebrewService {
 
     deinit {
         if let activationObserver {
-            NotificationCenter.default.removeObserver(activationObserver)
+            notificationCenter.removeObserver(activationObserver)
         }
     }
 
