@@ -159,10 +159,12 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
         let finishedCount: Int
         let total: Int
 
-        func sentence(installingLabel: (CaskOperationProgress) -> String) -> String {
+        /// The count always comes last; `bytes` goes before it for surfaces that pin the count in place.
+        func sentence(bytes: CaskByteProgress?, installingLabel: (CaskOperationProgress) -> String) -> String {
             var parts = installing.map { [installingLabel($0)] } ?? []
             if isDownloading || parts.isEmpty {
-                parts.append("\(CaskOperationPhase.downloading.label(for: .installing))…")
+                let downloading = "\(CaskOperationPhase.downloading.label(for: .installing))…"
+                parts.append(([downloading] + (bytes.map { [$0.text] } ?? [])).joined(separator: " "))
             }
             return parts.joined(separator: " · ") + " " + String(localized: "(\(finishedCount) of \(total))")
         }
@@ -210,7 +212,7 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
             finishedCount: progress.finishedCount,
             total: progress.total
         )
-        let sentence = batch.sentence { "\($0.phase.label(for: $0.action)) \($0.displayName)…" }
+        let sentence = batch.sentence(bytes: nil) { "\($0.phase.label(for: $0.action)) \($0.displayName)…" }
         let queued = phaseCounts(members.filter { $0.phase == .queued })
         let onlyDownload = downloads.count == 1 ? downloads.first : nil
         var status = CaskOperationStatus(

@@ -260,7 +260,7 @@ final class CaskOperationProgressTests: XCTestCase {
 
         XCTAssertEqual(status?.message, "\(installing) App 1… · \(downloading)… \(count(1, of: 8)) · 1 \(queued)")
         XCTAssertEqual(
-            status?.batch?.sentence { "Pouring \($0.displayName)…" },
+            status?.batch?.sentence(bytes: nil) { "Pouring \($0.displayName)…" },
             "Pouring App 1… · \(downloading)… \(count(1, of: 8))"
         )
     }
@@ -278,6 +278,11 @@ final class CaskOperationProgressTests: XCTestCase {
 
         XCTAssertNil(status?.batch?.installing)
         XCTAssertEqual(status?.message, "\(downloading)… \(count(3, of: 5)) · 12 / 34 MB")
+        XCTAssertEqual(
+            status?.batch?.sentence(bytes: status?.byteProgress) { _ in "" },
+            "\(downloading)… 12 / 34 MB \(count(3, of: 5))",
+            "the sheet keeps the count last so it stays put at the trailing edge"
+        )
     }
 
     func test_batch_status_drops_downloading_when_only_an_install_is_left() {

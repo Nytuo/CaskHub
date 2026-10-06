@@ -200,6 +200,8 @@ struct BrewfileImportSheet: View {
                 .font(CHType.statusMono)
                 .foregroundStyle(Color.chTextMuted)
                 .lineLimit(2, reservesSpace: true)
+                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.vertical, 8)
     }
@@ -207,8 +209,9 @@ struct BrewfileImportSheet: View {
     private var progressText: String {
         guard let status = localHomebrew.statusBarOperation else { return " " }
         guard let batch = status.batch else { return status.message }
-        let sentence = batch.sentence { String(localized: .shelfSetupBrewfileSheetPouring($0.displayName)) }
-        return ([sentence] + (status.byteProgress.map { [$0.text] } ?? [])).joined(separator: " · ")
+        return batch.sentence(bytes: status.byteProgress) {
+            String(localized: .shelfSetupBrewfileSheetPouring($0.displayName))
+        }
     }
 
     @ViewBuilder private func summary(failedCount: Int) -> some View {
