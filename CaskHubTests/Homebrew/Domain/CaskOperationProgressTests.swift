@@ -229,35 +229,77 @@ final class CaskOperationProgressTests: XCTestCase {
             .label(for: .updatingHomebrew)
             .lowercased()
         XCTAssertEqual(
-            CaskOperationStatus.make(operations: operations, updateAll: nil)?.message,
+            CaskOperationStatus.make(operations: operations, batch: nil)?.message,
             "\(summary) · 1 \(downloading) · 1 \(updating) · 1 \(updatingHomebrew)"
         )
     }
 
-    func test_operation_status_appends_current_update_all_download() {
-        let operation = CaskOperationProgress(
-            token: "docker",
-            displayName: "Docker Desktop",
-            action: .updating,
-            phase: .downloading,
-            completedBytes: 84_000_000,
-            totalBytes: 245_000_000
-        )
-        let updateAll = CaskUpdateAllProgress(
-            currentIndex: 3,
-            totalCount: 8,
-            currentToken: "docker",
-            currentDisplayName: "Docker Desktop"
-        )
-        let message = CaskOperationStatus.make(
-            operations: [operation],
-            updateAll: updateAll
-        )?.message
+    func test_operation_status_counts_queued_work_last() {
+        let operations = ["a", "b", "c"].map {
+            CaskOperationProgress(token: $0, displayName: $0, action: .updating, phase: $0 == "a" ? .downloading : .queued)
+        }
+        let summary = String(localized: "\(3) operations in progress")
+        let downloading = CaskOperationPhase.downloading.label(for: .updating).lowercased()
+        let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
 
         XCTAssertEqual(
-            message,
-            "Updating 3 of 8 · Docker Desktop · 84 / 245 MB"
+            CaskOperationStatus.make(operations: operations, batch: nil)?.message,
+            "\(summary) · 1 \(downloading) · 2 \(queued)"
         )
+    }
+
+    func test_batch_status_keeps_one_sentence_while_an_app_installs_and_others_download() {
+        let phases: [CaskOperationPhase] = [.downloading, .performing, .queued, .verifying]
+        let operations = phases.enumerated().map {
+            CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .installing, phase: $0.element)
+        }
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 8).map { "t\($0)" }), finishedCount: 1)
+        let status = CaskOperationStatus.make(operations: operations, batch: batch)
+        let installing = CaskOperationPhase.performing.label(for: .installing)
+        let queued = CaskOperationPhase.queued.label(for: .installing).lowercased()
+
+        XCTAssertEqual(status?.message, "\(installing) App 1… · \(downloading)… \(count(1, of: 8)) · 1 \(queued)")
+        XCTAssertEqual(
+            status?.batch?.sentence(bytes: nil) { "Pouring \($0.displayName)…" },
+            "Pouring App 1… · \(downloading)… \(count(1, of: 8))"
+        )
+    }
+
+    func test_batch_status_shows_bytes_for_a_single_download_and_ignores_outside_apps() {
+        let operations = [
+            CaskOperationProgress(
+                token: "t0", displayName: "App 0", action: .updating, phase: .downloading,
+                completedBytes: 12_000_000, totalBytes: 34_000_000
+            ),
+            CaskOperationProgress(token: "other", displayName: "Other", action: .uninstalling, phase: .performing)
+        ]
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 3)
+        let status = CaskOperationStatus.make(operations: operations, batch: batch)
+
+        XCTAssertNil(status?.batch?.installing)
+        XCTAssertEqual(status?.message, "\(downloading)… \(count(3, of: 5)) · 12 / 34 MB")
+        XCTAssertEqual(
+            status?.batch?.sentence(bytes: status?.byteProgress) { _ in "" },
+            "\(downloading)… 12 / 34 MB \(count(3, of: 5))",
+            "the sheet keeps the count last so it stays put at the trailing edge"
+        )
+    }
+
+    func test_batch_status_drops_downloading_when_only_an_install_is_left() {
+        let operations = [CaskOperationProgress(token: "t4", displayName: "App 4", action: .updating, phase: .performing)]
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 4)
+        let updating = CaskOperationPhase.performing.label(for: .updating)
+
+        XCTAssertEqual(
+            CaskOperationStatus.make(operations: operations, batch: batch)?.message,
+            "\(updating) App 4… \(count(4, of: 5))"
+        )
+    }
+
+    private var downloading: String { CaskOperationPhase.downloading.label(for: .installing) }
+
+    private func count(_ finished: Int, of total: Int) -> String {
+        String(localized: "(\(finished) of \(total))")
     }
 
     @MainActor

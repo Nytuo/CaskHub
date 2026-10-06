@@ -33,7 +33,7 @@ nonisolated struct BrewfileImportPlan: Identifiable {
 
 nonisolated enum BrewfileImportPhase: Equatable {
     case preview
-    case running(index: Int)
+    case running(completedCount: Int)
     case done(failedCount: Int)
 }
 
@@ -68,8 +68,8 @@ struct BrewfileImportSheet: View {
             switch phase {
             case .preview:
                 preview
-            case let .running(index):
-                progress(index: index)
+            case let .running(completedCount):
+                progress(completedCount: completedCount)
             case let .done(failedCount):
                 summary(failedCount: failedCount)
             }
@@ -183,28 +183,35 @@ struct BrewfileImportSheet: View {
         .overlay(alignment: .top) { Color.chHairline.frame(height: 1) }
     }
 
-    private func progress(index: Int) -> some View {
+    private func progress(completedCount: Int) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             GeometryReader { geo in
                 Capsule()
                     .fill(Color.chTerracotta)
                     .frame(
-                        width: geo.size.width * CGFloat(index) / CGFloat(selectedEntries.count)
+                        width: geo.size.width * CGFloat(completedCount) / CGFloat(selectedEntries.count)
                     )
             }
             .frame(height: 8)
             .background(Capsule().fill(Color.chSurfaceField))
             .overlay(Capsule().strokeBorder(Color.chHairline, lineWidth: 1))
-            .animation(.linear(duration: 0.15), value: index)
-            Text(String(localized: .shelfSetupBrewfileSheetPouring(
-                selectedEntries[index].displayName,
-                index + 1,
-                selectedEntries.count
-            )))
-            .font(CHType.statusMono)
-            .foregroundStyle(Color.chTextMuted)
+            .animation(.linear(duration: 0.15), value: completedCount)
+            Text(verbatim: progressText)
+                .font(CHType.statusMono)
+                .foregroundStyle(Color.chTextMuted)
+                .lineLimit(2, reservesSpace: true)
+                .multilineTextAlignment(.trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.vertical, 8)
+    }
+
+    private var progressText: String {
+        guard let status = localHomebrew.statusBarOperation else { return " " }
+        guard let batch = status.batch else { return status.message }
+        return batch.sentence(bytes: status.byteProgress) {
+            String(localized: .shelfSetupBrewfileSheetPouring($0.displayName))
+        }
     }
 
     @ViewBuilder private func summary(failedCount: Int) -> some View {
@@ -238,16 +245,10 @@ struct BrewfileImportSheet: View {
 
     private func runImport() {
         guard case .preview = phase, !selectedEntries.isEmpty else { return }
-        phase = .running(index: 0)
+        phase = .running(completedCount: 0)
         Task {
-            var failedCount = 0
-            for (index, entry) in selectedEntries.enumerated() {
-                phase = .running(index: index)
-                do {
-                    try await localHomebrew.install(token: entry.token)
-                } catch {
-                    failedCount += 1
-                }
+            let failedCount = await localHomebrew.installAll(tokens: selectedEntries.map(\.token)) {
+                phase = .running(completedCount: $0)
             }
             phase = .done(failedCount: failedCount)
         }

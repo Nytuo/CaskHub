@@ -160,7 +160,7 @@ final class ShelfSetupViewTests: XCTestCase {
             ]
         )
         let phases: [BrewfileImportPhase] = [
-            .preview, .running(index: 0), .done(failedCount: 0), .done(failedCount: 1)
+            .preview, .running(completedCount: 1), .done(failedCount: 0), .done(failedCount: 1)
         ]
         for phase in phases {
             render(BrewfileImportSheet(plan: plan, phase: phase)
