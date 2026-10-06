@@ -201,7 +201,7 @@ extension LocalHomebrewService {
         onFinished: (Int) -> Void,
         operation: @escaping @MainActor (String) async throws -> Void
     ) async -> Int {
-        let reportsProgress = operationStore.beginBatch(total: tokens.count)
+        let reportsProgress = operationStore.beginBatch(tokens: Set(tokens))
         defer { if reportsProgress { operationStore.endBatch() } }
         return await withTaskGroup(of: Bool.self) { group in
             for token in tokens {

@@ -146,8 +146,10 @@ nonisolated struct CaskByteProgress: Equatable, Sendable {
 }
 
 nonisolated struct CaskBatchProgress: Equatable, Sendable {
-    let total: Int
+    let tokens: Set<String>
     var finishedCount = 0
+
+    var total: Int { tokens.count }
 }
 
 nonisolated struct CaskOperationStatus: Equatable, Sendable {
@@ -192,7 +194,7 @@ nonisolated struct CaskOperationStatus: Equatable, Sendable {
     }
 
     private static func make(batch: CaskBatchProgress, operations: [CaskOperationProgress]) -> CaskOperationStatus {
-        guard let current = operations.first(where: { $0.phase == .performing }) else {
+        guard let current = operations.first(where: { $0.phase == .performing && batch.tokens.contains($0.token) }) else {
             let lead = String(localized: "Downloading… (\(batch.finishedCount) of \(batch.total))")
             let details = phaseCounts(operations.filter { $0.phase == .queued })
             return CaskOperationStatus(label: ([lead] + details).joined(separator: " · "))

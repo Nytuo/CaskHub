@@ -132,11 +132,11 @@ final class CaskOperationStoreTests: XCTestCase {
     func test_batch_progress_has_one_owner_and_needs_more_than_one_app() {
         let store = CaskOperationStore()
 
-        XCTAssertFalse(store.beginBatch(total: 1))
-        XCTAssertTrue(store.beginBatch(total: 3))
-        XCTAssertFalse(store.beginBatch(total: 5))
+        XCTAssertFalse(store.beginBatch(tokens: ["a"]))
+        XCTAssertTrue(store.beginBatch(tokens: ["a", "b", "c"]))
+        XCTAssertFalse(store.beginBatch(tokens: ["d", "e"]))
         store.advanceBatch()
-        XCTAssertEqual(store.batch, CaskBatchProgress(total: 3, finishedCount: 1))
+        XCTAssertEqual(store.batch, CaskBatchProgress(tokens: ["a", "b", "c"], finishedCount: 1))
 
         store.endBatch()
         XCTAssertNil(store.batch)

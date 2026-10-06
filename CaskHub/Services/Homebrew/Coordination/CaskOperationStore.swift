@@ -49,9 +49,9 @@ final class CaskOperationStore {
     }
 
     /// Only one batch reports progress at a time.
-    func beginBatch(total: Int) -> Bool {
-        guard batch == nil, total > 1 else { return false }
-        batch = CaskBatchProgress(total: total)
+    func beginBatch(tokens: Set<String>) -> Bool {
+        guard batch == nil, tokens.count > 1 else { return false }
+        batch = CaskBatchProgress(tokens: tokens)
         return true
     }
 

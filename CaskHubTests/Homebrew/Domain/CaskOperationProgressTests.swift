@@ -253,7 +253,7 @@ final class CaskOperationProgressTests: XCTestCase {
         let operations = phases.enumerated().map {
             CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .installing, phase: $0.element)
         }
-        let batch = CaskBatchProgress(total: 8, finishedCount: 1)
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 8).map { "t\($0)" }), finishedCount: 1)
         let status = CaskOperationStatus.make(operations: operations, batch: batch)
         let lead = "\(CaskOperationPhase.performing.label(for: .installing)) App 1"
         let downloading = CaskOperationPhase.downloading.label(for: .installing).lowercased()
@@ -267,12 +267,13 @@ final class CaskOperationProgressTests: XCTestCase {
         )
     }
 
-    func test_batch_status_reads_downloading_until_an_install_starts() {
+    func test_batch_status_reads_downloading_until_one_of_its_apps_is_installed() {
         let phases: [CaskOperationPhase] = [.downloading, .preparing, .verifying, .queued]
-        let operations = phases.enumerated().map {
+        var operations = phases.enumerated().map {
             CaskOperationProgress(token: "t\($0.offset)", displayName: "App \($0.offset)", action: .updating, phase: $0.element)
         }
-        let batch = CaskBatchProgress(total: 5, finishedCount: 1)
+        operations.append(CaskOperationProgress(token: "other", displayName: "Other", action: .uninstalling, phase: .performing))
+        let batch = CaskBatchProgress(tokens: Set((0 ..< 5).map { "t\($0)" }), finishedCount: 1)
         let status = CaskOperationStatus.make(operations: operations, batch: batch)
         let queued = CaskOperationPhase.queued.label(for: .updating).lowercased()
 
