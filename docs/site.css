@@ -758,7 +758,7 @@ footer {
   object-fit: contain;
 }
 
-@media (max-width: 860px) {
+@media (width <= 860px) {
   .wrap {
     padding-inline: 24px;
   }
@@ -796,7 +796,7 @@ footer {
   }
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .wrap {
     padding-inline: 20px;
   }
