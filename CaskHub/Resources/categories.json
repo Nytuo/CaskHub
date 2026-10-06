@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedDate": "2026-09-20",
-  "totalCasks": 3971,
+  "generatedDate": "2026-10-05",
+  "totalCasks": 4001,
   "categories": {
     "developerTools": {
       "displayName": "Developer Tools",
@@ -197,10 +197,6 @@
     },
     "ableton-live-suite": {
       "primary": "audioMusic",
-      "secondary": []
-    },
-    "abstract": {
-      "primary": "designGraphics",
       "secondary": []
     },
     "abyssoft-teleport": {
@@ -675,6 +671,12 @@
         "utilities"
       ]
     },
+    "amp-app": {
+      "primary": "developerTools",
+      "secondary": [
+        "ai"
+      ]
+    },
     "ampps": {
       "primary": "developerTools",
       "secondary": []
@@ -853,10 +855,6 @@
       "primary": "utilities",
       "secondary": []
     },
-    "app-fair": {
-      "primary": "utilities",
-      "secondary": []
-    },
     "app-tamer": {
       "primary": "utilities",
       "secondary": []
@@ -987,6 +985,10 @@
     },
     "ares-emulator": {
       "primary": "games",
+      "secondary": []
+    },
+    "argo-books": {
+      "primary": "financeCrypto",
       "secondary": []
     },
     "ariax": {
@@ -1972,6 +1974,12 @@
       "primary": "games",
       "secondary": []
     },
+    "buholaunchpad": {
+      "primary": "utilities",
+      "secondary": [
+        "productivity"
+      ]
+    },
     "buildsettingextractor": {
       "primary": "developerTools",
       "secondary": []
@@ -2056,6 +2064,12 @@
     "calcservice": {
       "primary": "utilities",
       "secondary": []
+    },
+    "caldera-amp": {
+      "primary": "audioMusic",
+      "secondary": [
+        "menuBar"
+      ]
     },
     "caldigit-docking-utility": {
       "primary": "other",
@@ -2639,6 +2653,12 @@
     "clickup": {
       "primary": "productivity",
       "secondary": []
+    },
+    "cline-app": {
+      "primary": "developerTools",
+      "secondary": [
+        "ai"
+      ]
     },
     "clion": {
       "primary": "developerTools",
@@ -3228,6 +3248,12 @@
         "utilities"
       ]
     },
+    "cuadriver": {
+      "primary": "developerTools",
+      "secondary": [
+        "ai"
+      ]
+    },
     "cubicsdr": {
       "primary": "scienceEducation",
       "secondary": []
@@ -3291,10 +3317,6 @@
       "secondary": [
         "developerTools"
       ]
-    },
-    "dadroit-json-viewer": {
-      "primary": "developerTools",
-      "secondary": []
     },
     "daedalus-mainnet": {
       "primary": "financeCrypto",
@@ -3550,6 +3572,13 @@
         "ai"
       ]
     },
+    "deepseek-harness": {
+      "primary": "productivity",
+      "secondary": [
+        "ai",
+        "developerTools"
+      ]
+    },
     "deezer": {
       "primary": "audioMusic",
       "secondary": []
@@ -3627,6 +3656,12 @@
     "developerexcuses": {
       "primary": "screensaverWallpaper",
       "secondary": []
+    },
+    "deviceshelf": {
+      "primary": "securityPrivacy",
+      "secondary": [
+        "utilities"
+      ]
     },
     "devilutionx": {
       "primary": "games",
@@ -3836,6 +3871,12 @@
       "primary": "designGraphics",
       "secondary": [
         "videoMedia"
+      ]
+    },
+    "dmenu-mac": {
+      "primary": "utilities",
+      "secondary": [
+        "productivity"
       ]
     },
     "dmg-canvas": {
@@ -4462,10 +4503,6 @@
     },
     "endnote": {
       "primary": "scienceEducation",
-      "secondary": []
-    },
-    "energia": {
-      "primary": "designGraphics",
       "secondary": []
     },
     "energiza": {
@@ -5424,10 +5461,6 @@
       "primary": "designGraphics",
       "secondary": []
     },
-    "fujitsu-scansnap-home": {
-      "primary": "other",
-      "secondary": []
-    },
     "funter": {
       "primary": "utilities",
       "secondary": []
@@ -5789,6 +5822,12 @@
       "primary": "utilities",
       "secondary": []
     },
+    "gloomberb": {
+      "primary": "financeCrypto",
+      "secondary": [
+        "developerTools"
+      ]
+    },
     "gluemotion": {
       "primary": "videoMedia",
       "secondary": []
@@ -6100,6 +6139,12 @@
       "primary": "designGraphics",
       "secondary": []
     },
+    "hagimimonitordirect": {
+      "primary": "menuBar",
+      "secondary": [
+        "utilities"
+      ]
+    },
     "halion-sonic": {
       "primary": "audioMusic",
       "secondary": []
@@ -6277,6 +6322,12 @@
       "primary": "utilities",
       "secondary": []
     },
+    "highball": {
+      "primary": "games",
+      "secondary": [
+        "utilities"
+      ]
+    },
     "highlight-ai": {
       "primary": "productivity",
       "secondary": [
@@ -6301,9 +6352,22 @@
       "primary": "securityPrivacy",
       "secondary": []
     },
+    "hol-guard": {
+      "primary": "securityPrivacy",
+      "secondary": [
+        "developerTools",
+        "ai"
+      ]
+    },
     "holavpn": {
       "primary": "securityPrivacy",
       "secondary": []
+    },
+    "holst": {
+      "primary": "productivity",
+      "secondary": [
+        "designGraphics"
+      ]
     },
     "home-assistant": {
       "primary": "utilities",
@@ -6398,10 +6462,6 @@
       "secondary": []
     },
     "hubstaff": {
-      "primary": "productivity",
-      "secondary": []
-    },
-    "huly": {
       "primary": "productivity",
       "secondary": []
     },
@@ -6544,6 +6604,18 @@
     "idagio": {
       "primary": "audioMusic",
       "secondary": []
+    },
+    "ideashell": {
+      "primary": "productivity",
+      "secondary": [
+        "ai"
+      ]
+    },
+    "ideashell-cn": {
+      "primary": "productivity",
+      "secondary": [
+        "ai"
+      ]
     },
     "idevice-pair": {
       "primary": "developerTools",
@@ -7043,10 +7115,6 @@
       "primary": "videoMedia",
       "secondary": []
     },
-    "jet-pilot": {
-      "primary": "developerTools",
-      "secondary": []
-    },
     "jetbrains-air": {
       "primary": "developerTools",
       "secondary": [
@@ -7128,6 +7196,12 @@
     "journey": {
       "primary": "productivity",
       "secondary": []
+    },
+    "jpki": {
+      "primary": "securityPrivacy",
+      "secondary": [
+        "productivity"
+      ]
     },
     "jprofiler": {
       "primary": "developerTools",
@@ -7364,6 +7438,12 @@
       "primary": "productivity",
       "secondary": []
     },
+    "keyecho": {
+      "primary": "utilities",
+      "secondary": [
+        "audioMusic"
+      ]
+    },
     "keyguard": {
       "primary": "securityPrivacy",
       "secondary": []
@@ -7438,6 +7518,12 @@
     "kindavim": {
       "primary": "utilities",
       "secondary": []
+    },
+    "kindle-comic-converter": {
+      "primary": "utilities",
+      "secondary": [
+        "designGraphics"
+      ]
     },
     "kindle-create": {
       "primary": "productivity",
@@ -7933,6 +8019,12 @@
       "primary": "securityPrivacy",
       "secondary": []
     },
+    "littlebird": {
+      "primary": "productivity",
+      "secondary": [
+        "ai"
+      ]
+    },
     "live-home-3d": {
       "primary": "designGraphics",
       "secondary": []
@@ -7968,10 +8060,6 @@
         "developerTools"
       ]
     },
-    "lo-rain": {
-      "primary": "utilities",
-      "secondary": []
-    },
     "loading": {
       "primary": "utilities",
       "secondary": []
@@ -7987,6 +8075,13 @@
     "local": {
       "primary": "developerTools",
       "secondary": []
+    },
+    "local-studio": {
+      "primary": "productivity",
+      "secondary": [
+        "ai",
+        "developerTools"
+      ]
     },
     "localcan": {
       "primary": "developerTools",
@@ -8013,6 +8108,12 @@
     "locu": {
       "primary": "productivity",
       "secondary": []
+    },
+    "lody": {
+      "primary": "developerTools",
+      "secondary": [
+        "ai"
+      ]
     },
     "logi-options+": {
       "primary": "other",
@@ -8071,6 +8172,12 @@
     "longplay": {
       "primary": "audioMusic",
       "secondary": []
+    },
+    "look": {
+      "primary": "productivity",
+      "secondary": [
+        "utilities"
+      ]
     },
     "lookaway": {
       "primary": "productivity",
@@ -8563,6 +8670,12 @@
         "ai"
       ]
     },
+    "manus-cue": {
+      "primary": "productivity",
+      "secondary": [
+        "ai"
+      ]
+    },
     "marathon": {
       "primary": "games",
       "secondary": []
@@ -8596,6 +8709,12 @@
     "markedit": {
       "primary": "productivity",
       "secondary": []
+    },
+    "markpad": {
+      "primary": "productivity",
+      "secondary": [
+        "developerTools"
+      ]
     },
     "markright": {
       "primary": "productivity",
@@ -8698,6 +8817,12 @@
     "mdb-accdb-viewer": {
       "primary": "developerTools",
       "secondary": []
+    },
+    "mdhero": {
+      "primary": "productivity",
+      "secondary": [
+        "developerTools"
+      ]
     },
     "mdrp": {
       "primary": "videoMedia",
@@ -9076,6 +9201,12 @@
     "mindmaster-cn": {
       "primary": "productivity",
       "secondary": []
+    },
+    "mindroom": {
+      "primary": "communication",
+      "secondary": [
+        "ai"
+      ]
     },
     "mindwtr": {
       "primary": "productivity",
@@ -9592,12 +9723,6 @@
       "primary": "screensaverWallpaper",
       "secondary": []
     },
-    "muse": {
-      "primary": "productivity",
-      "secondary": [
-        "ai"
-      ]
-    },
     "muse-code": {
       "primary": "developerTools",
       "secondary": [
@@ -9729,6 +9854,12 @@
     "nao": {
       "primary": "developerTools",
       "secondary": []
+    },
+    "napari": {
+      "primary": "scienceEducation",
+      "secondary": [
+        "designGraphics"
+      ]
     },
     "naps2": {
       "primary": "productivity",
@@ -10462,6 +10593,12 @@
         "ai"
       ]
     },
+    "openclip": {
+      "primary": "productivity",
+      "secondary": [
+        "utilities"
+      ]
+    },
     "opencloud": {
       "primary": "cloudStorage",
       "secondary": []
@@ -10936,7 +11073,7 @@
       "primary": "menuBar",
       "secondary": []
     },
-    "pally": {
+    "pallycompanion": {
       "primary": "productivity",
       "secondary": []
     },
@@ -11080,10 +11217,6 @@
     },
     "pd": {
       "primary": "audioMusic",
-      "secondary": []
-    },
-    "pdf-converter-master": {
-      "primary": "productivity",
       "secondary": []
     },
     "pdf-expert": {
@@ -11293,6 +11426,13 @@
       "primary": "other",
       "secondary": []
     },
+    "picsart-ai-playground": {
+      "primary": "designGraphics",
+      "secondary": [
+        "ai",
+        "videoMedia"
+      ]
+    },
     "pictogram": {
       "primary": "designGraphics",
       "secondary": []
@@ -11413,16 +11553,18 @@
         "scienceEducation"
       ]
     },
+    "plane": {
+      "primary": "productivity",
+      "secondary": [
+        "ai"
+      ]
+    },
     "planet": {
       "primary": "developerTools",
       "secondary": []
     },
     "plasticity": {
       "primary": "designGraphics",
-      "secondary": []
-    },
-    "plasticscm-cloud-edition": {
-      "primary": "developerTools",
       "secondary": []
     },
     "platinum-notes": {
@@ -12400,6 +12542,12 @@
       "primary": "productivity",
       "secondary": []
     },
+    "recordly": {
+      "primary": "videoMedia",
+      "secondary": [
+        "designGraphics"
+      ]
+    },
     "rectangle": {
       "primary": "utilities",
       "secondary": []
@@ -12760,6 +12908,10 @@
       "primary": "utilities",
       "secondary": []
     },
+    "robbietilton-compositor": {
+      "primary": "designGraphics",
+      "secondary": []
+    },
     "roblox": {
       "primary": "games",
       "secondary": []
@@ -12856,6 +13008,10 @@
         "ai"
       ]
     },
+    "rowel": {
+      "primary": "securityPrivacy",
+      "secondary": []
+    },
     "rowmote-helper": {
       "primary": "utilities",
       "secondary": []
@@ -12875,6 +13031,12 @@
     "rubymine": {
       "primary": "developerTools",
       "secondary": []
+    },
+    "ruffle": {
+      "primary": "videoMedia",
+      "secondary": [
+        "utilities"
+      ]
     },
     "runelite": {
       "primary": "games",
@@ -12970,6 +13132,12 @@
       "primary": "utilities",
       "secondary": []
     },
+    "sandisk": {
+      "primary": "utilities",
+      "secondary": [
+        "cloudStorage"
+      ]
+    },
     "sanesidebuttons": {
       "primary": "menuBar",
       "secondary": []
@@ -13006,6 +13174,10 @@
     },
     "sc-menu": {
       "primary": "utilities",
+      "secondary": []
+    },
+    "scansnap-home": {
+      "primary": "other",
       "secondary": []
     },
     "scapple": {
@@ -13137,6 +13309,12 @@
     "sdm": {
       "primary": "securityPrivacy",
       "secondary": []
+    },
+    "sdrmm-app": {
+      "primary": "scienceEducation",
+      "secondary": [
+        "developerTools"
+      ]
     },
     "seadrive": {
       "primary": "cloudStorage",
@@ -13706,10 +13884,6 @@
       "primary": "utilities",
       "secondary": []
     },
-    "smartsheet": {
-      "primary": "productivity",
-      "secondary": []
-    },
     "smartsvn": {
       "primary": "developerTools",
       "secondary": []
@@ -14183,6 +14357,18 @@
         "developerTools"
       ]
     },
+    "ssl-360": {
+      "primary": "audioMusic",
+      "secondary": [
+        "utilities"
+      ]
+    },
+    "ssl-download-manager": {
+      "primary": "audioMusic",
+      "secondary": [
+        "utilities"
+      ]
+    },
     "stability-matrix": {
       "primary": "designGraphics",
       "secondary": [
@@ -14531,6 +14717,10 @@
       "primary": "menuBar",
       "secondary": []
     },
+    "swiftcord": {
+      "primary": "communication",
+      "secondary": []
+    },
     "swiftdefaultappsprefpane": {
       "primary": "utilities",
       "secondary": []
@@ -14549,10 +14739,6 @@
     },
     "swiftpm-catalog": {
       "primary": "developerTools",
-      "secondary": []
-    },
-    "swifty": {
-      "primary": "securityPrivacy",
       "secondary": []
     },
     "swinsian": {
@@ -14709,10 +14895,6 @@
     },
     "tableflip": {
       "primary": "scienceEducation",
-      "secondary": []
-    },
-    "tablen": {
-      "primary": "developerTools",
       "secondary": []
     },
     "tableplus": {
@@ -15867,6 +16049,10 @@
         "games"
       ]
     },
+    "unity-version-control": {
+      "primary": "developerTools",
+      "secondary": []
+    },
     "unity-webgl-support-for-editor": {
       "primary": "developerTools",
       "secondary": [
@@ -16343,6 +16529,12 @@
       "primary": "audioMusic",
       "secondary": []
     },
+    "volumehud": {
+      "primary": "utilities",
+      "secondary": [
+        "menuBar"
+      ]
+    },
     "voodoopad": {
       "primary": "productivity",
       "secondary": []
@@ -16417,10 +16609,6 @@
     },
     "vysor": {
       "primary": "utilities",
-      "secondary": []
-    },
-    "wacom-inkspace": {
-      "primary": "designGraphics",
       "secondary": []
     },
     "wacom-tablet": {
@@ -16610,6 +16798,12 @@
     "whatsyoursign": {
       "primary": "securityPrivacy",
       "secondary": []
+    },
+    "wheelwizard": {
+      "primary": "games",
+      "secondary": [
+        "utilities"
+      ]
     },
     "whichspace": {
       "primary": "menuBar",
@@ -17101,6 +17295,12 @@
     "yandextelemost": {
       "primary": "communication",
       "secondary": []
+    },
+    "yap-app": {
+      "primary": "productivity",
+      "secondary": [
+        "utilities"
+      ]
     },
     "yate": {
       "primary": "audioMusic",
@@ -18021,6 +18221,12 @@
         "bundleIdentifier": "com.lucas-fischer.Amore"
       }
     ],
+    "amp-app": [
+      {
+        "bundleName": "Amp.app",
+        "bundleIdentifier": "com.ampcode.amp.macos"
+      }
+    ],
     "anarlog": [
       {
         "bundleName": "Anarlog.app",
@@ -18355,6 +18561,12 @@
       {
         "bundleName": "ares.app",
         "bundleIdentifier": "dev.ares.ares"
+      }
+    ],
+    "argo-books": [
+      {
+        "bundleName": "Argo Books.app",
+        "bundleIdentifier": "com.argobooks.ArgoBooks"
       }
     ],
     "ariax": [
@@ -19407,6 +19619,12 @@
         "bundleIdentifier": "io.jor.bugdom2"
       }
     ],
+    "buholaunchpad": [
+      {
+        "bundleName": "BuhoLaunchpad.app",
+        "bundleIdentifier": "com.drbuho.BuhoLaunchpad.Launcher"
+      }
+    ],
     "buildsettingextractor": [
       {
         "bundleName": "BuildSettingExtractor.app",
@@ -19513,6 +19731,12 @@
       {
         "bundleName": "CalcService.app",
         "bundleIdentifier": "org.grunenberg.CalcService"
+      }
+    ],
+    "caldera-amp": [
+      {
+        "bundleName": "Caldera Amp.app",
+        "bundleIdentifier": "com.nextamp.CalderaAmp"
       }
     ],
     "calendar-366": [
@@ -19743,6 +19967,12 @@
         "bundleIdentifier": "com.yourcompany.CEmu"
       }
     ],
+    "chalk": [
+      {
+        "bundleName": "Chalk.app",
+        "bundleIdentifier": "fr.chachatelier.pierre.Chalk"
+      }
+    ],
     "changes": [
       {
         "bundleName": "Changes.app",
@@ -19819,6 +20049,12 @@
       {
         "bundleName": "Cheetah3D.app",
         "bundleIdentifier": "de.wengenmayer.Cheetah3D"
+      }
+    ],
+    "chemdoodle": [
+      {
+        "bundleName": "ChemDoodle.app",
+        "bundleIdentifier": "com.iChemLabs.ChemDoodle"
       }
     ],
     "cherry-studio": [
@@ -19945,6 +20181,12 @@
       {
         "bundleName": "Clariti.app",
         "bundleIdentifier": "io.clariti"
+      }
+    ],
+    "clash-mi": [
+      {
+        "bundleName": "Clash Mi.app",
+        "bundleIdentifier": "com.nebula.clashmi"
       }
     ],
     "clash-verge-rev": [
@@ -20089,6 +20331,12 @@
       {
         "bundleName": "ClickUp.app",
         "bundleIdentifier": "com.clickup.desktop-app"
+      }
+    ],
+    "cline-app": [
+      {
+        "bundleName": "Cline.app",
+        "bundleIdentifier": "bot.cline.app"
       }
     ],
     "clion": [
@@ -20727,6 +20975,12 @@
         "bundleIdentifier": "com.cTiVo.cTiVo"
       }
     ],
+    "cuadriver": [
+      {
+        "bundleName": "CuaDriver.app",
+        "bundleIdentifier": "com.trycua.driver"
+      }
+    ],
     "cubicsdr": [
       {
         "bundleName": "CubicSDR.app",
@@ -21105,6 +21359,12 @@
         "bundleIdentifier": "com.linguee.DeepLCopyTranslator"
       }
     ],
+    "deepseek-harness": [
+      {
+        "bundleName": "DeepSeek Harness.app",
+        "bundleIdentifier": "com.deepseek.dsh"
+      }
+    ],
     "deezer": [
       {
         "bundleName": "Deezer.app",
@@ -21193,6 +21453,12 @@
       {
         "bundleName": "DevCleaner.app",
         "bundleIdentifier": "com.oneminutegames.XcodeCleaner"
+      }
+    ],
+    "deviceshelf": [
+      {
+        "bundleName": "DeviceShelf.app",
+        "bundleIdentifier": "com.wails.DeviceShelf"
       }
     ],
     "devilutionx": [
@@ -21391,6 +21657,12 @@
       {
         "bundleName": "djv.app",
         "bundleIdentifier": "com.grizzlypeak3d.djv"
+      }
+    ],
+    "dmenu-mac": [
+      {
+        "bundleName": "dmenu-mac.app",
+        "bundleIdentifier": "com.onaips.dmenu-macos"
       }
     ],
     "dmg-canvas": [
@@ -23489,6 +23761,12 @@
         "bundleIdentifier": "com.glinet.kvmdesk"
       }
     ],
+    "gloomberb": [
+      {
+        "bundleName": "Gloomberb.app",
+        "bundleIdentifier": "com.vincelwt.gloomberb"
+      }
+    ],
     "gluemotion": [
       {
         "bundleName": "GlueMotion.app",
@@ -23783,6 +24061,12 @@
         "bundleIdentifier": "org.codechimp.HA-Menu"
       }
     ],
+    "hagimimonitordirect": [
+      {
+        "bundleName": "HagimiMonitorDirect.app",
+        "bundleIdentifier": "com.acerola.hagimi-monitor.direct"
+      }
+    ],
     "halloy": [
       {
         "bundleName": "Halloy.app",
@@ -23975,6 +24259,12 @@
         "bundleIdentifier": "design.rafa.HiDock"
       }
     ],
+    "highball": [
+      {
+        "bundleName": "Highball.app",
+        "bundleIdentifier": "app.highball.Highball"
+      }
+    ],
     "highlight-ai": [
       {
         "bundleName": "Highlight.app",
@@ -23999,10 +24289,22 @@
         "bundleIdentifier": "com.hive.app"
       }
     ],
+    "hol-guard": [
+      {
+        "bundleName": "HOL Guard.app",
+        "bundleIdentifier": "org.hol.guard.desktop"
+      }
+    ],
     "holavpn": [
       {
         "bundleName": "HolaVPN2E.app",
         "bundleIdentifier": "org.hola.hola2e"
+      }
+    ],
+    "holst": [
+      {
+        "bundleName": "Holst.app",
+        "bundleIdentifier": "com.holst.desktop"
       }
     ],
     "home-assistant": [
@@ -24275,6 +24577,18 @@
         "bundleIdentifier": "com.idagio.desktop"
       }
     ],
+    "ideashell": [
+      {
+        "bundleName": "ideaShell.app",
+        "bundleIdentifier": "com.rrd.ideashell.global"
+      }
+    ],
+    "ideashell-cn": [
+      {
+        "bundleName": "ideaShell CN.app",
+        "bundleIdentifier": "com.rrd.ideashell"
+      }
+    ],
     "iexplorer": [
       {
         "bundleName": "iExplorer.app",
@@ -24543,6 +24857,12 @@
       {
         "bundleName": "Iris.app",
         "bundleIdentifier": "co.iristech.Iris"
+      }
+    ],
+    "isabelle": [
+      {
+        "bundleName": "Isabelle2025-2.app",
+        "bundleIdentifier": "de.tum.in.isabelle"
       }
     ],
     "ishare": [
@@ -24843,6 +25163,12 @@
         "bundleIdentifier": "com.stclairsoft.Jettison"
       }
     ],
+    "jiba": [
+      {
+        "bundleName": "JiBA.app",
+        "bundleIdentifier": "ink.hee.jibapplemusic"
+      }
+    ],
     "jiggler": [
       {
         "bundleName": "Jiggler.app",
@@ -24901,6 +25227,56 @@
       {
         "bundleName": "Journey.app",
         "bundleIdentifier": "com.journey.mac2"
+      }
+    ],
+    "jpki": [
+      {
+        "bundleName": "JPKI.app",
+        "bundleIdentifier": "jp.go.jpki",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/JPKI.app"
+      },
+      {
+        "bundleName": "JPKIRegistBCA.app",
+        "bundleIdentifier": "JPKIRegistBCA",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIRegistBCA.app"
+      },
+      {
+        "bundleName": "JPKIChangePassword.app",
+        "bundleIdentifier": "jp.go.jpki.JPKIChangePassword",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIChangePassword.app"
+      },
+      {
+        "bundleName": "JPKIUtility.app",
+        "bundleIdentifier": "jp.go.jpki.JPKIUtility",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIUtility.app"
+      },
+      {
+        "bundleName": "JPKIProxySetting.app",
+        "bundleIdentifier": "JPKIProxySetting",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIProxySetting.app"
+      },
+      {
+        "bundleName": "JPKIUninstall.app",
+        "bundleIdentifier": "jp.go.jpki.JPKIUninstall",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIUninstall.app"
+      },
+      {
+        "bundleName": "JPKIChangeAllPassword.app",
+        "bundleIdentifier": "jp.go.jpki.JPKIAllChangePassword",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIChangeAllPassword.app"
+      },
+      {
+        "bundleName": "JPKIUpdateReminderSetting.app",
+        "bundleIdentifier": "jp.go.jpki.JPKIUpdateReminderSetting",
+        "packageIdentifier": "jp.go.jpki",
+        "installedPath": "/Applications/Utilities/JPKI.localized/JPKIUpdateReminderSetting.app"
       }
     ],
     "jprofiler": [
@@ -25233,6 +25609,12 @@
       {
         "bundleName": "KeyCue.app",
         "bundleIdentifier": "com.macility.keycue"
+      }
+    ],
+    "keyecho": [
+      {
+        "bundleName": "KeyEcho.app",
+        "bundleIdentifier": "app.keyecho.keyecho"
       }
     ],
     "keyguard": [
@@ -25823,6 +26205,12 @@
         "bundleIdentifier": "at.obdev.littlesnitch"
       }
     ],
+    "littlebird": [
+      {
+        "bundleName": "Littlebird.app",
+        "bundleIdentifier": "com.genos.littlebird"
+      }
+    ],
     "live-home-3d": [
       {
         "bundleName": "Live Home 3D.app",
@@ -25889,6 +26277,12 @@
         "bundleIdentifier": "com.getflywheel.lightning.local"
       }
     ],
+    "local-studio": [
+      {
+        "bundleName": "Local Studio.app",
+        "bundleIdentifier": "org.local.studio.desktop"
+      }
+    ],
     "localcan": [
       {
         "bundleName": "LocalCan.app",
@@ -25917,6 +26311,12 @@
       {
         "bundleName": "Locu.app",
         "bundleIdentifier": "app.locu"
+      }
+    ],
+    "lody": [
+      {
+        "bundleName": "Lody.app",
+        "bundleIdentifier": "ai.lody.desktop"
       }
     ],
     "loginputmac": [
@@ -25965,6 +26365,12 @@
       {
         "bundleName": "Longplay.app",
         "bundleIdentifier": "app.longplay.Longplay-Mac"
+      }
+    ],
+    "look": [
+      {
+        "bundleName": "Look.app",
+        "bundleIdentifier": "noah-code.Look"
       }
     ],
     "lookaway": [
@@ -26411,6 +26817,12 @@
         "bundleIdentifier": "com.getmailbird.Mailbird"
       }
     ],
+    "mailmaster": [
+      {
+        "bundleName": "MailMaster.app",
+        "bundleIdentifier": "com.netease.macmail"
+      }
+    ],
     "mailmate": [
       {
         "bundleName": "MailMate.app",
@@ -26483,6 +26895,12 @@
         "bundleIdentifier": "im.manus.desktop"
       }
     ],
+    "manus-cue": [
+      {
+        "bundleName": "Cue.app",
+        "bundleIdentifier": "ai.manus.agents"
+      }
+    ],
     "marathon": [
       {
         "bundleName": "Classic Marathon.app",
@@ -26523,6 +26941,12 @@
       {
         "bundleName": "MarkEdit.app",
         "bundleIdentifier": "app.cyan.markedit"
+      }
+    ],
+    "markpad": [
+      {
+        "bundleName": "Markpad.app",
+        "bundleIdentifier": "com.alecdotdev.markpad"
       }
     ],
     "markright": [
@@ -26631,6 +27055,12 @@
       {
         "bundleName": "MDB ACCDB Viewer.app",
         "bundleIdentifier": "at.eggerapps.mdbviewer"
+      }
+    ],
+    "mdhero": [
+      {
+        "bundleName": "MDHero.app",
+        "bundleIdentifier": "com.mdhero.app"
       }
     ],
     "mdrp": [
@@ -27033,6 +27463,12 @@
       {
         "bundleName": "亿图脑图MindMaster.app",
         "bundleIdentifier": "com.edrawsoft.mindmaster"
+      }
+    ],
+    "mindroom": [
+      {
+        "bundleName": "MindRoom.app",
+        "bundleIdentifier": "chat.mindroom.menubar"
       }
     ],
     "mindwtr": [
@@ -28519,6 +28955,12 @@
         "bundleIdentifier": "ai.openclaw.mac"
       }
     ],
+    "openclip": [
+      {
+        "bundleName": "OpenClip.app",
+        "bundleIdentifier": "com.openclip.OpenClip"
+      }
+    ],
     "opencode-desktop": [
       {
         "bundleName": "OpenCode.app",
@@ -28979,6 +29421,12 @@
         "bundleIdentifier": "com.pallotron.yubiswitch"
       }
     ],
+    "pallycompanion": [
+      {
+        "bundleName": "PallyCompanion.app",
+        "bundleIdentifier": "com.pally.companion-kit"
+      }
+    ],
     "palmier-pro": [
       {
         "bundleName": "PalmierPro.app",
@@ -29375,6 +29823,12 @@
         "bundleIdentifier": "com.cantimplorastudio.picmal"
       }
     ],
+    "picsart-ai-playground": [
+      {
+        "bundleName": "AI Playground.app",
+        "bundleIdentifier": "com.picsart.apps.aiplayground"
+      }
+    ],
     "pictogram": [
       {
         "bundleName": "Pictogram.app",
@@ -29511,6 +29965,12 @@
       {
         "bundleName": "PLaMo翻訳.app",
         "bundleIdentifier": "com.pfn.plamo-translation"
+      }
+    ],
+    "plane": [
+      {
+        "bundleName": "Plane.app",
+        "bundleIdentifier": "com.todesktop.2405288gp0ar3qc"
       }
     ],
     "planet": [
@@ -30603,6 +31063,12 @@
         "bundleIdentifier": "com.lapier.Recents"
       }
     ],
+    "recordly": [
+      {
+        "bundleName": "Recordly.app",
+        "bundleIdentifier": "dev.recordly.app"
+      }
+    ],
     "rectangle": [
       {
         "bundleName": "Rectangle.app",
@@ -31023,6 +31489,12 @@
         "bundleIdentifier": "com.roam-research.desktop-app"
       }
     ],
+    "robbietilton-compositor": [
+      {
+        "bundleName": "Compositor.app",
+        "bundleIdentifier": "com.wonderassembly.compositor"
+      }
+    ],
     "roblox": [
       {
         "bundleName": "Roblox.app",
@@ -31119,6 +31591,12 @@
         "bundleIdentifier": "com.rowboat.app"
       }
     ],
+    "rowel": [
+      {
+        "bundleName": "Rowel.app",
+        "bundleIdentifier": "app.rowel.desktop"
+      }
+    ],
     "rowmote-helper": [
       {
         "bundleName": "Rowmote Helper.app",
@@ -31147,6 +31625,12 @@
       {
         "bundleName": "RubyMine.app",
         "bundleIdentifier": "com.jetbrains.rubymine"
+      }
+    ],
+    "ruffle": [
+      {
+        "bundleName": "Ruffle.app",
+        "bundleIdentifier": "rs.ruffle.ruffle"
       }
     ],
     "runelite": [
@@ -31197,6 +31681,12 @@
         "bundleIdentifier": "com.jetbrains.rustrover"
       }
     ],
+    "ruswitcher": [
+      {
+        "bundleName": "RuSwitcher.app",
+        "bundleIdentifier": "com.ruswitcher.app"
+      }
+    ],
     "sabaki": [
       {
         "bundleName": "Sabaki.app",
@@ -31243,6 +31733,12 @@
       {
         "bundleName": "SameBoy.app",
         "bundleIdentifier": "com.github.liji32.sameboy"
+      }
+    ],
+    "sandisk": [
+      {
+        "bundleName": "SANDISK.app",
+        "bundleIdentifier": "com.sandisk.smz2.mac"
       }
     ],
     "sanesidebuttons": [
@@ -31465,6 +31961,12 @@
       {
         "bundleName": "SDM.app",
         "bundleIdentifier": "com.electron.sdm"
+      }
+    ],
+    "sdrmm-app": [
+      {
+        "bundleName": "SDR--.app",
+        "bundleIdentifier": "dev.newspicel.sdrmm"
       }
     ],
     "seafile-client": [
@@ -32053,6 +32555,12 @@
         "bundleIdentifier": "com.shedworx.smartconverterpro3"
       }
     ],
+    "smartgit": [
+      {
+        "bundleName": "SmartGit.app",
+        "bundleIdentifier": "com.syntevo.smartgit"
+      }
+    ],
     "smartreporter-free": [
       {
         "bundleName": "SMARTReporter Free.app",
@@ -32581,6 +33089,26 @@
         "bundleIdentifier": "org.hejki.osx.sshce"
       }
     ],
+    "ssl-360": [
+      {
+        "bundleName": "SSL 360.app",
+        "bundleIdentifier": "com.solidstatelogic.ssl360",
+        "packageIdentifier": "com.sslcontrolroominstaller.pkg",
+        "installedPath": "/Applications/SSL 360.app"
+      },
+      {
+        "bundleName": "SSL 360 Uninstaller.app",
+        "bundleIdentifier": "com.solidstatelogic.SSL-360-Uninstaller",
+        "packageIdentifier": "com.sslcontrolroominstaller.pkg",
+        "installedPath": "/Applications/SSL/SSL 360 Uninstaller.app"
+      }
+    ],
+    "ssl-download-manager": [
+      {
+        "bundleName": "SSL Download Manager.app",
+        "bundleIdentifier": "com.solidstatelogic.downloadmanager"
+      }
+    ],
     "stability-matrix": [
       {
         "bundleName": "Stability Matrix.app",
@@ -32815,6 +33343,12 @@
         "bundleIdentifier": "dk.nikse.subtitleedit"
       }
     ],
+    "subtitle-studio": [
+      {
+        "bundleName": "Subtitle Studio.app",
+        "bundleIdentifier": "ai.subtitlestudio.subtitlestudio"
+      }
+    ],
     "sunsama": [
       {
         "bundleName": "Sunsama.app",
@@ -32941,6 +33475,12 @@
         "bundleIdentifier": "com.eteks.sweethome3d.SweetHome3D"
       }
     ],
+    "swift-im": [
+      {
+        "bundleName": "Swift.app",
+        "bundleIdentifier": "im.swift.Swift"
+      }
+    ],
     "swift-publisher": [
       {
         "bundleName": "Swift Publisher 5.app",
@@ -32963,6 +33503,12 @@
       {
         "bundleName": "SwiftBar.app",
         "bundleIdentifier": "com.ameba.SwiftBar"
+      }
+    ],
+    "swiftcord": [
+      {
+        "bundleName": "Swiftcord.app",
+        "bundleIdentifier": "app.swiftcord"
       }
     ],
     "swiftformat-for-xcode": [
@@ -34681,6 +35227,18 @@
         "bundleIdentifier": "com.ephod.Viso"
       }
     ],
+    "visual-paradigm": [
+      {
+        "bundleName": "Visual Paradigm.app",
+        "bundleIdentifier": "com.install4j.1106-5897-7327-6550.5"
+      }
+    ],
+    "visual-paradigm-ce": [
+      {
+        "bundleName": "Visual Paradigm CE.app",
+        "bundleIdentifier": "com.install4j.1106-5897-7327-6550.5"
+      }
+    ],
     "visual-studio-code": [
       {
         "bundleName": "Visual Studio Code.app",
@@ -34817,6 +35375,12 @@
       {
         "bundleName": "Volume Control.app",
         "bundleIdentifier": "io.alberti42.VolumeControl"
+      }
+    ],
+    "volumehud": [
+      {
+        "bundleName": "volumeHUD.app",
+        "bundleIdentifier": "com.dannystewart.volumehud"
       }
     ],
     "voodoopad": [
@@ -35111,6 +35675,12 @@
       {
         "bundleName": "WhatsApp.app",
         "bundleIdentifier": "net.whatsapp.WhatsApp"
+      }
+    ],
+    "wheelwizard": [
+      {
+        "bundleName": "WheelWizard.app",
+        "bundleIdentifier": "ga.gabema.WheelWizard"
       }
     ],
     "whichspace": [
@@ -35651,6 +36221,12 @@
         "bundleIdentifier": "ru.yandex.desktop.telemost"
       }
     ],
+    "yap-app": [
+      {
+        "bundleName": "Yap.app",
+        "bundleIdentifier": "com.frigade.Yap"
+      }
+    ],
     "yate": [
       {
         "bundleName": "Yate.app",
@@ -35922,8 +36498,8 @@
       }
     ]
   },
-  "metadataUpdatedAt": "2026-09-20T17:44:14.035481+00:00",
-  "releaseTag": "caskflow-v2026.09.20",
+  "metadataUpdatedAt": "2026-10-06T02:52:39.593639+00:00",
+  "releaseTag": "caskflow-v2026.10.06",
   "iconTokens": [
     "0-ad",
     "010-editor",
@@ -36053,6 +36629,7 @@
     "ammonite",
     "amneziavpn",
     "amore",
+    "amp-app",
     "ampps",
     "anaconda",
     "anarlog",
@@ -36118,6 +36695,7 @@
     "arctic",
     "arduino-ide",
     "ares-emulator",
+    "argo-books",
     "ariax",
     "arm-performix",
     "arq",
@@ -36337,6 +36915,7 @@
     "buckets",
     "bugdom",
     "bugdom2",
+    "buholaunchpad",
     "buildsettingextractor",
     "bunch",
     "burn",
@@ -36357,6 +36936,7 @@
     "caffeine",
     "caido",
     "calcservice",
+    "caldera-amp",
     "caldigit-docking-utility",
     "calendar-366",
     "calendr",
@@ -36422,6 +37002,7 @@
     "chatwork",
     "cheetah3d",
     "chef-workstation",
+    "chemdoodle",
     "cherry-studio",
     "chia",
     "chime",
@@ -36476,6 +37057,7 @@
     "clicker-for-youtube",
     "clickshare",
     "clickup",
+    "cline-app",
     "clion",
     "clipaste",
     "clipbook",
@@ -36589,6 +37171,7 @@
     "crystalmaker",
     "crystalviewer",
     "ctivo",
+    "cuadriver",
     "cubicsdr",
     "cura-lulzbot",
     "curio",
@@ -36656,6 +37239,7 @@
     "deeper",
     "deepgit",
     "deepl",
+    "deepseek-harness",
     "deezer",
     "default-folder-x",
     "default-handler",
@@ -36672,6 +37256,7 @@
     "desktoputility",
     "detectx-swift",
     "devcleaner",
+    "deviceshelf",
     "devilutionx",
     "devin-desktop",
     "devin-desktop@next",
@@ -36718,6 +37303,7 @@
     "djstudio",
     "djuced",
     "djv",
+    "dmenu-mac",
     "dmg-canvas",
     "dnclient",
     "dnsmonitor",
@@ -37140,6 +37726,7 @@
     "glide",
     "glide-browser",
     "glkvm",
+    "gloomberb",
     "gluemotion",
     "glyphs",
     "gnome",
@@ -37207,6 +37794,7 @@
     "gzdoom",
     "ha-menu",
     "hackolade",
+    "hagimimonitordirect",
     "halloy",
     "hammerspoon",
     "hamrs-pro",
@@ -37245,12 +37833,15 @@
     "hiddenbar",
     "hides",
     "hidock",
+    "highball",
     "highlight-ai",
     "hightop",
     "historyhound",
     "hive-app",
     "hma-vpn",
+    "hol-guard",
     "holavpn",
+    "holst",
     "home-assistant",
     "homebrew-app",
     "homerow",
@@ -37302,6 +37893,8 @@
     "iconscout",
     "iconset",
     "idagio",
+    "ideashell",
+    "ideashell-cn",
     "idevice-pair",
     "idrive",
     "iem-plugin-suite",
@@ -37357,6 +37950,7 @@
     "ireal-pro",
     "iris",
     "iriunwebcam",
+    "isabelle",
     "ishare",
     "ishowu-instant",
     "islide",
@@ -37427,6 +38021,7 @@
     "josm",
     "jottacloud",
     "journey",
+    "jpki",
     "jprofiler",
     "jslegendre-themeengine",
     "json-viewer",
@@ -37483,6 +38078,7 @@
     "keyclu",
     "keycombiner",
     "keycue",
+    "keyecho",
     "keyguard",
     "keymanager",
     "keymapp",
@@ -37498,6 +38094,7 @@
     "kimi",
     "kimis",
     "kindavim",
+    "kindle-comic-converter",
     "kindle-create",
     "kindle-previewer",
     "kiro",
@@ -37596,6 +38193,7 @@
     "linqpad",
     "litecoin",
     "little-snitch",
+    "littlebird",
     "live-home-3d",
     "livebook",
     "liviable",
@@ -37608,11 +38206,13 @@
     "loaf",
     "lobehub",
     "local",
+    "local-studio",
     "localcan",
     "localsend",
     "locationsimulator",
     "lockrattler",
     "locu",
+    "lody",
     "logi-options+",
     "loginputmac",
     "logitech-camera-settings",
@@ -37625,6 +38225,7 @@
     "lolgato",
     "longbridge-pro",
     "longplay",
+    "look",
     "lookaway",
     "lookin",
     "lookingglassstudio",
@@ -37735,6 +38336,7 @@
     "manictime",
     "manila",
     "manus",
+    "manus-cue",
     "marathon",
     "marathon-2",
     "marathon-infinity",
@@ -37742,6 +38344,7 @@
     "markdown-preview",
     "marked-app",
     "markedit",
+    "markpad",
     "markright",
     "markviewer",
     "marsedit",
@@ -37762,6 +38365,7 @@
     "mcpbundler",
     "mcreator",
     "mdb-accdb-viewer",
+    "mdhero",
     "mdrp",
     "mds",
     "media-center",
@@ -37849,6 +38453,7 @@
     "mindmac",
     "mindmanager",
     "mindmaster-cn",
+    "mindroom",
     "mindwtr",
     "minecraft",
     "minecraft-education",
@@ -38151,6 +38756,7 @@
     "openchamber",
     "openchrom",
     "openclaw",
+    "openclip",
     "opencloud",
     "opencode-desktop",
     "opencomic",
@@ -38249,6 +38855,7 @@
     "paletro",
     "pallotron-yubiswitch",
     "pally",
+    "pallycompanion",
     "palmier-pro",
     "pandora",
     "pangolin",
@@ -38328,6 +38935,7 @@
     "piclist",
     "picmal",
     "picoscope",
+    "picsart-ai-playground",
     "pictogram",
     "pictureview",
     "picview",
@@ -38354,6 +38962,7 @@
     "pixieditor",
     "pixpin",
     "plamo-translate",
+    "plane",
     "planet",
     "plasticity",
     "plasticscm-cloud-edition",
@@ -38565,6 +39174,7 @@
     "reaper",
     "receipts",
     "recents",
+    "recordly",
     "rectangle",
     "rectangle-pro",
     "recut",
@@ -38643,6 +39253,7 @@
     "roam",
     "roam-research",
     "roaringapps",
+    "robbietilton-compositor",
     "roblox",
     "robloxstudio",
     "robofont",
@@ -38665,11 +39276,13 @@
     "routine",
     "rouvy",
     "rowboat",
+    "rowel",
     "rowmote-helper",
     "royal-tsx",
     "rstudio",
     "rsyncui",
     "rubymine",
+    "ruffle",
     "runelite",
     "runescape",
     "runjs",
@@ -38678,6 +39291,7 @@
     "rustcast",
     "rustdesk",
     "rustrover",
+    "ruswitcher",
     "rwts-pdfwriter",
     "sabaki",
     "sabnzbd",
@@ -38690,6 +39304,7 @@
     "sameboy",
     "samsung-magician",
     "sanctum",
+    "sandisk",
     "sanesidebuttons",
     "santa",
     "sapmachine-jdk",
@@ -38698,6 +39313,7 @@
     "satyrn",
     "sauerbraten",
     "sc-menu",
+    "scansnap-home",
     "scapple",
     "scatter",
     "scene-maestro",
@@ -38730,6 +39346,7 @@
     "scummvm-app",
     "sdformatter",
     "sdm",
+    "sdrmm-app",
     "seadrive",
     "seafile-client",
     "seam-app",
@@ -38950,6 +39567,8 @@
     "ssdreporter-free",
     "ssh-config-editor",
     "sshfs-mac",
+    "ssl-360",
+    "ssl-download-manager",
     "stability-matrix",
     "stack",
     "stand",
@@ -39026,6 +39645,7 @@
     "swift-quit",
     "swift-shift",
     "swiftbar",
+    "swiftcord",
     "swiftdialog",
     "swiftformat-for-xcode",
     "swiftplantumlapp",
@@ -39304,6 +39924,7 @@
     "unite",
     "unity",
     "unity-hub",
+    "unity-version-control",
     "universal-media-server",
     "unnaturalscrollwheels",
     "unpkg",
@@ -39376,6 +39997,8 @@
     "viscosity",
     "visit",
     "viso",
+    "visual-paradigm",
+    "visual-paradigm-ce",
     "visual-studio-code",
     "visual-studio-code@insiders",
     "visualboyadvance-m",
@@ -39404,6 +40027,7 @@
     "voiden",
     "volanta",
     "volume-control",
+    "volumehud",
     "voodoopad",
     "voov-meeting",
     "vorssaint",
@@ -39464,6 +40088,7 @@
     "whatroute",
     "whatsapp",
     "whatsize",
+    "wheelwizard",
     "whichspace",
     "whimsical",
     "white-rabbit",
@@ -39570,6 +40195,7 @@
     "yandex-music",
     "yandex-music-unofficial",
     "yandextelemost",
+    "yap-app",
     "yate",
     "yattee",
     "yealink-meeting",
@@ -39629,6 +40255,85 @@
     "zwift",
     "zxpinstaller"
   ],
+  "packageProductIdentities": {
+    "gpg-suite": [],
+    "gpg-suite-no-mail": [],
+    "microsoft-excel": [
+      {
+        "bundleName": "Microsoft Excel.app",
+        "bundleIdentifier": "com.microsoft.Excel",
+        "packageIdentifier": "com.microsoft.package.Microsoft_Excel.app",
+        "installedPath": "/Applications/Microsoft Excel.app"
+      }
+    ],
+    "microsoft-office": [],
+    "microsoft-office-businesspro": [],
+    "microsoft-onenote": [
+      {
+        "bundleName": "Microsoft OneNote.app",
+        "bundleIdentifier": "com.microsoft.onenote.mac",
+        "packageIdentifier": "com.microsoft.package.Microsoft_OneNote.app",
+        "installedPath": "/Applications/Microsoft OneNote.app"
+      }
+    ],
+    "microsoft-outlook": [
+      {
+        "bundleName": "Microsoft Outlook.app",
+        "bundleIdentifier": "com.microsoft.Outlook",
+        "packageIdentifier": "com.microsoft.package.Microsoft_Outlook.app",
+        "installedPath": "/Applications/Microsoft Outlook.app"
+      }
+    ],
+    "microsoft-powerpoint": [
+      {
+        "bundleName": "Microsoft PowerPoint.app",
+        "bundleIdentifier": "com.microsoft.Powerpoint",
+        "packageIdentifier": "com.microsoft.package.Microsoft_PowerPoint.app",
+        "installedPath": "/Applications/Microsoft PowerPoint.app"
+      }
+    ],
+    "microsoft-teams": [
+      {
+        "bundleName": "Microsoft Teams.app",
+        "bundleIdentifier": "com.microsoft.teams2",
+        "packageIdentifier": "com.microsoft.teams2",
+        "installedPath": "/Applications/Microsoft Teams.app"
+      }
+    ],
+    "microsoft-word": [
+      {
+        "bundleName": "Microsoft Word.app",
+        "bundleIdentifier": "com.microsoft.Word",
+        "packageIdentifier": "com.microsoft.package.Microsoft_Word.app",
+        "installedPath": "/Applications/Microsoft Word.app"
+      }
+    ],
+    "onedrive": [
+      {
+        "bundleName": "OneDrive.app",
+        "bundleIdentifier": "com.microsoft.OneDrive",
+        "packageIdentifier": "com.microsoft.OneDrive",
+        "installedPath": "/Applications/OneDrive.app"
+      }
+    ],
+    "realvnc-connect": [
+      {
+        "bundleName": "RealVNC Connect.app",
+        "bundleIdentifier": "com.realvnc.rvncconnect",
+        "packageIdentifier": "com.realvnc.rvncconnect.1",
+        "installedPath": "/Applications/RealVNC Connect.app"
+      }
+    ],
+    "realvnc-connect-viewer": [
+      {
+        "bundleName": "RealVNC Connect Viewer.app",
+        "bundleIdentifier": "com.realvnc.rvncconnect",
+        "packageIdentifier": "com.realvnc.rvncconnect.viewer.1",
+        "installedPath": "/Applications/RealVNC Connect Viewer.app"
+      }
+    ],
+    "soundtoys": []
+  },
   "packageAppCandidates": {
     "arq": [
       {
@@ -39712,6 +40417,20 @@
         "bundleIdentifier": "com.teamviewer.TeamViewer",
         "packageIdentifier": "com.teamviewer.teamviewer",
         "installedPath": "/Applications/TeamViewer.app"
+      }
+    ],
+    "unity-version-control": [
+      {
+        "bundleName": "PlasticSCM.app",
+        "bundleIdentifier": "com.codicesoftware.plasticscm",
+        "packageIdentifier": "com.codicesoftware.plasticscm.macplastic",
+        "installedPath": "/Applications/PlasticSCM.app"
+      },
+      {
+        "bundleName": "PlasticSCMServer.app",
+        "bundleIdentifier": "com.codicesoftware.plasticscm.server",
+        "packageIdentifier": "com.codicesoftware.plasticscm.server",
+        "installedPath": "/Applications/PlasticSCMServer.app"
       }
     ],
     "virtualbox": [
