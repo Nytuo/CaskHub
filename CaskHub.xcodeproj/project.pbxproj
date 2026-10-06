@@ -128,6 +128,7 @@
 		C12000000000000000000001 /* BrewProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12000000000000000000001 /* BrewProcessRunner.swift */; };
 		C12000000000000000000002 /* added_dates.json in Resources */ = {isa = PBXBuildFile; fileRef = D12000000000000000000002 /* added_dates.json */; };
 		C12000000000000000000010 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D12000000000000000000010 /* Localizable.xcstrings */; };
+		C12000000000000000000011 /* WhatsNew.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D12000000000000000000011 /* WhatsNew.xcstrings */; };
 		C13000000000000000000001 /* LocalHomebrewService+Mutations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13000000000000000000001 /* LocalHomebrewService+Mutations.swift */; };
 		C13000000000000000000002 /* MutationRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13000000000000000000002 /* MutationRecoveryTests.swift */; };
 		C15000000000000000000001 /* ExternalInstallationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15000000000000000000001 /* ExternalInstallationTests.swift */; };
@@ -315,6 +316,7 @@
 		D12000000000000000000001 /* BrewProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrewProcessRunner.swift; sourceTree = "<group>"; };
 		D12000000000000000000002 /* added_dates.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = added_dates.json; sourceTree = "<group>"; };
 		D12000000000000000000010 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		D12000000000000000000011 /* WhatsNew.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = WhatsNew.xcstrings; sourceTree = "<group>"; };
 		D13000000000000000000001 /* LocalHomebrewService+Mutations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalHomebrewService+Mutations.swift"; sourceTree = "<group>"; };
 		D13000000000000000000002 /* MutationRecoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutationRecoveryTests.swift; sourceTree = "<group>"; };
 		D15000000000000000000001 /* ExternalInstallationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalInstallationTests.swift; sourceTree = "<group>"; };
@@ -463,6 +465,7 @@
 				41DFD46930028F7D00608C7A /* categories.json */,
 				D12000000000000000000002 /* added_dates.json */,
 				D12000000000000000000010 /* Localizable.xcstrings */,
+				D12000000000000000000011 /* WhatsNew.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1058,6 +1061,7 @@
 				41DFD48930028F7D00608C7A /* categories.json in Resources */,
 				C12000000000000000000002 /* added_dates.json in Resources */,
 				C12000000000000000000010 /* Localizable.xcstrings in Resources */,
+				C12000000000000000000011 /* WhatsNew.xcstrings in Resources */,
 				41DFD48A30028F7D00608C7A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

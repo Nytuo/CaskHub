@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "feature1.detail" : {
+      "comment" : "What's New card: description of feature row 1. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cleaner, native appearance joins Classic. Switch any time in Settings, Appearance."
+          }
+        }
+      }
+    },
+    "feature1.title" : {
+      "comment" : "What's New card: title of feature row 1. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A New Standard Look"
+          }
+        }
+      }
+    },
+    "feature2.detail" : {
+      "comment" : "What's New card: description of feature row 2. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search, sorting, and view controls now live in the system toolbar."
+          }
+        }
+      }
+    },
+    "feature2.title" : {
+      "comment" : "What's New card: title of feature row 2. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Native Toolbar"
+          }
+        }
+      }
+    },
+    "feature3.detail" : {
+      "comment" : "What's New card: description of feature row 3. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icons fill their tiles at full size and load without flicker."
+          }
+        }
+      }
+    },
+    "feature3.title" : {
+      "comment" : "What's New card: title of feature row 3. The text is rewritten for each announced release.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharper App Icons"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

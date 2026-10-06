@@ -20,18 +20,18 @@ struct WhatsNewRelease {
     static let latest = WhatsNewRelease(version: "0.9.0", features: [
         Feature(
             symbol: "paintbrush",
-            title: .launchCardWhatsNewStandardLookTitle,
-            detail: .launchCardWhatsNewStandardLookDetail
+            title: .WhatsNew.feature1Title,
+            detail: .WhatsNew.feature1Detail
         ),
         Feature(
             symbol: "macwindow",
-            title: .launchCardWhatsNewToolbarTitle,
-            detail: .launchCardWhatsNewToolbarDetail
+            title: .WhatsNew.feature2Title,
+            detail: .WhatsNew.feature2Detail
         ),
         Feature(
             symbol: "app.badge.checkmark",
-            title: .launchCardWhatsNewIconsTitle,
-            detail: .launchCardWhatsNewIconsDetail
+            title: .WhatsNew.feature3Title,
+            detail: .WhatsNew.feature3Detail
         )
     ])
 }

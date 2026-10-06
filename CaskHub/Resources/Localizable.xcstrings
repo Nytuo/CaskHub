@@ -6211,54 +6211,6 @@
         }
       }
     },
-    "launchCard.whatsNew.icons.detail" : {
-      "comment" : "What's New card, 0.9.0: description of the app icons feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Icons fill their tiles at full size and load without flicker."
-          }
-        }
-      }
-    },
-    "launchCard.whatsNew.icons.title" : {
-      "comment" : "What's New card, 0.9.0: title of the app icons feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sharper App Icons"
-          }
-        }
-      }
-    },
-    "launchCard.whatsNew.standardLook.detail" : {
-      "comment" : "What's New card, 0.9.0: description of the Standard appearance feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A cleaner, native appearance joins Classic. Switch any time in Settings, Appearance."
-          }
-        }
-      }
-    },
-    "launchCard.whatsNew.standardLook.title" : {
-      "comment" : "What's New card, 0.9.0: title of the Standard appearance feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A New Standard Look"
-          }
-        }
-      }
-    },
     "launchCard.whatsNew.title" : {
       "comment" : "Title of the What's New card and of its Help menu item",
       "extractionState" : "manual",
@@ -6267,30 +6219,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "What's New in CaskHub"
-          }
-        }
-      }
-    },
-    "launchCard.whatsNew.toolbar.detail" : {
-      "comment" : "What's New card, 0.9.0: description of the system toolbar feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search, sorting, and view controls now live in the system toolbar."
-          }
-        }
-      }
-    },
-    "launchCard.whatsNew.toolbar.title" : {
-      "comment" : "What's New card, 0.9.0: title of the system toolbar feature row",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Native Toolbar"
           }
         }
       }
