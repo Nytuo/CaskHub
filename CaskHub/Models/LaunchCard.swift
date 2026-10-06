@@ -24,14 +24,19 @@ struct WhatsNewRelease {
             detail: .WhatsNew.feature1Detail
         ),
         Feature(
-            symbol: "macwindow",
+            symbol: "arrow.down.circle",
             title: .WhatsNew.feature2Title,
             detail: .WhatsNew.feature2Detail
         ),
         Feature(
-            symbol: "app.badge.checkmark",
+            symbol: "arrow.triangle.2.circlepath",
             title: .WhatsNew.feature3Title,
             detail: .WhatsNew.feature3Detail
+        ),
+        Feature(
+            symbol: "tray.2",
+            title: .WhatsNew.feature4Title,
+            detail: .WhatsNew.feature4Detail
         )
     ])
 }
