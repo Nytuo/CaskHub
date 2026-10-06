@@ -59,24 +59,24 @@ final class ConcurrentDownloadTests: XCTestCase {
         for token in ["a", "b", "c"] { XCTAssertNil(service.operationStore.state(for: token)) }
     }
 
-    func test_eleventh_download_waits_for_a_slot() async {
+    func test_fourth_download_waits_for_a_slot() async {
         let executor = ControlledHomebrewCommandExecutor()
         let service = makeService(executor)
-        let tokens = (0 ..< 11).map { "cask\($0)" }
+        let tokens = (0 ..< 4).map { "cask\($0)" }
         let tasks = tokens.map { token in Task { try? await service.install(token: token) } }
-        await executor.waitForRequests(10)
-        await settle { service.operationStore.state(for: "cask10")?.progress?.phase == .queued }
+        await executor.waitForRequests(3)
+        await settle { service.operationStore.state(for: "cask3")?.progress?.phase == .queued }
 
-        XCTAssertEqual(executor.running("fetch").count, 10)
-        XCTAssertEqual(service.operationStore.state(for: "cask10")?.progress?.phase, .queued)
-        XCTAssertEqual(service.operationStore.state(for: "cask10")?.canCancel, true)
+        XCTAssertEqual(executor.running("fetch").count, 3)
+        XCTAssertEqual(service.operationStore.state(for: "cask3")?.progress?.phase, .queued)
+        XCTAssertEqual(service.operationStore.state(for: "cask3")?.canCancel, true)
 
         executor.finish("cask0")
-        await settle { executor.running("fetch").contains("cask10") }
-        XCTAssertTrue(executor.running("fetch").contains("cask10"))
+        await settle { executor.running("fetch").contains("cask3") }
+        XCTAssertTrue(executor.running("fetch").contains("cask3"))
 
         await finishEverything(executor, tasks)
-        XCTAssertEqual(executor.maxActive["fetch"], 10)
+        XCTAssertEqual(executor.maxActive["fetch"], 3)
         XCTAssertEqual(executor.maxActive["install"], 1)
     }
 
@@ -252,7 +252,7 @@ final class ConcurrentDownloadTests: XCTestCase {
         LocalHomebrewService(defaults: makeScratchDefaults("concurrent-\(UUID().uuidString)")) {
             $0.fileManager = NoFilesFileManager()
             $0.commandExecutor = executor
-            $0.laneLimiter = sharingLanesWithMaintenance ? nil : HomebrewLaneLimiter(downloadLimit: 10)
+            $0.laneLimiter = sharingLanesWithMaintenance ? nil : HomebrewLaneLimiter(downloadLimit: 3)
             $0.softwareScanner = EmptyInstalledSoftwareScanner()
             $0.askpassProvider = { URL(fileURLWithPath: "/private/tmp/caskhub-test-askpass-\($0)") }
             $0.brewBinaryProvider = { URL(fileURLWithPath: "/test/bin/brew") }

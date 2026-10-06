@@ -15,7 +15,7 @@ final class HomebrewLaneLimiter {
         case exclusive
     }
 
-    static let shared = HomebrewLaneLimiter(downloadLimit: 10)
+    static let shared = HomebrewLaneLimiter(downloadLimit: 3)
 
     private struct Waiter {
         let lane: Lane
