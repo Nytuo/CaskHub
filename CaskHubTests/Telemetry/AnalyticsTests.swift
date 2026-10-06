@@ -319,20 +319,32 @@ final class AnalyticsTests: XCTestCase {
 
     func test_launch_card_event_names_and_parameters() {
         Analytics.launchCardShown(.welcome)
-        Analytics.launchCardDismissed(.welcome, page: 3)
+        Analytics.welcomeLookConfirmed(.classic)
+        Analytics.launchCardDismissed(.welcome, page: 3, style: .classic)
         Analytics.launchCardShown(.whatsNew)
-        Analytics.launchCardDismissed(.whatsNew)
+        Analytics.launchCardDismissed(.whatsNew, style: .native)
 
         XCTAssertEqual(spy.signals.map(\.name), [
-            "LaunchCard.shown", "LaunchCard.dismissed",
+            "LaunchCard.shown", "LaunchCard.lookConfirmed", "LaunchCard.dismissed",
             "LaunchCard.shown", "LaunchCard.dismissed"
         ])
         XCTAssertEqual(spy.signals.map(\.parameters), [
             ["kind": "welcome"],
-            ["kind": "welcome", "page": "3"],
+            ["style": "classic"],
+            ["kind": "welcome", "page": "3", "style": "classic"],
             ["kind": "whatsNew"],
-            ["kind": "whatsNew"]
+            ["kind": "whatsNew", "style": "native"]
         ])
+    }
+
+    func test_welcome_look_confirmation_sends_once_per_distinct_style() {
+        var confirmation = WelcomeLookConfirmation()
+        confirmation.confirm(.native)
+        confirmation.confirm(.native)
+        confirmation.confirm(.classic)
+
+        XCTAssertEqual(spy.signals.map(\.name), ["LaunchCard.lookConfirmed", "LaunchCard.lookConfirmed"])
+        XCTAssertEqual(spy.signals.map(\.parameters), [["style": "native"], ["style": "classic"]])
     }
 
     // MARK: - Crash-report breadcrumbs
