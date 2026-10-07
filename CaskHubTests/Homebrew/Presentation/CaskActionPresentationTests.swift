@@ -212,6 +212,18 @@ final class AdoptionViewRenderTests: XCTestCase {
     }
 
     @MainActor
+    func test_alert_sheet_presentation_waits_for_the_current_update_to_finish() async {
+        var presented = false
+        CaskActionAlertFactory.presentAfterUpdate { presented = true }
+
+        XCTAssertFalse(presented)
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async { continuation.resume() }
+        }
+        XCTAssertTrue(presented)
+    }
+
+    @MainActor
     func test_uninstall_alert_shows_copyable_command_with_destructive_button() {
         let service = LocalHomebrewService(defaults: makeScratchDefaults("uninstall-alert"))
         let alert = CaskActionAlertFactory.uninstallAlert(for: makeCask("iina", name: "IINA"), service: service)
