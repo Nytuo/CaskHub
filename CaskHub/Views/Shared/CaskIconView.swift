@@ -48,7 +48,7 @@ struct CaskIconView: View {
             }
         }
         .animation(.easeIn(duration: 0.2), value: loadedImage != nil)
-        .task(id: [cask.iconKey, imageCache.iconHash(for: cask.token) ?? "", String(imageCache.iconRefreshRevision), String(localHomebrew?.catalogStateRevision ?? 0)]) {
+        .task(id: iconTaskID) {
             didResolve = false
             var image = await imageCache.image(for: cask)
             if image == nil { image = installedAppIcon }
@@ -56,6 +56,15 @@ struct CaskIconView: View {
             loadedImage = image
             didResolve = true
         }
+    }
+
+    private var iconTaskID: [String] {
+        [
+            cask.iconKey,
+            imageCache.iconHash(for: cask.token) ?? "",
+            String(imageCache.iconRefreshRevision),
+            String(localHomebrew?.catalogStateRevision ?? 0)
+        ]
     }
 
     private var installedAppIcon: NSImage? {

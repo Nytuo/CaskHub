@@ -42,7 +42,12 @@ struct TapsView: View {
                 remove(tap)
             }
         } message: { tap in
-            Text("Casks from \(tap.name) will no longer appear in CaskHub. Installed apps are kept, and Homebrew refuses to untap while any of them is still installed.")
+            Text(
+                """
+                Casks from \(tap.name) will no longer appear in CaskHub. Installed apps are kept, \
+                and Homebrew refuses to untap while any of them is still installed.
+                """
+            )
         }
     }
 
@@ -293,7 +298,12 @@ struct TapsSettingsView: View {
                     }
                     .disabled(isWorking)
                 }
-                Text("Tap apps use the installed app's icon, or Icons/<token>.png from the tap's GitHub repository. Reset the icon cache after pushing a new icon.")
+                Text(
+                    """
+                    Tap apps use the installed app's icon, or Icons/<token>.png from the tap's GitHub repository. \
+                    Reset the icon cache after pushing a new icon.
+                    """
+                )
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
